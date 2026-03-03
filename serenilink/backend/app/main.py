@@ -12,6 +12,7 @@ from app.api.routes.progress import router as progress_router
 from app.api.routes.chat import router as chat_router
 from app.api.routes.counselor_applications import router as counselor_applications_router
 from app.api.routes.availability import router as availability_router
+from app.api.routes.ai import router as ai_router
 
 
 from app.db.session import engine
@@ -38,5 +39,6 @@ app.include_router(progress_router)
 app.include_router(chat_router)
 app.include_router(counselor_applications_router)
 app.include_router(availability_router)
+app.include_router(ai_router)
 
 Base.metadata.create_all(bind=engine)
