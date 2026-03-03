@@ -11,10 +11,11 @@ from app.api.routes.booking import router as bookings_router
 from app.api.routes.progress import router as progress_router
 from app.api.routes.chat import router as chat_router
 from app.api.routes.counselor_applications import router as counselor_applications_router
+from app.api.routes.availability import router as availability_router
 
 
 from app.db.session import engine
-from app.models import User, Content, Assessment, Counselor, Booking, Progress, ChatMessage
+from app.models import User, Content, Assessment, Counselor, Booking, Progress, ChatMessage, AvailabilitySlot
 from app.db.base import Base
 
 app = FastAPI(title=settings.APP_NAME)
@@ -36,5 +37,6 @@ app.include_router(bookings_router)
 app.include_router(progress_router)
 app.include_router(chat_router)
 app.include_router(counselor_applications_router)
+app.include_router(availability_router)
 
 Base.metadata.create_all(bind=engine)

@@ -40,7 +40,7 @@ def list_my_assessments(
         .all()
     )
 
-@router.get("me/summary")
+@router.get("/me/summary")
 def my_summary(
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user),

@@ -13,6 +13,8 @@ class Booking(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), index=True, nullable=False)
     counselor_id: Mapped[int] = mapped_column(Integer, ForeignKey("counselors.id"), index=True, nullable=False)
 
+    slot_id: Mapped[int] = mapped_column(Integer, ForeignKey("availability_slots.id"), index=True, nullable=False)
+
     scheduled_for: Mapped[datetime] = mapped_column(DateTime, nullable=False)  # requested session time
     reason: Mapped[str | None] = mapped_column(String(300), nullable=True)
 

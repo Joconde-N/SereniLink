@@ -5,3 +5,4 @@ from .counselor import Counselor
 from .booking import Booking
 from .progress import Progress
 from .chat import ChatMessage
+from .availability import AvailabilitySlot
