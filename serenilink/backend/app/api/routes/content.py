@@ -18,7 +18,7 @@ def list_content(
     query = db.query(Content).filter(Content.is_published == True)
 
     if category:
-        query = query.filter(Content.category.ilike(category))
+        query = query.filter(Content.category.ilike(f"%{category}%"))
 
     if q:
         like = f"%{q}%"

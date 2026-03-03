@@ -1,5 +1,6 @@
-from sqlalchemy import String, Integer
+from sqlalchemy import String, Integer, Boolean, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
+from datetime import datetime
 
 from app.db.base import Base
 
@@ -13,3 +14,7 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
 
     role: Mapped[str] = mapped_column(String(20), default="user")  # user | counselor(doc) | admin
+
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

@@ -9,7 +9,7 @@ class ContentCreate(BaseModel):
     category: str = Field(min_length=2, max_length=60)
     tags: str | None = Field(default=None, max_length=200)
 
-    is_published: bool = True
+    is_published: bool = False
 
 class ContentUpdate(BaseModel):
     title: str | None = Field(default=None, min_length=3, max_length=200)

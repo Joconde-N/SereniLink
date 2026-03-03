@@ -27,16 +27,24 @@ def get_current_user(
     """
     try:
         payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
-        user_id_str: str | None = payload.get("sub")
-        if not user_id_str:
+        subject: str | None = payload.get("sub")
+        if not subject:
             raise HTTPException(status_code=401, detail="Invalid token")
-        user_id = int(user_id_str)
+        user_id = int(subject)
     except (JWTError, ValueError):
         raise HTTPException(status_code=401, detail="Invalid or expired token")
-
+    
+    try:
+        user_id = int(subject)
+    except ValueError:
+        raise HTTPException(status_code=401, detail="Invalid token subject")
+    
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
+    
+    if hasattr(user, "is_active") and not user.is_active:
+        raise HTTPException(status_code=403, detail="User account is disabled")
 
     return user
 

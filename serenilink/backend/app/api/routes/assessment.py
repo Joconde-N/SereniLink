@@ -73,9 +73,9 @@ def my_summary(
             "total_checkins": int(avg[3]),
         },
         "last_7_days": {
-            "avg_mood": to_float(avg[0]),
-            "avg_stress": to_float(avg[1]),
-            "avg_sleep": to_float(avg[2]),
-            "checkins": int(avg[3]),    
+            "avg_mood": to_float(avg7[0]),
+            "avg_stress": to_float(avg7[1]),
+            "avg_sleep": to_float(avg7[2]),
+            "checkins": int(avg7[3]),    
         }
     }
