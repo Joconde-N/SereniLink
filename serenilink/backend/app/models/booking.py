@@ -20,6 +20,8 @@ class Booking(Base):
 
     # workflow status
     status: Mapped[str] = mapped_column(String(20), default="PENDING", index=True)
+    
+    payment_status: Mapped[str] = mapped_column(String(20), default="PENDING", index=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

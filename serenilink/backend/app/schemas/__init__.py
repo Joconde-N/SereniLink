@@ -9,3 +9,6 @@ from .chat import ChatCreate, ChatOut
 from .counselor import CounselorApplicationSubmit, CounselorPublicOut, CounselorAdminOut
 from .availability import AvailabilityCreate, AvailabilityOut
 from .ai import AIChatIn, AIChatOut, AIConversationOut, AIMessageOut
+from .mood import MoodCreate, MoodOut
+from .exercise import ExerciseCreate, ExerciseOut
+from .notification import NotificationOut, NotificationMarkRead

@@ -103,7 +103,7 @@ def ai_chat(
         {
             "role": "system",
             "content": (
-                "You are SereniLink AI Support. Be kind, supportive, and practical. "
+                "You are SereniLink AI Support. Be kind, supportive, practical and answer any question clearly. "
                 "Do not provide harmful instructions. Encourage professional help when appropriate."
             )
         }

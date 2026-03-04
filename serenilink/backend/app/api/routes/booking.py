@@ -2,17 +2,32 @@ from datetime import datetime, date, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from app.api.deps import get_db, get_current_user, require_admin
 from app.models.booking import Booking
 from app.models.counselor import Counselor
 from app.models.availability import AvailabilitySlot
-from app.schemas.booking import BookingCreate, BookingUpdateStatus, BookingOut
+from app.models.notification import Notification
+from app.schemas.booking import (
+    BookingCreate,
+    BookingUpdateStatus,
+    BookingUpdatePayment,
+    BookingOut,
+)
 
 router = APIRouter(prefix="/bookings", tags=["Bookings"])
 
 ALLOWED_STATUSES = {"PENDING", "APPROVED", "DECLINED", "COMPLETED", "CANCELLED"}
 COUNSELOR_ALLOWED = {"APPROVED", "DECLINED", "COMPLETED", "CANCELLED"}
+PAYMENT_ALLOWED = {"PENDING", "PAID", "WAIVED"}
+
+
+def create_notification(db: Session, user_id: int, title: str, message: str):
+    note = Notification(user_id=user_id, title=title, message=message, is_read=False)
+    db.add(note)
+    db.commit()
+
 
 def _get_counselor_profile_for_user(db: Session, user_id: int) -> Counselor:
     counselor = db.query(Counselor).filter(
@@ -20,18 +35,21 @@ def _get_counselor_profile_for_user(db: Session, user_id: int) -> Counselor:
         Counselor.is_active == True,
         Counselor.application_status == "APPROVED",
     ).first()
-    if not counselor: 
+    if not counselor:
         raise HTTPException(status_code=403, detail="Counselor access required")
     return counselor
 
+
 def _booking_access_check(db: Session, booking: Booking, current_user) -> tuple[bool, bool, bool]:
     is_owner = booking.user_id == current_user.id
+
     counselor = db.query(Counselor).filter(Counselor.id == booking.counselor_id).first()
     is_booked_counselor = (counselor is not None and counselor.user_id == current_user.id)
 
     is_admin = getattr(current_user, "role", "") == "admin"
     return is_owner, is_booked_counselor, is_admin
- 
+
+
 @router.post("/", response_model=BookingOut, status_code=201)
 def create_booking(
     payload: BookingCreate,
@@ -59,7 +77,6 @@ def create_booking(
     if slot.start_time <= datetime.utcnow():
         raise HTTPException(status_code=409, detail="Slot must be in the future")
 
-    # Create booking using slot start_time as scheduled_for
     item = Booking(
         user_id=current_user.id,
         counselor_id=counselor.id,
@@ -67,16 +84,26 @@ def create_booking(
         scheduled_for=slot.start_time,
         reason=payload.reason,
         status="PENDING",
+        payment_status="PENDING",
+        created_at=datetime.utcnow(),
         updated_at=datetime.utcnow(),
-    ) 
+    )
 
-    # Mark slot booked immediately (prevents double booking)
     slot.status = "BOOKED"
     slot.updated_at = datetime.utcnow()
 
     db.add(item)
     db.commit()
     db.refresh(item)
+
+    # Notify counselor of new request
+    create_notification(
+        db,
+        counselor.user_id,
+        "New Booking Request",
+        "You have a new booking request pending approval."
+    )
+
     return item
 
 
@@ -112,7 +139,7 @@ def list_all_bookings(
 
 
 @router.patch("/{booking_id}/status", response_model=BookingOut)
-def update_booking_status(
+def update_booking_status_admin(
     booking_id: int,
     payload: BookingUpdateStatus,
     db: Session = Depends(get_db),
@@ -126,15 +153,60 @@ def update_booking_status(
     if new_status not in ALLOWED_STATUSES:
         raise HTTPException(status_code=409, detail=f"Invalid status. Allowed: {sorted(list(ALLOWED_STATUSES))}")
 
-    # rule: cannot approve/complete past sessions
     if new_status in ("APPROVED", "COMPLETED") and item.scheduled_for <= datetime.utcnow():
         raise HTTPException(status_code=409, detail="Cannot set APPROVED/COMPLETED for past bookings")
 
     item.status = new_status
     item.updated_at = datetime.utcnow()
 
+    # Free slot if admin cancels/declines
+    if new_status in ("CANCELLED", "DECLINED"):
+        slot = db.query(AvailabilitySlot).filter(AvailabilitySlot.id == item.slot_id).first()
+        if slot:
+            slot.status = "AVAILABLE"
+            slot.updated_at = datetime.utcnow()
+
     db.commit()
     db.refresh(item)
+
+    create_notification(
+        db,
+        item.user_id,
+        "Booking Status Updated",
+        f"Your booking status is now: {new_status}"
+    )
+
+    return item
+
+
+@router.patch("/{booking_id}/payment", response_model=BookingOut)
+def admin_update_payment_status(
+    booking_id: int,
+    payload: BookingUpdatePayment,
+    db: Session = Depends(get_db),
+    _admin=Depends(require_admin),
+):
+    item = db.query(Booking).filter(Booking.id == booking_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Booking not found")
+
+    new_ps = payload.payment_status.upper()
+    if new_ps not in PAYMENT_ALLOWED:
+        raise HTTPException(status_code=409, detail=f"Invalid payment_status. Allowed: {sorted(list(PAYMENT_ALLOWED))}")
+
+    item.payment_status = new_ps
+    item.updated_at = datetime.utcnow()
+
+    db.commit()
+    db.refresh(item)
+
+    create_notification(
+        db,
+        item.user_id,
+        "Payment Status Updated",
+        f"Your booking payment status is now: {new_ps}"
+    )
+
     return item
 
 
@@ -157,14 +229,29 @@ def cancel_my_booking(
     item.status = "CANCELLED"
     item.updated_at = datetime.utcnow()
 
-    # free the slot again
     slot = db.query(AvailabilitySlot).filter(AvailabilitySlot.id == item.slot_id).first()
     if slot:
         slot.status = "AVAILABLE"
         slot.updated_at = datetime.utcnow()
 
     db.commit()
+
+    # notify counselor
+    counselor = db.query(Counselor).filter(Counselor.id == item.counselor_id).first()
+    if counselor:
+        create_notification(
+            db,
+            counselor.user_id,
+            "Booking Cancelled",
+            "A user cancelled a booking that was scheduled with you."
+        )
+
     return None
+
+
+# =========================
+# Counselor booking views
+# =========================
 
 @router.get("/counselor/me", response_model=list[BookingOut])
 def counselor_my_bookings(
@@ -182,6 +269,7 @@ def counselor_my_bookings(
 
     return q.order_by(Booking.scheduled_for.asc()).offset(skip).limit(limit).all()
 
+
 @router.get("/counselor/me/stats")
 def counselor_my_stats(
     db: Session = Depends(get_db),
@@ -193,42 +281,19 @@ def counselor_my_stats(
     today_start = datetime.combine(date.today(), datetime.min.time())
     today_end = today_start + timedelta(days=1)
 
-    # total bookings under this counselor
-    total = (
-        db.query(Booking)
-        .filter(Booking.counselor_id == counselor.id)
-        .count()
-    )
-
-    # pending requests
-    pending = (
-        db.query(Booking)
-        .filter(
-            Booking.counselor_id == counselor.id,
-            Booking.status == "PENDING"
-        ).count()
-    )
-
-    # today's sessions (pending or approved happening today)
-    today = (
-        db.query(Booking)
-        .filter(
-            Booking.counselor_id == counselor.id,
-            Booking.scheduled_for >= today_start,
-            Booking.scheduled_for < today_end,
-            Booking.status.in_(["PENDING", "APPROVED"])
-        ).count()
-    )
-
-    # upcoming approved sessions
-    upcoming = (
-        db.query(Booking)
-        .filter(
-            Booking.counselor_id == counselor.id,
-            Booking.scheduled_for >= now,
-            Booking.status == "APPROVED"
-        ).count()
-    )
+    total = db.query(Booking).filter(Booking.counselor_id == counselor.id).count()
+    pending = db.query(Booking).filter(Booking.counselor_id == counselor.id, Booking.status == "PENDING").count()
+    today = db.query(Booking).filter(
+        Booking.counselor_id == counselor.id,
+        Booking.scheduled_for >= today_start,
+        Booking.scheduled_for < today_end,
+        Booking.status.in_(["PENDING", "APPROVED"])
+    ).count()
+    upcoming = db.query(Booking).filter(
+        Booking.counselor_id == counselor.id,
+        Booking.scheduled_for >= now,
+        Booking.status == "APPROVED"
+    ).count()
 
     return {
         "total_bookings": total,
@@ -236,6 +301,7 @@ def counselor_my_stats(
         "today_sessions": today,
         "upcoming_approved": upcoming,
     }
+
 
 @router.patch("/{booking_id}/counselor-status", response_model=BookingOut)
 def counselor_update_booking_status(
@@ -255,18 +321,13 @@ def counselor_update_booking_status(
 
     new_status = payload.status.upper()
     if new_status not in COUNSELOR_ALLOWED:
-        raise HTTPException(
-            status_code=409,
-            detail=f"Invalid status for counselor. Allowed: {sorted(list(COUNSELOR_ALLOWED))}"
-        )
+        raise HTTPException(status_code=409, detail=f"Invalid status. Allowed: {sorted(list(COUNSELOR_ALLOWED))}")
 
-    # rules to keep workflow clean
     if item.status in ("CANCELLED", "DECLINED", "COMPLETED"):
         raise HTTPException(status_code=409, detail=f"Cannot change status from {item.status}")
 
-    if new_status == "APPROVED":
-        if item.scheduled_for <= datetime.utcnow():
-            raise HTTPException(status_code=409, detail="Cannot approve a past booking")
+    if new_status == "APPROVED" and item.scheduled_for <= datetime.utcnow():
+        raise HTTPException(status_code=409, detail="Cannot approve a past booking")
 
     if new_status == "COMPLETED":
         if item.status != "APPROVED":
@@ -274,19 +335,7 @@ def counselor_update_booking_status(
         if item.scheduled_for > datetime.utcnow():
             raise HTTPException(status_code=409, detail="Cannot complete a booking that is in the future")
 
-    if new_status == "CANCELLED":
-        # counselor can cancel only if not yet completed
-        if item.status == "COMPLETED":
-            raise HTTPException(status_code=409, detail="Completed booking cannot be cancelled")
-
-        # free the slot
-        slot = db.query(AvailabilitySlot).filter(AvailabilitySlot.id == item.slot_id).first()
-        if slot:
-            slot.status = "AVAILABLE"
-            slot.updated_at = datetime.utcnow()
-
-    if new_status == "DECLINED":
-        # free the slot too
+    if new_status in ("CANCELLED", "DECLINED"):
         slot = db.query(AvailabilitySlot).filter(AvailabilitySlot.id == item.slot_id).first()
         if slot:
             slot.status = "AVAILABLE"
@@ -297,11 +346,22 @@ def counselor_update_booking_status(
 
     db.commit()
     db.refresh(item)
+
+    # notify user
+    if new_status == "APPROVED":
+        create_notification(db, item.user_id, "Booking Approved", "Your booking was approved. You can now view contact details.")
+    elif new_status == "DECLINED":
+        create_notification(db, item.user_id, "Booking Declined", "Your booking request was declined. You can choose another slot.")
+    elif new_status == "CANCELLED":
+        create_notification(db, item.user_id, "Booking Cancelled", "Your booking was cancelled by the counselor.")
+    elif new_status == "COMPLETED":
+        create_notification(db, item.user_id, "Session Completed", "Your session was marked as completed.")
+
     return item
 
 
 # =========================
-# NEW: Contact details after approval
+# Contact details after approval
 # =========================
 
 @router.get("/{booking_id}/contact")

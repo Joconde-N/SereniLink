@@ -13,10 +13,15 @@ from app.api.routes.chat import router as chat_router
 from app.api.routes.counselor_applications import router as counselor_applications_router
 from app.api.routes.availability import router as availability_router
 from app.api.routes.ai import router as ai_router
+from app.api.routes.moods import router as moods_router
+from app.api.routes.exercises import router as exercises_router
+from app.api.routes.notifications import router as notifications_router
+from app.api.routes.dashboard import router as dashboard_router
+from app.api.routes.admin_users import router as admin_users_router
 
 
 from app.db.session import engine
-from app.models import User, Content, Assessment, Counselor, Booking, Progress, ChatMessage, AvailabilitySlot
+from app.models import User, Content, Assessment, Counselor, Booking, Progress, ChatMessage, AvailabilitySlot, AIConversation, AIMessage, MoodEntry, Exercise, Notification
 from app.db.base import Base
 
 app = FastAPI(title=settings.APP_NAME)
@@ -40,5 +45,10 @@ app.include_router(chat_router)
 app.include_router(counselor_applications_router)
 app.include_router(availability_router)
 app.include_router(ai_router)
+app.include_router(moods_router)
+app.include_router(exercises_router)
+app.include_router(notifications_router)
+app.include_router(dashboard_router)
+app.include_router(admin_users_router)
 
 Base.metadata.create_all(bind=engine)
