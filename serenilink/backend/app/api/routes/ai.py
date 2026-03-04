@@ -1,11 +1,15 @@
-from fastapi import APIRouter, Depends
+from datetime import datetime
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, get_current_user
 from app.core.ai_client import get_ai_client, get_ai_model
-from app.schemas.ai import AIChatIn, AIChatOut
+from app.models.ai_conversation import AIConversation
+from app.models.ai_message import AIMessage
+from app.schemas.ai import AIChatIn, AIChatOut, AIConversationOut, AIMessageOut
 
 router = APIRouter(prefix="/ai", tags=["AI Support"])
+
 
 def detect_risk(message: str) -> str:
     msg = message.lower()
@@ -21,14 +25,32 @@ def detect_risk(message: str) -> str:
             return "MODERATE"
     return "LOW"
 
-def high_risk_reply() -> str:
-    # keep it supportive + encourage reaching out
+
+def safe_high_risk_reply() -> str:
+    # supportive, not graphic, and encourages reaching out
     return (
-        "I’m really sorry you’re feeling this way. You don’t have to handle this alone. "
-        "If you’re in danger right now, please call Rwanda emergency services (112) or health services (114). "
-        "If you’re a child/teen and need help, you can also call 116. "
-        "If you can, reach out to a trusted adult or someone close to you right now."
+        "I’m really sorry you’re feeling this way. You don’t have to handle it alone. "
+        "If you feel unsafe right now, please reach out to a trusted person nearby or local emergency support. "
+        "If you want, tell me what’s going on — I can help you find a safer next step."
     )
+
+
+def get_or_create_conversation(db: Session, user_id: int, conversation_id: int | None) -> AIConversation:
+    if conversation_id is None:
+        conv = AIConversation(user_id=user_id)
+        db.add(conv)
+        db.commit()
+        db.refresh(conv)
+        return conv
+
+    conv = db.query(AIConversation).filter(
+        AIConversation.id == conversation_id,
+        AIConversation.user_id == user_id
+    ).first()
+    if not conv:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    return conv
+
 
 @router.post("/chat", response_model=AIChatOut)
 def ai_chat(
@@ -36,24 +58,62 @@ def ai_chat(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
+    conv = get_or_create_conversation(db, current_user.id, payload.conversation_id)
+
     risk = detect_risk(payload.message)
 
-    if risk == "HIGH":
-        return {"reply": high_risk_reply(), "risk_level": risk}
+    # Save user message first
+    user_msg = AIMessage(
+        conversation_id=conv.id,
+        role="user",
+        content=payload.message,
+        risk_level=risk,
+    )
+    db.add(user_msg)
+    db.commit()
 
-    client = get_ai_client()
-    model = get_ai_model()
+    # If HIGH risk: do NOT call external AI
+    if risk == "HIGH":
+        reply_text = safe_high_risk_reply()
+
+        ai_msg = AIMessage(
+            conversation_id=conv.id,
+            role="assistant",
+            content=reply_text,
+            risk_level=risk,
+        )
+        db.add(ai_msg)
+        db.commit()
+
+        return {"conversation_id": conv.id, "reply": reply_text, "risk_level": risk}
+
+    # Fetch last N messages for memory (simple, effective)
+    memory_limit = 10
+    history = (
+        db.query(AIMessage)
+        .filter(AIMessage.conversation_id == conv.id)
+        .order_by(AIMessage.created_at.asc())
+        .all()
+    )
+
+    # keep only last N (user+assistant pairs)
+    history = history[-memory_limit:]
 
     messages = [
         {
             "role": "system",
             "content": (
-                "You are SereniLink AI Support. Be supportive, respectful, and helpful. "
-                "Do not provide harmful instructions. If the user seems in danger, encourage seeking immediate help."
+                "You are SereniLink AI Support. Be kind, supportive, and practical. "
+                "Do not provide harmful instructions. Encourage professional help when appropriate."
             )
-        },
-        {"role": "user", "content": payload.message},
+        }
     ]
+
+    for m in history:
+        messages.append({"role": m.role, "content": m.content})
+
+    client = get_ai_client()
+    model = get_ai_model()
 
     resp = client.chat.completions.create(
         model=model,
@@ -62,5 +122,58 @@ def ai_chat(
         max_tokens=400,
     )
 
-    reply_text = resp.choices[0].message.content
-    return {"reply": reply_text, "risk_level": risk}
+    reply_text = resp.choices[0].message.content or "I’m here with you. Tell me more."
+
+    # Save assistant reply
+    ai_msg = AIMessage(
+        conversation_id=conv.id,
+        role="assistant",
+        content=reply_text,
+        risk_level=risk,
+    )
+    db.add(ai_msg)
+    db.commit()
+
+    return {"conversation_id": conv.id, "reply": reply_text, "risk_level": risk}
+
+
+@router.get("/conversations/me", response_model=list[AIConversationOut])
+def my_conversations(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+    skip: int = 0,
+    limit: int = Query(default=20, le=100),
+):
+    return (
+        db.query(AIConversation)
+        .filter(AIConversation.user_id == current_user.id)
+        .order_by(AIConversation.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+
+@router.get("/conversations/{conversation_id}", response_model=list[AIMessageOut])
+def conversation_messages(
+    conversation_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+    skip: int = 0,
+    limit: int = Query(default=50, le=200),
+):
+    conv = db.query(AIConversation).filter(
+        AIConversation.id == conversation_id,
+        AIConversation.user_id == current_user.id
+    ).first()
+    if not conv:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+
+    return (
+        db.query(AIMessage)
+        .filter(AIMessage.conversation_id == conversation_id)
+        .order_by(AIMessage.created_at.asc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )

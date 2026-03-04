@@ -8,4 +8,4 @@ from .progress import ProgressCreate, ProgressOut
 from .chat import ChatCreate, ChatOut
 from .counselor import CounselorApplicationSubmit, CounselorPublicOut, CounselorAdminOut
 from .availability import AvailabilityCreate, AvailabilityOut
-from .ai import AIChatIn, AIChatOut
+from .ai import AIChatIn, AIChatOut, AIConversationOut, AIMessageOut

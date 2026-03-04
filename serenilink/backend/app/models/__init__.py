@@ -6,3 +6,5 @@ from .booking import Booking
 from .progress import Progress
 from .chat import ChatMessage
 from .availability import AvailabilitySlot
+from .ai_conversation import AIConversation
+from .ai_message import AIMessage
