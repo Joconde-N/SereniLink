@@ -14,8 +14,8 @@ router = APIRouter(prefix="/ai", tags=["AI Support"])
 def detect_risk(message: str) -> str:
     msg = message.lower()
 
-    high = ["suicide", "kill myself", "end my life", "self harm"]
-    moderate = ["hopeless", "worthless", "very depressed"]
+    high = ["suicide", "kill myself", "end my life", "self harm", "self-harm"]
+    moderate = ["hopeless", "worthless", "very depressed", "i can't go on", "i want to disappear"]
 
     for w in high:
         if w in msg:
@@ -27,7 +27,6 @@ def detect_risk(message: str) -> str:
 
 
 def safe_high_risk_reply() -> str:
-    # supportive, not graphic, and encourages reaching out
     return (
         "I’m really sorry you’re feeling this way. You don’t have to handle it alone. "
         "If you feel unsafe right now, please reach out to a trusted person nearby or local emergency support. "
@@ -35,20 +34,31 @@ def safe_high_risk_reply() -> str:
     )
 
 
+# auto-pick latest conversation if none provided
 def get_or_create_conversation(db: Session, user_id: int, conversation_id: int | None) -> AIConversation:
-    if conversation_id is None:
-        conv = AIConversation(user_id=user_id)
-        db.add(conv)
-        db.commit()
-        db.refresh(conv)
+    if conversation_id is not None:
+        conv = db.query(AIConversation).filter(
+            AIConversation.id == conversation_id,
+            AIConversation.user_id == user_id
+        ).first()
+        if not conv:
+            raise HTTPException(status_code=404, detail="Conversation not found")
         return conv
 
-    conv = db.query(AIConversation).filter(
-        AIConversation.id == conversation_id,
-        AIConversation.user_id == user_id
-    ).first()
-    if not conv:
-        raise HTTPException(status_code=404, detail="Conversation not found")
+    conv = (
+        db.query(AIConversation)
+        .filter(AIConversation.user_id == user_id)
+        .order_by(AIConversation.created_at.desc())
+        .first()
+    )
+    if conv:
+        return conv
+
+    # If user has no conversations: create a new one
+    conv = AIConversation(user_id=user_id, created_at=datetime.utcnow())
+    db.add(conv)
+    db.commit()
+    db.refresh(conv)
     return conv
 
 
@@ -68,11 +78,11 @@ def ai_chat(
         role="user",
         content=payload.message,
         risk_level=risk,
+        created_at=datetime.utcnow()
     )
     db.add(user_msg)
     db.commit()
 
-    # If HIGH risk: do NOT call external AI
     if risk == "HIGH":
         reply_text = safe_high_risk_reply()
 
@@ -81,13 +91,13 @@ def ai_chat(
             role="assistant",
             content=reply_text,
             risk_level=risk,
+            created_at=datetime.utcnow()
         )
         db.add(ai_msg)
         db.commit()
 
         return {"conversation_id": conv.id, "reply": reply_text, "risk_level": risk}
 
-    # Fetch last N messages for memory (simple, effective)
     memory_limit = 10
     history = (
         db.query(AIMessage)
@@ -95,8 +105,6 @@ def ai_chat(
         .order_by(AIMessage.created_at.asc())
         .all()
     )
-
-    # keep only last N (user+assistant pairs)
     history = history[-memory_limit:]
 
     messages = [
@@ -130,6 +138,7 @@ def ai_chat(
         role="assistant",
         content=reply_text,
         risk_level=risk,
+        created_at=datetime.utcnow()
     )
     db.add(ai_msg)
     db.commit()
