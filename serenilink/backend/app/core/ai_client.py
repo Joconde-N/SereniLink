@@ -1,12 +1,12 @@
 import os
 from openai import OpenAI
+from app.core.config import settings
 
-def get_ai_client() -> OpenAI:
-    # Hugging Face router is OpenAI-compatible
+def get_ai_client():
     return OpenAI(
-        base_url="https://router.huggingface.co/v1",
-        api_key=os.getenv("HF_TOKEN", ""),
+        api_key=settings.HF_API_KEY,
+        base_url=settings.HF_BASE_URL
     )
 
 def get_ai_model() -> str:
-    return os.getenv("AI_MODEL", "openai/gpt-oss-20b:groq")
+    return settings.AI_MODEL
