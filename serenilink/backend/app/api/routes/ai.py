@@ -14,8 +14,12 @@ router = APIRouter(prefix="/ai", tags=["AI Support"])
 def detect_risk(message: str) -> str:
     msg = message.lower()
 
-    high = ["suicide", "kill myself", "end my life", "self harm", "self-harm"]
-    moderate = ["hopeless", "worthless", "very depressed", "i can't go on", "i want to disappear"]
+    high = ["suicide", "kill myself", "end my life", "self harm", "self-harm", "i want to die",
+            "i wish i was dead", "life is not worth living", "i can't live anymore", "thinking about suicide"
+            "take my life", "hurt myself"]
+    moderate = ["hopeless", "worthless", "very depressed", "i can't go on", "i want to disappear", "i feel empty", "nothing matters",
+                "i feel lost", "i hate my life", "i feel like giving up", "i feel alone",
+                "i feel overwhelmed", "everything is too much", "i feel broken"]
 
     for w in high:
         if w in msg:
@@ -30,7 +34,7 @@ def safe_high_risk_reply() -> str:
     return (
         "I’m really sorry you’re feeling this way. You don’t have to handle it alone. "
         "If you feel unsafe right now, please reach out to a trusted person nearby or local emergency support. "
-        "If you want, tell me what’s going on — I can help you find a safer next step."
+        "If you want, tell me what’s going on. I can help you find a safer next step."
     )
 
 

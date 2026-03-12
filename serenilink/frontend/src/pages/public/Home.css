@@ -1,0 +1,414 @@
+.home-page {
+  background: #070808;
+  color: #ffffff;
+}
+
+/* HERO */
+.hero-section {
+  position: relative;
+  overflow: hidden;
+  min-height: 760px;
+  padding: 30px 70px 40px;
+  background: #000000;
+}
+
+.hero-content {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  align-items: center;
+  gap: 30px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-text {
+  padding-top: 80px;
+}
+
+.hero-text h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 4rem;
+  line-height: 1.15;
+  font-weight: 500;
+  color: #ffffff;
+  max-width: 720px;
+  margin-bottom: 20px;
+}
+
+.hero-text h1 span {
+  color: #E19A86;
+}
+
+.hero-text p {
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-size: 1.5rem;
+  color: #F2F2F2;
+  margin-bottom: 40px;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.home-btn {
+  background: #8B6B5E;
+  color: #ffffff;
+  padding: 15px 34px;
+  border-radius: 999px;
+  display: inline-block;
+  font-weight: 600;
+  transition: 0.3s ease;
+}
+
+.home-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.hero-image-wrap {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.hero-image {
+  width: 100%;
+  max-width: 450px;
+  object-fit: contain;
+  position: relative;
+  z-index: 3;
+}
+
+.hero-shape {
+  position: absolute;
+  background: #2A2E2A;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.hero-shape-top {
+  width: 290px;
+  height: 290px;
+  top: -40px;
+  right: 210px;
+}
+
+.hero-shape-left {
+  width: 220px;
+  height: 220px;
+  left: -70px;
+  bottom: 0;
+}
+
+.hero-shape-middle {
+  width: 260px;
+  height: 260px;
+  right: 220px;
+  top: 220px;
+}
+
+/* WHY */
+.why-section {
+  padding: 80px 70px 60px;
+  background: #090b0a;
+  text-align: center;
+}
+
+.why-section h2,
+.resources-section h2,
+.works-section h2,
+.tools-section h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 3rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin-bottom: 50px;
+}
+
+.why-section h2 span,
+.resources-section h2 span,
+.works-section h2 span,
+.tools-section h2 span {
+  color: #E19A86;
+}
+
+.why-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px;
+}
+
+.info-card {
+  background: #2B2D2B;
+  border-radius: 8px;
+  padding: 28px 24px;
+  text-align: left;
+  min-height: 250px;
+}
+
+.card-icon {
+  width: 42px;
+  height: 42px;
+  border: 1px solid #A68B7E;
+  color: #A68B7E;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  font-size: 0.95rem;
+}
+
+.info-card h3 {
+  color: #A68B7E;
+  font-size: 1.4rem;
+  margin-bottom: 18px;
+}
+
+.info-card p {
+  color: #F2F2F2;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+/* RESOURCES */
+.resources-section {
+  padding: 70px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 40px;
+  align-items: center;
+  background: #090b0a;
+}
+
+.resources-section h2 {
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.resources-subtitle {
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  color: #F2F2F2;
+  font-size: 1.4rem;
+  margin-bottom: 28px;
+}
+
+.resource-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.resource-card {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  background: #2B2D2B;
+  padding: 24px 22px;
+  border-radius: 8px;
+}
+
+.resource-icon {
+  font-size: 1.8rem;
+  color: #A68B7E;
+  min-width: 34px;
+}
+
+.resource-card h3 {
+  color: #A68B7E;
+  font-size: 1.35rem;
+  margin-bottom: 10px;
+}
+
+.resource-card p {
+  color: #F2F2F2;
+  line-height: 1.55;
+}
+
+.view-btn {
+  margin-top: 30px;
+}
+
+.resources-right {
+  display: flex;
+  justify-content: center;
+}
+
+.resources-image {
+  width: 100%;
+  max-width: 470px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+/* HOW IT WORKS */
+.works-section {
+  padding: 70px;
+  text-align: center;
+  background: #090b0a;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.step-box {
+  text-align: center;
+}
+
+.step-number {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: #c7b0a4;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.step-box p {
+  color: #F2F2F2;
+  max-width: 260px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* TOOLS */
+.tools-section {
+  position: relative;
+  padding: 60px 70px 100px;
+  text-align: center;
+  background: #090b0a;
+  overflow: hidden;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 60px;
+  position: relative;
+  z-index: 2;
+}
+
+.tool-card {
+  background: #2B2D2B;
+  border-radius: 8px;
+  padding: 30px 20px;
+  min-height: 130px;
+}
+
+.tool-icon {
+  color: #A68B7E;
+  font-size: 2rem;
+  margin-bottom: 18px;
+}
+
+.tool-card h3 {
+  color: #A68B7E;
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+}
+
+.tool-card p {
+  color: #F2F2F2;
+}
+
+.rings {
+  position: absolute;
+  width: 420px;
+  height: 180px;
+  border: 2px solid rgba(166, 139, 126, 0.25);
+  border-radius: 50%;
+  left: 50%;
+  top: 58%;
+  transform: translate(-50%, -50%);
+}
+
+.rings::before,
+.rings::after {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  border: 2px solid rgba(166, 139, 126, 0.2);
+  border-radius: 50%;
+}
+
+.rings::after {
+  inset: 28px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+  .hero-content,
+  .resources-section,
+  .why-cards,
+  .steps,
+  .tools-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-text {
+    padding-top: 40px;
+  }
+
+  .hero-text h1 {
+    font-size: 3rem;
+  }
+
+  .hero-image-wrap {
+    justify-content: center;
+  }
+
+  .resources-section h2 {
+    text-align: center;
+  }
+
+  .resources-left {
+    order: 2;
+  }
+
+  .resources-right {
+    order: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section,
+  .why-section,
+  .resources-section,
+  .works-section,
+  .tools-section {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .hero-text h1 {
+    font-size: 2.3rem;
+  }
+
+  .why-section h2,
+  .resources-section h2,
+  .works-section h2,
+  .tools-section h2 {
+    font-size: 2.1rem;
+  }
+
+  .hero-buttons {
+    gap: 16px;
+  }
+
+  .home-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
