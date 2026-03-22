@@ -170,11 +170,11 @@
 
 .counselor-card {
   background: #2b2d2b;
+  border-radius: 0;
   overflow: hidden;
   min-height: 560px;
   display: flex;
   flex-direction: column;
-  border-radius: 5px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -218,13 +218,34 @@
   margin-bottom: auto;
 }
 
+.counselor-card-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
 .book-btn {
   margin-top: 28px;
-  align-self: flex-end;
-  background: #b88f80;
+  align-self: flex-start;
+  background: #8B6B5E;
   color: #ffffff;
-  padding: 12px 22px;
+  padding: 12px 20px;
   border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: inline-block;
+  transition: 0.3s ease;
+}
+
+.detail-btn {
+  margin-top: 28px;
+  align-self: flex-end;
+  background: transparent;
+  color: #8B6B5E;
+  padding: 12px 20px;
+  border: 1px solid #8B6B5E;
+  border-radius: 999px; 
   font-weight: 600;
   font-size: 0.95rem;
   display: inline-block;
@@ -262,11 +283,13 @@
   align-items: center;
   justify-content: center;
   z-index: 999;
+
+  
 }
 
-.chat-svg {
-  width: 50px;
-  height: 50px;
+.counselors-chat-btn .chat-svg {
+  width: 55px;
+  height: 55px;
   display: block;
   color: #A68B7E;
 }

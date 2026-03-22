@@ -105,8 +105,8 @@ function Counselors() {
               Browse verified counselors ready to support your mental wellbeing.
             </p>
 
-            <Link to="/register" className="counselors-btn">
-              Get Started
+            <Link to="/login" className="counselors-btn">
+              Book a Session
             </Link>
           </div>
         </div>
@@ -157,10 +157,14 @@ function Counselors() {
                 <h3>{counselor.name}</h3>
                 <h4>{counselor.title}</h4>
                 <p>{counselor.description}</p>
-
-                <Link to="/login" className="book-btn">
-                  Book Session
-                </Link>
+                <div className="counselor-card-buttons">
+                  <Link to="/login" className="book-btn">
+                    Book Session
+                  </Link>
+                  <Link to="#" className="detail-btn">
+                    View Details
+                  </Link>
+                  </div>
               </div>
             </div>
           ))}
@@ -173,7 +177,7 @@ function Counselors() {
 
       <Link
         to="/guest-ai"
-        className="home-chat-btn"
+        className="counselors-chat-btn"
         title="Chat with SereniLink AI"
       >
         <svg

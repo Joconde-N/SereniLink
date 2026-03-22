@@ -169,7 +169,7 @@ function About() {
 
       <Link
         to="/guest-ai"
-        className="home-chat-btn"
+        className="about-chat-btn"
         title="Chat with SereniLink AI"
       >
         <svg
