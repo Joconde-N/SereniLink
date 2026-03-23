@@ -1,11 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Home.css"
+import api from "../../api/axios";
 
 import heroImage from "../../assets/hero-woman.png";
 import meditationImage from "../../assets/meditation-woman.png";
 
+const CATEGORY_ICONS = {
+  video: (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="resource-svg">
+      <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"
+        d="M3 15.75v-7.5a2 2 0 0 1 2-2h8.5a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2m17.168-8.759l-4 3.563a.5.5 0 0 0-.168.373v1.778a.5.5 0 0 0 .168.373l4 3.563a.5.5 0 0 0 .832-.374V7.365a.5.5 0 0 0-.832-.374" />
+    </svg>
+  ),
+  default: (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" className="resource-svg">
+      <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+        d="M16 7S9 1 2 6v22c7-5 14 0 14 0s7-5 14 0V6c-7-5-14 1-14 1m0 0v21" />
+    </svg>
+  ),
+};
+
 function Home() {
+  const [previewContent, setPreviewContent] = useState([]);
+
+  useEffect(() => {
+    api.get("/content/", { params: { limit: 3 } })
+      .then((res) => setPreviewContent(res.data))
+      .catch(() => {});
+  }, []);
     return (
       <div className="home-page">
         <section className="hero-section">
@@ -129,83 +152,32 @@ function Home() {
             </p>
 
             <div className="resource-list">
-              <div className="resource-card">
-                <div className="resource-icon">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 32 32"
-                    className="resource-svg"
-                  >
-                    <path
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M16 7S9 1 2 6v22c7-5 14 0 14 0s7-5 14 0V6c-7-5-14 1-14 1m0 0v21"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h3>Understanding Stress: A youth guide</h3>
-                  <p>
-                    Learn what stress is, how it affects your body and mind, and
-                    simple ways to manage it in your daily...
-                  </p>
-                </div>
-              </div>
-
-              <div className="resource-card">
-                <div className="resource-icon">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    className="resource-svg"
-                  >
-                    <path
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="1.5"
-                      d="M3 15.75v-7.5a2 2 0 0 1 2-2h8.5a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2m17.168-8.759l-4 3.563a.5.5 0 0 0-.168.373v1.778a.5.5 0 0 0 .168.373l4 3.563a.5.5 0 0 0 .832-.374V7.365a.5.5 0 0 0-.832-.374"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h3>Guided Meditation for Anxiety</h3>
-                  <p>
-                    A gentle guided meditation designed to help ease anxious
-                    thoughts and feelings...
-                  </p>
-                </div>
-              </div>
-
-              <div className="resource-card">
-                <div className="resource-icon">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 32 32"
-                    className="resource-svg"
-                  >
-                    <path
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M16 7S9 1 2 6v22c7-5 14 0 14 0s7-5 14 0V6c-7-5-14 1-14 1m0 0v21"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h3>Building Healthy Sleep Habits</h3>
-                  <p>
-                    Sleep is crucial for mental health. Learn how to create a
-                    bedtime routine that works for you...
-                  </p>
-                </div>
-              </div>
+              {previewContent.length > 0
+                ? previewContent.map((item) => (
+                    <div className="resource-card" key={item.id}>
+                      <div className="resource-icon">
+                        {CATEGORY_ICONS[(item.category || "").toLowerCase()] || CATEGORY_ICONS.default}
+                      </div>
+                      <div>
+                        <h3>{item.title}</h3>
+                        <p>{item.summary ? item.summary.slice(0, 90) + "..." : item.body.slice(0, 90) + "..."}</p>
+                      </div>
+                    </div>
+                  ))
+                : [
+                    { id: 1, title: "Understanding Stress: A youth guide", summary: "Learn what stress is, how it affects your body and mind, and simple ways to manage it in your daily..." },
+                    { id: 2, title: "Guided Meditation for Anxiety", summary: "A gentle guided meditation designed to help ease anxious thoughts and feelings..." },
+                    { id: 3, title: "Building Healthy Sleep Habits", summary: "Sleep is crucial for mental health. Learn how to create a bedtime routine that works for you..." },
+                  ].map((item) => (
+                    <div className="resource-card" key={item.id}>
+                      <div className="resource-icon">{CATEGORY_ICONS.default}</div>
+                      <div>
+                        <h3>{item.title}</h3>
+                        <p>{item.summary}</p>
+                      </div>
+                    </div>
+                  ))
+              }
             </div>
 
             <Link to="/resources" className="home-btn view-btn">

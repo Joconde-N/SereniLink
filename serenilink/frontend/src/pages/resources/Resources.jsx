@@ -1,105 +1,130 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./Resources.css";
+import api from "../../api/axios";
 
 import featuredVideo from "../../assets/resources/featured-video.jpg";
 import featuredMusic from "../../assets/resources/featured-music.jpg";
 import featuredArticle from "../../assets/resources/featured-article.jpg";
 
-import video1 from "../../assets/resources/video-1.jpg";
-import music1 from "../../assets/resources/music-1.jpg";
-import article1 from "../../assets/resources/article-1.jpg";
-import video2 from "../../assets/resources/video-2.jpg";
-import music2 from "../../assets/resources/music-2.jpg";
-import article2 from "../../assets/resources/article-2.jpg";
+const CATEGORY_IMAGES = {
+  video: featuredVideo,
+  music: featuredMusic,
+  article: featuredArticle,
+};
+
+function getCategoryImage(category) {
+  const key = (category || "").toLowerCase();
+  return CATEGORY_IMAGES[key] || featuredArticle;
+}
+
+function getActionLabel(category) {
+  const key = (category || "").toLowerCase();
+  if (key === "video") return "Watch Now";
+  if (key === "music") return "Listen Now";
+  return "Read Now";
+}
+
+function ResourceCard({ item }) {
+  const cat = (item.category || "").toLowerCase();
+  return (
+    <div className="resource-item-card">
+      <div className="resource-image-wrap">
+        <img
+          src={getCategoryImage(item.category)}
+          alt={item.title}
+          className="resource-item-image"
+        />
+        <div className="resource-badge">{item.category}</div>
+
+        {(cat === "video" || cat === "music") && (
+          <div className="resource-center-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="play-svg">
+              <path
+                fill="currentColor"
+                d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18a1 1 0 0 0 0-1.68L9.54 5.98A1 1 0 0 0 8 6.82"
+              />
+            </svg>
+          </div>
+        )}
+
+        {cat === "article" && (
+          <div className="resource-corner-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" className="corner-svg">
+              <path
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M16 7S9 1 2 6v22c7-5 14 0 14 0s7-5 14 0V6c-7-5-14 1-14 1m0 0v21"
+              />
+            </svg>
+          </div>
+        )}
+      </div>
+
+      <div className="resource-item-body">
+        <h3>{item.title}</h3>
+        <p className="resource-meta">
+          {new Date(item.created_at).toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          })}{" "}
+          | {item.category}
+        </p>
+        <Link to="/login" className="resource-action-btn">
+          {getActionLabel(item.category)}
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 function Resources() {
-  const featuredResources = [
-    {
-      id: 1,
-      type: "video",
-      image: featuredVideo,
-      badge: "12:45",
-      title: "Guided Breathing Exercise: Find Your Calm",
-      meta: "Video | Calming Exercise",
-      action: "Watch Now",
-    },
-    {
-      id: 2,
-      type: "music",
-      image: featuredMusic,
-      badge: "45:00",
-      title: "Peaceful Mind: Relaxing Music",
-      meta: "Music | Calming Soundtrack",
-      action: "Listen Now",
-    },
-    {
-      id: 3,
-      type: "article",
-      image: featuredArticle,
-      badge: "Article",
-      title: "Understanding Stress: A Youth Guide",
-      meta: "April 10, 2024 | Article",
-      action: "Read Now",
-    },
-  ];
+  const [allItems, setAllItems] = useState([]);
+  const [search, setSearch] = useState("");
+  const [activeTab, setActiveTab] = useState("All");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [skip, setSkip] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const LIMIT = 9;
 
-  const allResources = [
-    {
-      id: 4,
-      type: "video",
-      image: video1,
-      badge: "14:32",
-      title: "Mindful Meditation for Beginners",
-      meta: "Video | Calming Exercise",
-      action: "Watch Now",
-    },
-    {
-      id: 5,
-      type: "music",
-      image: music1,
-      badge: "60:00",
-      title: "Soothing Forest Sounds",
-      meta: "Music | Calming Soundtrack",
-      action: "Listen Now",
-    },
-    {
-      id: 6,
-      type: "article",
-      image: article1,
-      badge: "Article",
-      title: "The Power of Journaling",
-      meta: "March 22, 2024 | Article",
-      action: "Read Now",
-    },
-    {
-      id: 7,
-      type: "video",
-      image: video2,
-      badge: "11:20",
-      title: "Coping Strategies During Tough Times",
-      meta: "Video | Calming Exercise",
-      action: "Watch Now",
-    },
-    {
-      id: 8,
-      type: "music",
-      image: music2,
-      badge: "50:00",
-      title: "Sleepy Serenity Sounds",
-      meta: "Music | Calming Soundtrack",
-      action: "Listen Now",
-    },
-    {
-      id: 9,
-      type: "article",
-      image: article2,
-      badge: "Article",
-      title: "Building Healthy Sleep Habits",
-      meta: "April 2, 2024 | Article",
-      action: "Read Now",
-    },
-  ];
+  const fetchContent = async (newSkip = 0, append = false) => {
+    setLoading(true);
+    try {
+      const params = { skip: newSkip, limit: LIMIT };
+      if (search) params.q = search;
+      if (activeTab !== "All") params.category = activeTab;
+
+      const res = await api.get("/content/", { params });
+      const data = res.data;
+
+      setAllItems((prev) => (append ? [...prev, ...data] : data));
+      setHasMore(data.length === LIMIT);
+      setSkip(newSkip + data.length);
+    } catch {
+      setError("Failed to load resources.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    setSkip(0);
+    fetchContent(0, false);
+  }, [activeTab]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setSkip(0);
+    fetchContent(0, false);
+  };
+
+  const featured = allItems.slice(0, 3);
+  const rest = allItems.slice(3);
 
   return (
     <div className="resources-page">
@@ -110,13 +135,10 @@ function Resources() {
 
         <div className="resources-hero-content">
           <h1>Resources</h1>
-          <p>
-            Explore videos, music, and articles curated to support your mental
-            health journey.
-          </p>
+          <p>Explore videos, music, and articles curated to support your mental health journey.</p>
 
           <div className="resources-toolbar">
-            <div className="resources-search-box">
+            <form className="resources-search-box" onSubmit={handleSearch}>
               <span className="resources-search-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="toolbar-svg">
                   <path
@@ -125,13 +147,14 @@ function Resources() {
                   />
                 </svg>
               </span>
-
               <input
                 type="text"
                 placeholder="Search resources"
                 className="resources-search-input"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
               />
-            </div>
+            </form>
 
             <div className="resources-filter-box">
               <span>Filter by Type</span>
@@ -147,144 +170,76 @@ function Resources() {
       </section>
 
       <section className="resources-main-section">
-        <div className="section-heading-row">
-          <h2>Featured Resources</h2>
-          <div className="section-line"></div>
-        </div>
+        {error && <p style={{ color: "red", textAlign: "center", padding: "20px" }}>{error}</p>}
 
-        <div className="resources-grid featured-grid">
-          {featuredResources.map((item) => (
-            <div className="resource-item-card" key={item.id}>
-              <div className="resource-image-wrap">
-                <img src={item.image} alt={item.title} className="resource-item-image" />
+        {loading && allItems.length === 0 ? (
+          <p style={{ textAlign: "center", padding: "40px", color: "#888" }}>Loading resources...</p>
+        ) : (
+          <>
+            {featured.length > 0 && (
+              <>
+                <div className="section-heading-row">
+                  <h2>Featured Resources</h2>
+                  <div className="section-line"></div>
+                </div>
+                <div className="resources-grid featured-grid">
+                  {featured.map((item) => (
+                    <ResourceCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </>
+            )}
 
-                <div className="resource-badge">{item.badge}</div>
-
-                {item.type === "video" && (
-                  <div className="resource-center-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="play-svg">
-                      <path fill="currentColor" d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18a1 1 0 0 0 0-1.68L9.54 5.98A1 1 0 0 0 8 6.82" />
-                    </svg>
-                  </div>
-                )}
-
-                {item.type === "music" && (
-                  <div className="resource-center-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="play-svg">
-                      <path fill="currentColor" d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18a1 1 0 0 0 0-1.68L9.54 5.98A1 1 0 0 0 8 6.82" />
-                    </svg>
-                  </div>
-                )}
-
-                {item.type === "article" && (
-                  <div className="resource-corner-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" className="corner-svg">
-                      <path
-                        fill="none"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M16 7S9 1 2 6v22c7-5 14 0 14 0s7-5 14 0V6c-7-5-14 1-14 1m0 0v21"
-                      />
-                    </svg>
-                  </div>
-                )}
-              </div>
-
-              <div className="resource-item-body">
-                <h3>{item.title}</h3>
-                <p className="resource-meta">{item.meta}</p>
-
-                <Link to="/login" className="resource-action-btn">
-                  {item.action}
-                </Link>
-              </div>
+            <div className="section-heading-row all-row">
+              <h2>All Resources</h2>
+              <div className="section-line"></div>
             </div>
-          ))}
-        </div>
 
-        <div className="section-heading-row all-row">
-          <h2>All Resources</h2>
-          <div className="section-line"></div>
-        </div>
-
-        <div className="resource-tabs">
-          <button className="resource-tab active">All</button>
-          <button className="resource-tab">Videos</button>
-          <button className="resource-tab">Music</button>
-          <button className="resource-tab">Articles</button>
-        </div>
-
-        <div className="resources-grid all-grid">
-          {allResources.map((item) => (
-            <div className="resource-item-card" key={item.id}>
-              <div className="resource-image-wrap">
-                <img src={item.image} alt={item.title} className="resource-item-image" />
-                <div className="resource-badge">{item.badge}</div>
-
-                {item.type === "video" && (
-                  <div className="resource-corner-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="corner-svg">
-                      <path
-                        fill="none"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="1.5"
-                        d="M3 15.75v-7.5a2 2 0 0 1 2-2h8.5a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2m17.168-8.759l-4 3.563a.5.5 0 0 0-.168.373v1.778a.5.5 0 0 0 .168.373l4 3.563a.5.5 0 0 0 .832-.374V7.365a.5.5 0 0 0-.832-.374"
-                      />
-                    </svg>
-                  </div>
-                )}
-
-                {item.type === "music" && (
-                  <div className="resource-corner-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="corner-svg">
-                      <path
-                        fill="currentColor"
-                        d="M12 3a1 1 0 0 1 1 1v9.382A3.5 3.5 0 1 1 11 10.1V7.9l8-2V15.5a3.5 3.5 0 1 1-2-3.15V4a1 1 0 0 1 1-1"
-                      />
-                    </svg>
-                  </div>
-                )}
-
-                {item.type === "article" && (
-                  <div className="resource-corner-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" className="corner-svg">
-                      <path
-                        fill="none"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M16 7S9 1 2 6v22c7-5 14 0 14 0s7-5 14 0V6c-7-5-14 1-14 1m0 0v21"
-                      />
-                    </svg>
-                  </div>
-                )}
-              </div>
-
-              <div className="resource-item-body">
-                <h3>{item.title}</h3>
-                <p className="resource-meta">{item.meta}</p>
-
-                <Link to="/login" className="resource-action-btn">
-                  {item.action}
-                </Link>
-              </div>
+            <div className="resource-tabs">
+              {["All", "Video", "Music", "Article"].map((tab) => (
+                <button
+                  key={tab}
+                  className={`resource-tab${activeTab === tab ? " active" : ""}`}
+                  onClick={() => setActiveTab(tab)}
+                >
+                  {tab}s
+                </button>
+              ))}
             </div>
-          ))}
-        </div>
 
-        <div className="view-more-wrap">
-          <button className="view-more-btn">View More</button>
-        </div>
+            {rest.length === 0 && !loading ? (
+              <p style={{ textAlign: "center", padding: "40px", color: "#888" }}>
+                No resources found.
+              </p>
+            ) : (
+              <div className="resources-grid all-grid">
+                {rest.map((item) => (
+                  <ResourceCard key={item.id} item={item} />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {hasMore && (
+          <div className="view-more-wrap">
+            <button
+              className="view-more-btn"
+              onClick={() => fetchContent(skip, true)}
+              disabled={loading}
+            >
+              {loading ? "Loading..." : "View More"}
+            </button>
+          </div>
+        )}
       </section>
 
       <Link to="/guest-ai" className="resources-chat-btn" title="Chat with SereniLink AI">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="chat-svg">
-          <path fill="currentColor" d="M3 12c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h8c1.1 0 2 .9 2 2v5c0 1.1-.9 2-2 2H9v3l-3-3zm18 6c1.1 0 2-.9 2-2v-5c0-1.1-.9-2-2-2h-6v1c0 2.2-1.8 4-4 4v2c0 1.1.9 2 2 2h2v3l3-3z"/>
+          <path
+            fill="currentColor"
+            d="M3 12c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h8c1.1 0 2 .9 2 2v5c0 1.1-.9 2-2 2H9v3l-3-3zm18 6c1.1 0 2-.9 2-2v-5c0-1.1-.9-2-2-2h-6v1c0 2.2-1.8 4-4 4v2c0 1.1.9 2 2 2h2v3l3-3z"
+          />
         </svg>
       </Link>
     </div>

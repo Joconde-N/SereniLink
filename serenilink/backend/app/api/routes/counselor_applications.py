@@ -1,100 +1,165 @@
+import secrets
+import string
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db, get_current_user, require_admin
+from app.api.deps import get_db, require_admin
+from app.core.email import send_counselor_credentials
+from app.core.security import hash_password
+from app.models.counselor_application import CounselorApplication
 from app.models.counselor import Counselor
 from app.models.user import User
-from app.schemas.counselor import CounselorApplicationSubmit, CounselorAdminOut
+from app.schemas.counselor_application import CounselorApplicationCreate, CounselorApplicationOut
 
 router = APIRouter(prefix="/counselor-applications", tags=["Counselor Applications"])
 
 
-@router.post("/submit", response_model=CounselorAdminOut, status_code=201)
+def _generate_temp_password(length: int = 12) -> str:
+    alphabet = string.ascii_letters + string.digits
+    return "".join(secrets.choice(alphabet) for _ in range(length))
+
+
+def _generate_nickname(full_name: str, db: Session) -> str:
+    """Derive a unique nickname from full_name."""
+    base = full_name.strip().lower().replace(" ", "_")[:30]
+    nickname = base
+    counter = 1
+    while db.query(User).filter(User.nickname == nickname).first():
+        nickname = f"{base}_{counter}"
+        counter += 1
+    return nickname
+
+
+@router.post("/", response_model=CounselorApplicationOut, status_code=201)
 def submit_application(
-    payload: CounselorApplicationSubmit,
+    payload: CounselorApplicationCreate,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
 ):
-    # prevent duplicates: 1 user -> 1 counselor profile/application
-    existing = db.query(Counselor).filter(Counselor.user_id == current_user.id).first()
+    # Prevent duplicate applications from same email
+    existing = db.query(CounselorApplication).filter(
+        CounselorApplication.email == payload.email,
+        CounselorApplication.status == "PENDING",
+    ).first()
     if existing:
-        raise HTTPException(status_code=409, detail="You already submitted an application")
+        raise HTTPException(status_code=409, detail="An application with this email is already pending.")
 
-    item = Counselor(
-        user_id=current_user.id,
-        application_status="PENDING",
-        is_active=False,
-        **payload.model_dump()
-    )
-
-    # mark the user as pending counselor
-    current_user.role = "pending_counselor"
-
+    item = CounselorApplication(**payload.model_dump())
     db.add(item)
     db.commit()
     db.refresh(item)
     return item
 
 
-@router.get("/me", response_model=CounselorAdminOut)
-def my_application(
+@router.get("/", response_model=list[CounselorApplicationOut])
+def list_applications(
+    status: str | None = None,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
+    _admin=Depends(require_admin),
 ):
-    item = db.query(Counselor).filter(Counselor.user_id == current_user.id).first()
+    q = db.query(CounselorApplication)
+    if status:
+        q = q.filter(CounselorApplication.status == status.upper())
+    return q.order_by(CounselorApplication.created_at.desc()).all()
+
+
+@router.get("/{application_id}", response_model=CounselorApplicationOut)
+def get_application(
+    application_id: int,
+    db: Session = Depends(get_db),
+    _admin=Depends(require_admin),
+):
+    item = db.query(CounselorApplication).filter(CounselorApplication.id == application_id).first()
     if not item:
-        raise HTTPException(status_code=404, detail="No application found")
+        raise HTTPException(status_code=404, detail="Application not found")
     return item
 
 
-@router.get("/pending", response_model=list[CounselorAdminOut])
-def list_pending(
-    db: Session = Depends(get_db),
-    _admin=Depends(require_admin),
-):
-    return db.query(Counselor).filter(Counselor.application_status == "PENDING").all()
-
-
-@router.patch("/{counselor_id}/approve", response_model=CounselorAdminOut)
+@router.patch("/{application_id}/approve", response_model=CounselorApplicationOut)
 def approve_application(
-    counselor_id: int,
+    application_id: int,
     db: Session = Depends(get_db),
     _admin=Depends(require_admin),
 ):
-    item = db.query(Counselor).filter(Counselor.id == counselor_id).first()
+    item = db.query(CounselorApplication).filter(CounselorApplication.id == application_id).first()
     if not item:
         raise HTTPException(status_code=404, detail="Application not found")
+    if item.status != "PENDING":
+        raise HTTPException(status_code=409, detail=f"Application is already {item.status}")
 
-    user = db.query(User).filter(User.id == item.user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="Linked user not found")
+    # Check if a user account already exists for this email
+    existing_user = db.query(User).filter(User.email == item.email).first()
+    if existing_user:
+        raise HTTPException(status_code=409, detail="A user account with this email already exists.")
 
-    item.application_status = "APPROVED"
-    item.is_active = True
-    user.role = "counselor"
+    # Generate credentials
+    temp_password = _generate_temp_password()
+    nickname = _generate_nickname(item.full_name, db)
+
+    # Create user account
+    user = User(
+        nickname=nickname,
+        email=item.email,
+        password_hash=hash_password(temp_password),
+        role="counselor",
+        is_active=True,
+        must_change_password=True,
+    )
+    db.add(user)
+    db.flush()  # get user.id without committing
+
+    # Create counselor profile from application data
+    counselor = Counselor(
+        user_id=user.id,
+        full_name=item.full_name,
+        title=item.title,
+        bio=item.bio,
+        specialization=item.specialization,
+        phone_number=item.phone_number,
+        general_location=item.general_location,
+        office_address=item.office_address,
+        offers_online=item.offers_online,
+        offers_in_person=item.offers_in_person,
+        show_phone_after_booking=True,
+        show_office_after_booking=True,
+        application_status="APPROVED",
+        is_active=True,
+    )
+    db.add(counselor)
+
+    # Mark application as approved
+    item.status = "APPROVED"
+    item.reviewed_at = datetime.utcnow()
 
     db.commit()
     db.refresh(item)
+
+    # Send credentials email (non-blocking — logs warning if SMTP not configured)
+    send_counselor_credentials(
+        to_email=item.email,
+        full_name=item.full_name,
+        nickname=nickname,
+        temp_password=temp_password,
+    )
+
     return item
 
 
-@router.patch("/{counselor_id}/reject", response_model=CounselorAdminOut)
+@router.patch("/{application_id}/reject", response_model=CounselorApplicationOut)
 def reject_application(
-    counselor_id: int,
+    application_id: int,
     db: Session = Depends(get_db),
     _admin=Depends(require_admin),
 ):
-    item = db.query(Counselor).filter(Counselor.id == counselor_id).first()
+    item = db.query(CounselorApplication).filter(CounselorApplication.id == application_id).first()
     if not item:
         raise HTTPException(status_code=404, detail="Application not found")
+    if item.status != "PENDING":
+        raise HTTPException(status_code=409, detail=f"Application is already {item.status}")
 
-    user = db.query(User).filter(User.id == item.user_id).first()
-    if user and user.role == "pending_counselor":
-        user.role = "user"
-
-    item.application_status = "REJECTED"
-    item.is_active = False
-
+    item.status = "REJECTED"
+    item.reviewed_at = datetime.utcnow()
     db.commit()
     db.refresh(item)
     return item

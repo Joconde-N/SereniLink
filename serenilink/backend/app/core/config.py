@@ -15,10 +15,16 @@ class Settings(BaseSettings):
     HF_BASE_URL: str = "https://router.huggingface.co/v1"
     AI_MODEL: str = "openai/gpt-oss-20b:groq"
 
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM: str = "noreply@serenilink.com"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        extra="forbid"   # keeps it strict (recommended)
+        extra="ignore"
     )
 
 

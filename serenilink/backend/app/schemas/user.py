@@ -17,8 +17,9 @@ class UserOut(BaseModel):
     nickname: str
     email: EmailStr | None = None
     role: str
+    must_change_password: bool = False
 
     class Config:
-        from_attributes = True  #allows readinf from SQLAlchemy models
+        from_attributes = True
 
 
