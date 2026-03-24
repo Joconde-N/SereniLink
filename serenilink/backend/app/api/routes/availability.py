@@ -27,27 +27,27 @@ def create_slot(
 ): 
     counselor = _get_my_counselor_profile(db, current_user.id)
 
-    if payload.end_time <= payload.start_time:
+    start = payload.start_time.replace(tzinfo=None)
+    end   = payload.end_time.replace(tzinfo=None)
+
+    if end <= start:
         raise HTTPException(status_code=409, detail="end time must be after start time")
-    
-    if payload.start_time <= datetime.utcnow():
-        raise HTTPException(status_code=409, detail="start time must ")
-    
-        # prevent overlaps for same counselor
+    if start <= datetime.utcnow():
+        raise HTTPException(status_code=409, detail="start time must be in the future")
+
     overlap = db.query(AvailabilitySlot).filter(
         AvailabilitySlot.counselor_id == counselor.id,
         AvailabilitySlot.status == "AVAILABLE",
-        AvailabilitySlot.start_time < payload.end_time,
-        AvailabilitySlot.end_time > payload.start_time,
+        AvailabilitySlot.start_time < end,
+        AvailabilitySlot.end_time > start,
     ).first()
-
     if overlap:
         raise HTTPException(status_code=409, detail="This slot overlaps an existing available slot")
 
     slot = AvailabilitySlot(
         counselor_id=counselor.id,
-        start_time=payload.start_time,
-        end_time=payload.end_time,
+        start_time=start,
+        end_time=end,
         status="AVAILABLE",
         updated_at=datetime.utcnow(),
     )
@@ -72,6 +72,44 @@ def list_my_slots(
         q = q.filter(AvailabilitySlot.status == status.upper())
 
     return q.order_by(AvailabilitySlot.start_time.asc()).offset(skip).limit(limit).all()
+
+
+@router.patch("/me/{slot_id}", response_model=AvailabilityOut)
+def update_slot(
+    slot_id: int,
+    payload: AvailabilityCreate,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    counselor = _get_my_counselor_profile(db, current_user.id)
+
+    slot = db.query(AvailabilitySlot).filter(
+        AvailabilitySlot.id == slot_id,
+        AvailabilitySlot.counselor_id == counselor.id,
+    ).first()
+    if not slot:
+        raise HTTPException(status_code=404, detail="Slot not found")
+    if slot.status == "BOOKED":
+        raise HTTPException(status_code=409, detail="Booked slot cannot be edited")
+    if payload.end_time <= payload.start_time:
+        raise HTTPException(status_code=409, detail="end time must be after start time")
+
+    overlap = db.query(AvailabilitySlot).filter(
+        AvailabilitySlot.counselor_id == counselor.id,
+        AvailabilitySlot.status == "AVAILABLE",
+        AvailabilitySlot.id != slot_id,
+        AvailabilitySlot.start_time < payload.end_time,
+        AvailabilitySlot.end_time > payload.start_time,
+    ).first()
+    if overlap:
+        raise HTTPException(status_code=409, detail="This slot overlaps an existing available slot")
+
+    slot.start_time = payload.start_time.replace(tzinfo=None)
+    slot.end_time   = payload.end_time.replace(tzinfo=None)
+    slot.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(slot)
+    return slot
 
 
 @router.delete("/me/{slot_id}", status_code=204)

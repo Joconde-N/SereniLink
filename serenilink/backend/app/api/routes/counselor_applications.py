@@ -6,8 +6,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, require_admin
-from app.core.email import send_counselor_credentials
-from app.core.security import hash_password
 from app.models.counselor_application import CounselorApplication
 from app.models.counselor import Counselor
 from app.models.user import User
@@ -88,6 +86,10 @@ def approve_application(
     if item.status != "PENDING":
         raise HTTPException(status_code=409, detail=f"Application is already {item.status}")
 
+    # lazy imports to avoid slow startup
+    from app.core.security import hash_password
+    from app.core.email import send_counselor_credentials
+
     # Check if a user account already exists for this email
     existing_user = db.query(User).filter(User.email == item.email).first()
     if existing_user:
@@ -123,6 +125,13 @@ def approve_application(
         offers_in_person=item.offers_in_person,
         show_phone_after_booking=True,
         show_office_after_booking=True,
+        years_of_experience=item.years_of_experience,
+        counseling_approach=item.counseling_approach,
+        highest_certification=item.highest_certification,
+        issuing_institution=item.issuing_institution,
+        languages_offered=item.languages_offered,
+        preferred_session_type=item.preferred_session_type,
+        preferred_duration=item.preferred_duration,
         application_status="APPROVED",
         is_active=True,
     )

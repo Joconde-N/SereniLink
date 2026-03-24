@@ -10,6 +10,8 @@ function CounselorApplication() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [profilePreview, setProfilePreview] = useState(null);
+
   const [form, setForm] = useState({
     full_name: "", email: "", phone_number: "", general_location: "",
     title: "", specialization: "", years_of_experience: "",
@@ -17,11 +19,20 @@ function CounselorApplication() {
     highest_certification: "", issuing_institution: "",
     office_address: "", offers_online: true, offers_in_person: false,
     languages_offered: "", preferred_session_type: "Video Call", preferred_duration: "30 Minutes",
+    profile_image_url: "",
   });
 
   const set = (e) => {
     const { name, value, type, checked } = e.target;
     setForm((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
+  };
+
+  const handleProfilePic = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setProfilePreview(url);
+    setForm((prev) => ({ ...prev, profile_image_url: url }));
   };
 
   const handleSubmit = async (e) => {
@@ -98,6 +109,22 @@ function CounselorApplication() {
               <div className="field">
                 <label>Location (City, Country)</label>
                 <input type="text" name="general_location" placeholder="New York, USA" value={form.general_location} onChange={set} />
+              </div>
+            </div>
+            <div className="field no-margin">
+              <label>Upload Profile Picture</label>
+              <div className="upload-box">
+                <input type="file" accept="image/*" onChange={handleProfilePic} />
+                {profilePreview ? (
+                  <img
+                    src={profilePreview}
+                    alt="Preview"
+                    style={{ width: 80, height: 80, borderRadius: "50%", objectFit: "cover", margin: "0 auto 10px", display: "block", border: "2px solid #E19A86" }}
+                  />
+                ) : (
+                  <p>Click to upload or drag and drop</p>
+                )}
+                <span>{profilePreview ? "Click to change photo" : "JPG or PNG (Max 5MB)"}</span>
               </div>
             </div>
           </section>

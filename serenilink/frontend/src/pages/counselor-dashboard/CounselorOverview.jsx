@@ -53,21 +53,9 @@ function CounselorOverview() {
       {/* Welcome */}
       <div style={{ marginBottom: "28px" }}>
         <h1 className="dashboard-page-title">
-          Welcome, <span style={{ color: "var(--accent)" }}>{user?.nickname}</span> 👋
+          Welcome, <span style={{ color: "var(--accent)" }}>{user?.nickname}</span> 
         </h1>
         <p className="dashboard-page-subtitle">Here is an overview of your counseling activity.</p>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="dashboard-card" style={{ marginBottom: "20px" }}>
-        <h3>Quick Actions</h3>
-        <div className="quick-links">
-          <Link className="quick-link-chip" to="/counselor/availability">📅 Add Availability</Link>
-          <Link className="quick-link-chip" to="/counselor/requests">📋 Booking Requests</Link>
-          <Link className="quick-link-chip" to="/counselor/sessions">✅ My Sessions</Link>
-          <Link className="quick-link-chip" to="/counselor/messages">💬 Messages</Link>
-          <Link className="quick-link-chip" to="/counselor/notifications">🔔 Notifications</Link>
-        </div>
       </div>
 
       {/* Stats */}
@@ -78,9 +66,7 @@ function CounselorOverview() {
         <StatCard title="Upcoming"         value={stats?.upcoming_approved} label="Approved sessions" color="#67d58c" />
       </div>
 
-      {/* Pending + Upcoming */}
       <div className="dashboard-grid dashboard-cards-2" style={{ marginBottom: "20px" }}>
-        {/* Pending Requests */}
         <div className="dashboard-card">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
             <h3 style={{ margin: 0 }}>Pending Requests</h3>
@@ -106,7 +92,30 @@ function CounselorOverview() {
           )}
         </div>
 
-        {/* Upcoming Sessions */}
+        <div className="dashboard-card">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+            <h3 style={{ margin: 0 }}>Recent Notifications</h3>
+            <Link to="/counselor/notifications" style={{ color: "var(--accent)", fontSize: "13px", textDecoration: "none" }}>View all →</Link>
+          </div>
+          {notifs.length === 0 ? (
+            <div className="empty-state" style={{ minHeight: "100px" }}>No unread notifications.</div>
+          ) : (
+            <div className="list-stack">
+              {notifs.map((n) => (
+                <div key={n.id} className="simple-item notification-item unread">
+                  <p style={{ margin: 0, fontWeight: 600, fontSize: "14px" }}>{n.title}</p>
+                  <p className="small-muted" style={{ margin: "4px 0 0" }}>{n.message}</p>
+                  <p className="small-muted" style={{ margin: "4px 0 0", fontSize: "12px" }}>
+                    {new Date(n.created_at).toLocaleString()}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="dashboard-grid dashboard-cards-2">
         <div className="dashboard-card">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
             <h3 style={{ margin: 0 }}>Upcoming Sessions</h3>
@@ -119,7 +128,7 @@ function CounselorOverview() {
               {upcoming.map((b) => (
                 <div key={b.id} className="simple-item">
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontWeight: 600 }}>Booking #{b.id}</span>
+                    <span style={{ fontWeight: 600, fontSize: "14px" }}>Booking #{b.id}</span>
                     <span className="status-pill approved">APPROVED</span>
                   </div>
                   <p className="small-muted" style={{ margin: "4px 0 0" }}>
@@ -130,11 +139,7 @@ function CounselorOverview() {
             </div>
           )}
         </div>
-      </div>
 
-      {/* Availability + Notifications */}
-      <div className="dashboard-grid dashboard-cards-2">
-        {/* Availability Overview */}
         <div className="dashboard-card">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
             <h3 style={{ margin: 0 }}>Available Slots</h3>
@@ -158,29 +163,6 @@ function CounselorOverview() {
                   <span style={{ padding: "4px 10px", borderRadius: "999px", background: "rgba(103,213,140,0.1)", color: "#67d58c", fontSize: "12px" }}>
                     {s.status}
                   </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Recent Notifications */}
-        <div className="dashboard-card">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
-            <h3 style={{ margin: 0 }}>Recent Notifications</h3>
-            <Link to="/counselor/notifications" style={{ color: "var(--accent)", fontSize: "13px", textDecoration: "none" }}>View all →</Link>
-          </div>
-          {notifs.length === 0 ? (
-            <div className="empty-state" style={{ minHeight: "100px" }}>No unread notifications.</div>
-          ) : (
-            <div className="list-stack">
-              {notifs.map((n) => (
-                <div key={n.id} className="simple-item notification-item unread">
-                  <p style={{ margin: 0, fontWeight: 600, fontSize: "14px" }}>{n.title}</p>
-                  <p className="small-muted" style={{ margin: "4px 0 0" }}>{n.message}</p>
-                  <p className="small-muted" style={{ margin: "4px 0 0", fontSize: "12px" }}>
-                    {new Date(n.created_at).toLocaleString()}
-                  </p>
                 </div>
               ))}
             </div>
