@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./login.css";
 import { Link, useNavigate } from "react-router-dom";
 import loginImage from "../../assets/login.png";
@@ -7,7 +7,14 @@ import { useAuth } from "../../context/AuthContext";
 
 function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      const role = user.role;
+      navigate(role === "admin" ? "/admin" : role === "counselor" ? "/counselor" : "/dashboard", { replace: true });
+    }
+  }, [user, authLoading]);
 
   const [form, setForm] = useState({ username: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);

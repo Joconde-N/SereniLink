@@ -3,13 +3,15 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     navigate("/");
   };
+
+  const dashboardPath = user?.role === "counselor" ? "/counselor" : user?.role === "admin" ? "/admin" : "/dashboard";
 
   return (
     <nav className="navbar">
@@ -42,23 +44,14 @@ function Navbar() {
           </svg>
         </button>
 
-        {user ? (
-          <>
-            <Link to="/dashboard" className="login-btn">
-              {user.nickname}
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="login-btn"
-              style={{ marginLeft: "8px", cursor: "pointer" }}
-            >
-              Logout
-            </button>
-          </>
-        ) : (
-          <Link to="/login" className="login-btn">
+        {!loading && (
+          <span
+            className="login-btn"
+            onClick={() => user ? navigate(dashboardPath) : navigate("/login")}
+            style={{ cursor: "pointer" }}
+          >
             Login
-          </Link>
+          </span>
         )}
       </div>
     </nav>

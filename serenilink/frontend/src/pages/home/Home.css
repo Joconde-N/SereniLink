@@ -66,6 +66,8 @@
   font-weight: 600;
   font-size: 1rem;
   transition: 0.3s ease;
+  border: none;
+  cursor: pointer;
 }
 
 .home-btn:hover {
@@ -167,7 +169,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  color: #A68B7E;
+  color: #967364;
 }
 
 .feature-svg {
@@ -177,7 +179,7 @@
 }
 
 .info-card h3 {
-  color: #A68B7E;
+  color: #967364;
   font-size: 1.4rem;
   margin-bottom: 18px;
 }
@@ -227,7 +229,7 @@
 }
 
 .resource-icon {
-  color: #A68B7E;
+  color: #967364;
   min-width: 34px;
   display: flex;
   align-items: flex-start;
@@ -242,7 +244,7 @@
 }
 
 .resource-card h3 {
-  color: #A68B7E;
+  color: #967364;
   font-size: 1.35rem;
   margin-bottom: 10px;
 }
@@ -333,7 +335,7 @@
 }
 
 .tool-icon {
-  color: #A68B7E;
+  color: #967364;
   margin-bottom: 18px;
   display: flex;
   justify-content: center;
@@ -346,7 +348,7 @@
 }
 
 .tool-card h3 {
-  color: #A68B7E;
+  color: #967364;
   font-size: 1.3rem;
   margin-bottom: 10px;
 }
@@ -387,22 +389,22 @@
   bottom: 35px;
   background: transparent;
   box-shadow: none;
+  border: none;
+  cursor: pointer;
   width: auto;
   height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 999;
-  
-  
+  padding: 0;
 }
 
 .chat-svg {
   width: 55px;
   height: 55px;
   display: block;
-  color: #A68B7E;
-
+  color: #967364;
 }
 
 .home-chat-btn:hover {

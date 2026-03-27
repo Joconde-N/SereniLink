@@ -51,6 +51,10 @@ function ExercisesManagement() {
       </div>
       <p className="dashboard-page-subtitle">Create and manage coping exercises for users.</p>
 
+      <div style={{ marginBottom: "20px", padding: "14px 18px", borderRadius: "12px", background: "rgba(245,201,95,0.08)", border: "1px solid rgba(245,201,95,0.2)", color: "#f5c95f", fontSize: "13px", lineHeight: 1.6 }}>
+        <strong>Note:</strong> The user-facing exercises page currently uses a built-in set of 15 curated exercises defined in the frontend. Exercises created here are stored in the database and can be used for future API-driven features or a separate exercise library. Both sets are independent.
+      </div>
+
       {msg && (
         <div style={{ marginBottom: "16px", padding: "12px 16px", borderRadius: "12px", background: msg.ok ? "rgba(103,213,140,0.1)" : "rgba(239,68,68,0.1)", color: msg.ok ? "#67d58c" : "#f08f8f", border: `1px solid ${msg.ok ? "rgba(103,213,140,0.2)" : "rgba(239,68,68,0.2)"}` }}>
           {msg.text}

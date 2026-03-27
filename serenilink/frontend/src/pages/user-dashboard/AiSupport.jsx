@@ -89,6 +89,28 @@ function AiSupport() {
       <p className="dashboard-page-subtitle">Chat with SereniLink AI for guided emotional support.</p>
 
       <div style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
+        {/* Crisis banner */}
+        <div style={{
+          position: "absolute",
+          left: 0, right: 0,
+        }} />
+      </div>
+
+      {/* Crisis banner */}
+      <div style={{
+        background: "rgba(220, 80, 80, 0.12)",
+        border: "1px solid rgba(220, 80, 80, 0.3)",
+        borderRadius: "10px",
+        padding: "12px 18px",
+        marginBottom: "16px",
+        color: "#f08f8f",
+        fontSize: "14px",
+        lineHeight: 1.5,
+      }}>
+       <center> <strong>In case you are in crisis or emergency</strong>, call emergency services <strong>112</strong> or <strong>114</strong> for health services.</center>
+      </div>
+
+      <div style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
         {/* Sidebar: conversation list */}
         <div className="dashboard-card" style={{ width: "220px", flexShrink: 0 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
@@ -131,7 +153,6 @@ function AiSupport() {
               <div style={{ color: "var(--text-muted)", padding: "40px", textAlign: "center" }}>Loading...</div>
             ) : messages.length === 0 ? (
               <div className="empty-state" style={{ flexDirection: "column", gap: "8px" }}>
-                <span style={{ fontSize: "32px" }}>🤖</span>
                 <p>Hi {user?.nickname}! I'm here to support you. What's on your mind?</p>
               </div>
             ) : (
@@ -168,6 +189,16 @@ function AiSupport() {
               {sending ? "..." : "Send"}
             </button>
           </div>
+
+          <p style={{
+            fontSize: "11px",
+            color: "var(--text-muted)",
+            marginTop: "10px",
+            lineHeight: 1.6,
+            textAlign: "center",
+          }}>
+            <strong>Disclaimer:</strong> This AI is a support tool, not a replacement for professional medical advice, diagnosis, or treatment. Conversations are confidential but may be used to improve support services.
+          </p>
         </div>
       </div>
     </div>

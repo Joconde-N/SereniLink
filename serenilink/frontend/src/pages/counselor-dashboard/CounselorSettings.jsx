@@ -1,19 +1,30 @@
 import React, { useState } from "react";
+import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 
 function CounselorSettings() {
   const { user } = useAuth();
-  const [pwMsg, setPwMsg]     = useState("");
+  const [pwMsg, setPwMsg]         = useState({ text: "", ok: true });
+  const [saving, setSaving]       = useState(false);
   const [currentPw, setCurrentPw] = useState("");
-  const [newPw, setNewPw]     = useState("");
+  const [newPw, setNewPw]         = useState("");
   const [confirmPw, setConfirmPw] = useState("");
 
-  const handlePasswordChange = (e) => {
+  const handlePasswordChange = async (e) => {
     e.preventDefault();
-    setPwMsg("");
-    if (newPw !== confirmPw) { setPwMsg("New passwords do not match."); return; }
-    if (newPw.length < 6)    { setPwMsg("Password must be at least 6 characters."); return; }
-    setPwMsg("Password change is not yet supported by the server API.");
+    setPwMsg({ text: "", ok: true });
+    if (newPw !== confirmPw) { setPwMsg({ text: "New passwords do not match.", ok: false }); return; }
+    if (newPw.length < 6)   { setPwMsg({ text: "Password must be at least 6 characters.", ok: false }); return; }
+    setSaving(true);
+    try {
+      await api.post("/auth/change-password", { new_password: newPw });
+      setPwMsg({ text: "Password updated successfully.", ok: true });
+      setCurrentPw(""); setNewPw(""); setConfirmPw("");
+    } catch (err) {
+      setPwMsg({ text: err.response?.data?.detail || "Failed to update password.", ok: false });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -46,9 +57,9 @@ function CounselorSettings() {
         {/* Change Password */}
         <div className="dashboard-card">
           <h3>Change Password</h3>
-          {pwMsg && (
-            <p style={{ color: pwMsg.includes("not") || pwMsg.includes("match") ? "#f08f8f" : "#f5c95f", fontSize: "13px", marginBottom: "12px" }}>
-              {pwMsg}
+          {pwMsg.text && (
+            <p style={{ color: pwMsg.ok ? "#67d58c" : "#f08f8f", fontSize: "13px", marginBottom: "12px" }}>
+              {pwMsg.text}
             </p>
           )}
           <form onSubmit={handlePasswordChange}>
@@ -64,8 +75,8 @@ function CounselorSettings() {
               <label className="form-label">Confirm New Password</label>
               <input className="form-input" type="password" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} placeholder="••••••••" />
             </div>
-            <button className="primary-btn" type="submit" style={{ width: "100%" }}>
-              Update Password
+            <button className="primary-btn" type="submit" disabled={saving} style={{ width: "100%" }}>
+              {saving ? "Updating..." : "Update Password"}
             </button>
           </form>
         </div>

@@ -3,10 +3,13 @@ import api from "../../api/axios";
 
 const ROLE_COLOR = { admin: "#f5c95f", counselor: "#67d58c", pending_counselor: "var(--accent)", user: "var(--text-soft)" };
 
+const ROLE_TABS = ["ALL", "user", "counselor", "admin"];
+
 function AdminUsers() {
   const [users, setUsers]   = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [roleTab, setRoleTab] = useState("ALL");
   const [msg, setMsg]       = useState("");
 
   useEffect(() => {
@@ -29,11 +32,11 @@ function AdminUsers() {
 
   const filtered = users.filter((u) => {
     const q = search.toLowerCase();
-    return (
+    const matchesSearch =
       (u.nickname ?? "").toLowerCase().includes(q) ||
-      (u.email ?? "").toLowerCase().includes(q) ||
-      (u.role ?? "").toLowerCase().includes(q)
-    );
+      (u.email ?? "").toLowerCase().includes(q);
+    const matchesRole = roleTab === "ALL" || u.role === roleTab;
+    return matchesSearch && matchesRole;
   });
 
   return (
@@ -47,10 +50,30 @@ function AdminUsers() {
         </div>
       )}
 
+      {/* Role filter tabs */}
+      <div style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
+        {ROLE_TABS.map((r) => (
+          <button
+            key={r} type="button"
+            onClick={() => setRoleTab(r)}
+            style={{
+              padding: "7px 16px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, cursor: "pointer",
+              border: roleTab === r ? "none" : "1px solid var(--border-soft)",
+              background: roleTab === r ? "var(--accent)" : "transparent",
+              color: roleTab === r ? "#111" : "var(--text-soft)",
+              textTransform: "capitalize",
+            }}
+          >
+            {r === "ALL" ? "All" : r}{r !== "ALL" && ` (${users.filter(u => u.role === r).length})`}
+          </button>
+        ))}
+      </div>
+
+      {/* Search */}
       <div style={{ marginBottom: "20px" }}>
         <input
           className="form-input"
-          placeholder="Search by nickname, email, or role..."
+          placeholder="Search by nickname or email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{ maxWidth: "400px" }}

@@ -23,6 +23,41 @@ COUNSELOR_ALLOWED = {"APPROVED", "DECLINED", "COMPLETED", "CANCELLED"}
 PAYMENT_ALLOWED = {"PENDING", "PAID", "WAIVED"}
 
 
+def expire_stale_bookings(db: Session):
+    """Auto-expire bookings whose scheduled time has passed."""
+    now = datetime.utcnow()
+
+    # PENDING bookings that passed their slot — mark DECLINED and free the slot
+    stale_pending = db.query(Booking).filter(
+        Booking.status == "PENDING",
+        Booking.scheduled_for <= now
+    ).all()
+    for b in stale_pending:
+        b.status = "DECLINED"
+        b.updated_at = now
+        slot = db.query(AvailabilitySlot).filter(AvailabilitySlot.id == b.slot_id).first()
+        if slot:
+            slot.status = "AVAILABLE"
+            slot.updated_at = now
+        create_notification(
+            db, b.user_id,
+            "Booking Expired",
+            "Your booking request expired as the session time passed without a response."
+        )
+
+    # APPROVED bookings that passed their slot — mark COMPLETED
+    stale_approved = db.query(Booking).filter(
+        Booking.status == "APPROVED",
+        Booking.scheduled_for <= now
+    ).all()
+    for b in stale_approved:
+        b.status = "COMPLETED"
+        b.updated_at = now
+
+    if stale_pending or stale_approved:
+        db.commit()
+
+
 def create_notification(db: Session, user_id: int, title: str, message: str):
     note = Notification(user_id=user_id, title=title, message=message, is_read=False)
     db.add(note)
@@ -114,6 +149,7 @@ def my_bookings(
     skip: int = 0,
     limit: int = Query(default=10, le=50),
 ):
+    expire_stale_bookings(db)
     return (
         db.query(Booking)
         .filter(Booking.user_id == current_user.id)
@@ -262,6 +298,7 @@ def counselor_my_bookings(
     limit: int = Query(default=20, le=100),
 ):
     counselor = _get_counselor_profile_for_user(db, current_user.id)
+    expire_stale_bookings(db)
 
     q = db.query(Booking).filter(Booking.counselor_id == counselor.id)
     if status:

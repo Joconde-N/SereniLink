@@ -354,20 +354,22 @@
   bottom: 35px;
   background: transparent;
   box-shadow: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
   width: auto;
   height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 999;
-  
 }
 
 .about-chat-btn .chat-svg {
   width: 55px;
   height: 55px;
   display: block;
-  color: #A68B7E;
+  color: #967364;
 }
 
 .about-chat-btn:hover {

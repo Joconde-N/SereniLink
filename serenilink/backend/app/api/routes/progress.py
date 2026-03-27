@@ -1,7 +1,7 @@
-from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends
+from datetime import datetime, timedelta, date
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, cast, Date
 
 from app.api.deps import get_db, get_current_user
 from app.models.progress import Progress
@@ -95,9 +95,23 @@ def my_progress_analytics(
     if last_7["avg_sleep"] is not None and last_30["avg_sleep"] is not None:
         sleep_diff = last_7["avg_sleep"] - last_30["avg_sleep"]
 
+    # streak: count consecutive days (going back from today) with at least one check-in
+    streak = 0
+    check_day = now.date()
+    while True:
+        count = db.query(func.count(Assessment.id)).filter(
+            Assessment.user_id == current_user.id,
+            func.date(Assessment.created_at) == check_day,
+        ).scalar()
+        if not count:
+            break
+        streak += 1
+        check_day -= timedelta(days=1)
+
     return {
         "last_7_days": last_7,
         "last_30_days": last_30,
+        "streak": streak,
         "diff": {
             "mood": mood_diff,
             "stress": stress_diff,
@@ -109,3 +123,33 @@ def my_progress_analytics(
             "sleep": trend_from_diff(sleep_diff),
         }
     }
+
+
+@router.get("/me/daily")
+def my_daily_analytics(
+    days: int = Query(default=7, ge=7, le=30),
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    since = datetime.utcnow() - timedelta(days=days)
+    rows = (
+        db.query(
+            cast(Assessment.created_at, Date).label("day"),
+            func.avg(Assessment.mood).label("avg_mood"),
+            func.avg(Assessment.stress).label("avg_stress"),
+            func.avg(Assessment.sleep).label("avg_sleep"),
+        )
+        .filter(Assessment.user_id == current_user.id, Assessment.created_at >= since)
+        .group_by(cast(Assessment.created_at, Date))
+        .order_by(cast(Assessment.created_at, Date))
+        .all()
+    )
+    return [
+        {
+            "date": str(r.day),
+            "avg_mood": float(r.avg_mood) if r.avg_mood is not None else None,
+            "avg_stress": float(r.avg_stress) if r.avg_stress is not None else None,
+            "avg_sleep": float(r.avg_sleep) if r.avg_sleep is not None else None,
+        }
+        for r in rows
+    ]

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Outlet, Navigate } from "react-router-dom";
 import DashboardSidebar from "./DahboardSidebar";
+import NotificationBell from "./NotificationBell";
 import { useAuth } from "../../context/AuthContext";
 import "./DashboardLayout.css";
 
@@ -21,7 +22,10 @@ function DashboardLayout() {
   return (
     <div className="dashboard-shell">
       <DashboardSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-      <main className={`dashboard-main ${collapsed ? "expanded" : ""}`}>
+      <main className={`dashboard-main ${collapsed ? "expanded" : ""}`} style={{ position: "relative" }}>
+        <div style={{ position: "absolute", top: "28px", right: "28px", zIndex: 10 }}>
+          <NotificationBell notifPath="/dashboard/notifications" />
+        </div>
         <Outlet />
       </main>
     </div>

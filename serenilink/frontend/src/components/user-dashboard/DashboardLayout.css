@@ -3,8 +3,8 @@
   --bg-panel: #1a1a1d;
   --bg-panel-2: #171719;
   --bg-input: #18181b;
-  --border-soft: rgba(255, 255, 255, 0.08);
-  --border-faint: rgba(255, 255, 255, 0.06);
+  --border-soft: rgba(176, 176, 176, 0.08);
+  --border-faint: rgba(176, 176, 176, 0.06);
   --text-main: #f4f4f4;
   --text-soft: #b8bfcc;
   --text-muted: #b0b0b0;
@@ -21,7 +21,7 @@
 
 .dashboard-sidebar {
   width: 300px;
-  background: linear-gradient(180deg, #2a2b2b 0%, #252625 100%);
+  background: #1A1D1E;
   border-right: 1px solid var(--border-faint);
   color: var(--text-main);
   display: flex;
@@ -145,6 +145,23 @@
   overflow-y: auto;
 }
 
+.dashboard-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(202, 163, 143, 0.35);
+  border-radius: 999px;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(202, 163, 143, 0.6);
+}
+
 .dashboard-page-title {
   font-size: 30px;
   margin: 0 0 8px;
@@ -187,7 +204,7 @@
 }
 
 .metric-value {
-  font-size: 24px;
+  font-size: 23px;
   font-weight: 700;
   color: var(--accent);
 }
@@ -230,7 +247,16 @@
   color: #67d58c;
 }
 
-.status-pill.cancelled,
+.status-pill.completed {
+  background: rgba(126, 184, 247, 0.1);
+  color: #7eb8f7;
+}
+
+.status-pill.cancelled {
+  background: rgba(156, 163, 175, 0.1);
+  color: #9ca3af;
+}
+
 .status-pill.declined {
   background: rgba(240, 143, 143, 0.1);
   color: #f08f8f;
@@ -248,7 +274,7 @@
 
 .primary-btn {
   border: none;
-  background: #8B6B5E;
+  background: #a86955;
   color: #ffffff;
 }
 
@@ -323,6 +349,23 @@
   flex-direction: column;
   gap: 14px;
   min-height: 380px;
+}
+
+.message-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.message-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.message-list::-webkit-scrollbar-thumb {
+  background: rgba(202, 163, 143, 0.35);
+  border-radius: 999px;
+}
+
+.message-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(202, 163, 143, 0.6);
 }
 
 .message-row {

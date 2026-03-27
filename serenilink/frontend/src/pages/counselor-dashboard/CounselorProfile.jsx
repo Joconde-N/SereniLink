@@ -1,10 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { LuPencil, LuCheck, LuX, LuShieldCheck, LuMapPin, LuPhone, LuUser } from "react-icons/lu";
+import { LuPencil, LuCheck, LuX, LuShieldCheck, LuMapPin, LuPhone, LuUser, LuCamera } from "react-icons/lu";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 
-const FALLBACK = (name) => `https://ui-avatars.com/api/?background=caa38f&color=111&bold=true&size=128&name=${encodeURIComponent(name || "C")}`;
+const FALLBACK = (name) =>
+  `https://ui-avatars.com/api/?background=caa38f&color=111&bold=true&size=128&name=${encodeURIComponent(name || "C")}`;
+
+const EMPTY_FORM = {
+  full_name: "", title: "", bio: "", specialization: "",
+  profile_image_url: "", phone_number: "", general_location: "", office_address: "",
+  offers_online: true, offers_in_person: false,
+  show_phone_after_booking: true, show_office_after_booking: true,
+  years_of_experience: "", counseling_approach: "",
+  highest_certification: "", issuing_institution: "",
+  languages_offered: "", preferred_session_type: "", preferred_duration: "",
+};
 
 function Tag({ label }) {
   return (
@@ -18,33 +29,23 @@ function Tag({ label }) {
   );
 }
 
-const EMPTY_FORM = {
-  full_name: "", title: "", bio: "", specialization: "",
-  profile_image_url: "", phone_number: "", general_location: "", office_address: "",
-  offers_online: true, offers_in_person: false,
-  show_phone_after_booking: true, show_office_after_booking: true,
-  years_of_experience: "", counseling_approach: "",
-  highest_certification: "", issuing_institution: "",
-  languages_offered: "", preferred_session_type: "", preferred_duration: "",
-};
-
-// Defined outside component to prevent remount on every render (fixes focus loss)
-function Field({ label, name, rows, type = "text", form, onChange }) {
+// Defined outside — stable reference, no remount on parent re-render
+function Field({ label, name, rows, type = "text", value, onChange }) {
   return (
     <div style={{ marginBottom: 16 }}>
       <label className="form-label">{label}</label>
       {rows
-        ? <textarea className="form-textarea" name={name} value={form[name]} onChange={onChange} rows={rows} />
-        : <input className="form-input" type={type} name={name} value={form[name]} onChange={onChange} />
+        ? <textarea className="form-textarea" name={name} value={value ?? ""} onChange={onChange} rows={rows} />
+        : <input className="form-input" type={type} name={name} value={value ?? ""} onChange={onChange} />
       }
     </div>
   );
 }
 
-function Check({ name, label, form, onChange }) {
+function Check({ name, label, checked, onChange }) {
   return (
     <label style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--text-soft)", fontSize: 14, cursor: "pointer", marginBottom: 10 }}>
-      <input type="checkbox" name={name} checked={form[name]} onChange={onChange} style={{ accentColor: "var(--accent)" }} />
+      <input type="checkbox" name={name} checked={checked ?? false} onChange={onChange} style={{ accentColor: "var(--accent)" }} />
       {label}
     </label>
   );
@@ -53,17 +54,20 @@ function Check({ name, label, form, onChange }) {
 export default function CounselorProfile() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
+
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState({ text: "", ok: true });
   const [form, setForm] = useState(EMPTY_FORM);
+  const [imgPreview, setImgPreview] = useState(null);
 
   useEffect(() => {
     api.get("/counselors/me")
       .then((res) => { setProfile(res.data); populateForm(res.data); })
-      .catch(() => setMsg({ text: "Could not load profile.", ok: false }))
+      .catch(() => setMsg({ text: "Could not load profile. Make sure you are logged in as a counselor.", ok: false }))
       .finally(() => setLoading(false));
   }, []);
 
@@ -97,38 +101,53 @@ export default function CounselorProfile() {
     setForm((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
   };
 
-  const handleSave = async (e) => {
-    e.preventDefault();
+  const handleImageFile = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const base64 = ev.target.result;
+      setImgPreview(base64);
+      setForm((prev) => ({ ...prev, profile_image_url: base64 }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSave = async () => {
     setSaving(true);
     setMsg({ text: "", ok: true });
     try {
-      const payload = { ...form, years_of_experience: form.years_of_experience !== "" ? parseInt(form.years_of_experience) : null };
+      const payload = {
+        ...form,
+        years_of_experience: form.years_of_experience !== "" ? parseInt(form.years_of_experience) : null,
+      };
       const res = await api.patch("/counselors/me", payload);
       setProfile(res.data);
       populateForm(res.data);
       setEditing(false);
       setMsg({ text: "Profile updated successfully.", ok: true });
-    } catch {
-      setMsg({ text: "Failed to save. Please try again.", ok: false });
+    } catch (err) {
+      setMsg({ text: err.response?.data?.detail || "Failed to save. Please try again.", ok: false });
     } finally {
       setSaving(false);
     }
   };
 
-  const cancelEdit = () => { populateForm(profile); setEditing(false); setMsg({ text: "", ok: true }); };
+  const handleCancel = () => {
+    if (profile) populateForm(profile);
+    setEditing(false);
+    setMsg({ text: "", ok: true });
+  };
 
   if (loading) return <div style={{ color: "var(--text-muted)", padding: 40 }}>Loading profile...</div>;
 
   const d = profile || {};
-  const avatarSrc = form.profile_image_url || FALLBACK(d.full_name);
+  const avatarSrc = (editing ? imgPreview || form.profile_image_url : d.profile_image_url) || FALLBACK(d.full_name);
   const specializations = (d.specialization || "").split(",").map(s => s.trim()).filter(Boolean);
-
-  const f = (label, name, rows, type) => <Field key={name} label={label} name={name} rows={rows} type={type} form={form} onChange={handleChange} />;
-  const c = (name, label) => <Check key={name} name={name} label={label} form={form} onChange={handleChange} />;
 
   return (
     <div>
-      {/* Header row */}
+      {/* Page header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div>
           <h1 className="dashboard-page-title" style={{ marginBottom: 4 }}>My Profile</h1>
@@ -140,7 +159,7 @@ export default function CounselorProfile() {
           </button>
         ) : (
           <div style={{ display: "flex", gap: 10 }}>
-            <button className="secondary-btn" onClick={cancelEdit} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <button className="secondary-btn" onClick={handleCancel} style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <LuX size={16} /> Cancel
             </button>
             <button className="primary-btn" onClick={handleSave} disabled={saving} style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -166,25 +185,47 @@ export default function CounselorProfile() {
             <div style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
 
               {/* Avatar */}
-              <div style={{ position: "relative", flexShrink: 0 }}>
-                <img
-                  src={avatarSrc}
-                  alt={d.full_name}
-                  onError={(e) => { e.target.src = FALLBACK(d.full_name); }}
-                  style={{ width: 110, height: 110, borderRadius: "50%", objectFit: "cover", border: "3px solid var(--accent)" }}
-                />
+              <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+                <div style={{ position: "relative" }}>
+                  <img
+                    src={avatarSrc}
+                    alt={d.full_name}
+                    onError={(e) => { e.target.src = FALLBACK(d.full_name); }}
+                    style={{ width: 110, height: 110, borderRadius: "50%", objectFit: "cover", border: "3px solid var(--accent)" }}
+                  />
+                  {editing && (
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      style={{
+                        position: "absolute", bottom: 0, right: 0,
+                        width: 32, height: 32, borderRadius: "50%",
+                        background: "var(--accent)", color: "#111",
+                        border: "2px solid var(--bg-main)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <LuCamera size={14} />
+                    </button>
+                  )}
+                </div>
                 {editing && (
-                  <div style={{ marginTop: 8 }}>
-                    <label className="form-label" style={{ fontSize: 11 }}>Profile Image URL</label>
+                  <>
                     <input
-                      className="form-input"
-                      name="profile_image_url"
-                      value={form.profile_image_url}
-                      onChange={handleChange}
-                      placeholder="https://..."
-                      style={{ fontSize: 12, padding: "8px 12px" }}
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/png, image/jpeg, image/jpg"
+                      onChange={handleImageFile}
+                      style={{ display: "none" }}
                     />
-                  </div>
+                    <span
+                      onClick={() => fileInputRef.current?.click()}
+                      style={{ fontSize: 12, color: "var(--accent)", cursor: "pointer", textDecoration: "underline" }}
+                    >
+                      {imgPreview ? "Change photo" : "Upload photo"}
+                    </span>
+                  </>
                 )}
               </div>
 
@@ -199,8 +240,8 @@ export default function CounselorProfile() {
 
                 {editing ? (
                   <div className="form-grid-2" style={{ marginBottom: 12 }}>
-                    {f("Full Name", "full_name")}
-                    {f("Title", "title")}
+                    <Field label="Full Name" name="full_name" value={form.full_name} onChange={handleChange} />
+                    <Field label="Title" name="title" value={form.title} onChange={handleChange} />
                   </div>
                 ) : (
                   <>
@@ -209,7 +250,6 @@ export default function CounselorProfile() {
                   </>
                 )}
 
-                {/* Key stats row */}
                 {!editing && (
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 20, marginBottom: 20 }}>
                     {d.years_of_experience && (
@@ -217,11 +257,7 @@ export default function CounselorProfile() {
                         <span style={{ color: "var(--accent)", fontWeight: 700 }}>{d.years_of_experience}</span> yrs experience
                       </span>
                     )}
-                    {d.languages_offered && (
-                      <span style={{ fontSize: 14, color: "var(--text-soft)" }}>
-                        🌐 {d.languages_offered}
-                      </span>
-                    )}
+                    {d.languages_offered && <span style={{ fontSize: 14, color: "var(--text-soft)" }}>🌐 {d.languages_offered}</span>}
                     {d.general_location && (
                       <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 14, color: "var(--text-soft)" }}>
                         <LuMapPin size={14} color="var(--accent)" /> {d.general_location}
@@ -244,10 +280,8 @@ export default function CounselorProfile() {
           <div className="dashboard-card">
             <h3 style={{ marginBottom: 14 }}>About Me</h3>
             {editing
-              ? f("Bio", "bio", 5)
-              : <p style={{ color: "var(--text-soft)", lineHeight: 1.8, margin: 0, fontSize: 15 }}>
-                  {d.bio || "No bio added yet."}
-                </p>
+              ? <Field label="Bio" name="bio" value={form.bio} onChange={handleChange} rows={5} />
+              : <p style={{ color: "var(--text-soft)", lineHeight: 1.8, margin: 0, fontSize: 15 }}>{d.bio || "No bio added yet."}</p>
             }
           </div>
 
@@ -255,7 +289,7 @@ export default function CounselorProfile() {
           <div className="dashboard-card">
             <h3 style={{ marginBottom: 14 }}>Specializations</h3>
             {editing
-              ? f("Specializations (comma-separated)", "specialization")
+              ? <Field label="Specializations (comma-separated)" name="specialization" value={form.specialization} onChange={handleChange} />
               : (
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
                   {specializations.length > 0
@@ -271,34 +305,32 @@ export default function CounselorProfile() {
           <div className="dashboard-card">
             <h3 style={{ marginBottom: 14 }}>Counseling Approach</h3>
             {editing
-              ? f("Describe your approach", "counseling_approach", 4)
-              : <p style={{ color: "var(--text-soft)", lineHeight: 1.8, margin: 0, fontSize: 15 }}>
-                  {d.counseling_approach || "Not provided."}
-                </p>
+              ? <Field label="Describe your approach" name="counseling_approach" value={form.counseling_approach} onChange={handleChange} rows={4} />
+              : <p style={{ color: "var(--text-soft)", lineHeight: 1.8, margin: 0, fontSize: 15 }}>{d.counseling_approach || "Not provided."}</p>
             }
           </div>
 
-          {/* Edit-only: contact + session settings */}
+          {/* Contact & Session Settings — edit only */}
           {editing && (
             <div className="dashboard-card">
               <h3 style={{ marginBottom: 16 }}>Contact & Session Settings</h3>
               <div className="form-grid-2" style={{ marginBottom: 4 }}>
-                {f("Phone Number", "phone_number")}
-                {f("Location", "general_location")}
+                <Field label="Phone Number" name="phone_number" value={form.phone_number} onChange={handleChange} />
+                <Field label="Location" name="general_location" value={form.general_location} onChange={handleChange} />
               </div>
-              {f("Office Address", "office_address")}
+              <Field label="Office Address" name="office_address" value={form.office_address} onChange={handleChange} />
               <div className="form-grid-2" style={{ marginBottom: 4 }}>
-                {f("Languages Offered", "languages_offered")}
-                {f("Years of Experience", "years_of_experience", null, "number")}
+                <Field label="Languages Offered" name="languages_offered" value={form.languages_offered} onChange={handleChange} />
+                <Field label="Years of Experience" name="years_of_experience" value={form.years_of_experience} onChange={handleChange} type="number" />
               </div>
               <div className="form-grid-2" style={{ marginBottom: 16 }}>
-                {f("Preferred Session Type", "preferred_session_type")}
-                {f("Preferred Duration", "preferred_duration")}
+                <Field label="Preferred Session Type" name="preferred_session_type" value={form.preferred_session_type} onChange={handleChange} />
+                <Field label="Preferred Duration" name="preferred_duration" value={form.preferred_duration} onChange={handleChange} />
               </div>
-              {c("offers_online", "Offers Online Sessions")}
-              {c("offers_in_person", "Offers In-Person Sessions")}
-              {c("show_phone_after_booking", "Show Phone After Booking")}
-              {c("show_office_after_booking", "Show Office Address After Booking")}
+              <Check name="offers_online" label="Offers Online Sessions" checked={form.offers_online} onChange={handleChange} />
+              <Check name="offers_in_person" label="Offers In-Person Sessions" checked={form.offers_in_person} onChange={handleChange} />
+              <Check name="show_phone_after_booking" label="Show Phone After Booking" checked={form.show_phone_after_booking} onChange={handleChange} />
+              <Check name="show_office_after_booking" label="Show Office Address After Booking" checked={form.show_office_after_booking} onChange={handleChange} />
             </div>
           )}
         </div>
@@ -335,17 +367,15 @@ export default function CounselorProfile() {
             <h3 style={{ marginBottom: 16 }}>Education & Credentials</h3>
             {editing ? (
               <>
-                {f("Highest Certification / Degree", "highest_certification")}
-                {f("Issuing Institution", "issuing_institution")}
+                <Field label="Highest Certification / Degree" name="highest_certification" value={form.highest_certification} onChange={handleChange} />
+                <Field label="Issuing Institution" name="issuing_institution" value={form.issuing_institution} onChange={handleChange} />
               </>
             ) : (
-              <div className="list-stack">
-                <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                  <span style={{ fontSize: 20 }}>🎓</span>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-main)" }}>{d.highest_certification || "Not provided"}</div>
-                    <div style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 2 }}>{d.issuing_institution || ""}</div>
-                  </div>
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <span style={{ fontSize: 20 }}>🎓</span>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-main)" }}>{d.highest_certification || "Not provided"}</div>
+                  <div style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 2 }}>{d.issuing_institution || ""}</div>
                 </div>
               </div>
             )}

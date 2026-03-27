@@ -2,22 +2,17 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 
-# What a user submits when applying to become a counselor
 class CounselorApplicationSubmit(BaseModel):
     full_name: str = Field(min_length=3, max_length=200)
     title: str | None = Field(default=None, max_length=150)
     bio: str | None = Field(default=None, max_length=500)
     specialization: str = Field(min_length=2, max_length=150)
-
-    profile_image_url: str | None = Field(default=None, max_length=500)
+    profile_image_url: str | None = None
     phone_number: str | None = Field(default=None, max_length=30)
-
     general_location: str | None = Field(default=None, max_length=120)
     office_address: str | None = Field(default=None, max_length=250)
-
     offers_online: bool = True
     offers_in_person: bool = False
-
     show_phone_after_booking: bool = True
     show_office_after_booking: bool = True
 
@@ -34,6 +29,11 @@ class CounselorPublicOut(BaseModel):
     offers_online: bool
     offers_in_person: bool
     is_active: bool
+    years_of_experience: int | None
+    languages_offered: str | None
+    counseling_approach: str | None
+    highest_certification: str | None
+    issuing_institution: str | None
 
     class Config:
         from_attributes = True
@@ -76,7 +76,7 @@ class CounselorProfileUpdate(BaseModel):
     title: str | None = Field(default=None, max_length=150)
     bio: str | None = Field(default=None, max_length=500)
     specialization: str | None = Field(default=None, max_length=150)
-    profile_image_url: str | None = Field(default=None, max_length=500)
+    profile_image_url: str | None = None
     phone_number: str | None = Field(default=None, max_length=30)
     general_location: str | None = Field(default=None, max_length=120)
     office_address: str | None = Field(default=None, max_length=250)

@@ -20,7 +20,7 @@ class Counselor(Base):
     bio: Mapped[str | None] = mapped_column(String(500), nullable=True)
     specialization: Mapped[str] = mapped_column(String(150), nullable=False)
 
-    profile_image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    profile_image_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     phone_number: Mapped[str | None] = mapped_column(String(30), nullable=True)
     general_location: Mapped[str | None] = mapped_column(String(120), nullable=True)
     office_address: Mapped[str | None] = mapped_column(String(250), nullable=True)

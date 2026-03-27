@@ -28,6 +28,95 @@ function StatCard({ title, value, label, accent }) {
   );
 }
 
+function formatSessionTime(dateStr) {
+  const date = new Date(dateStr);
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
+
+  const isToday = date.toDateString() === today.toDateString();
+  const isTomorrow = date.toDateString() === tomorrow.toDateString();
+
+  const time = date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const day = isToday ? "Today" : isTomorrow ? "Tomorrow" : date.toLocaleDateString([], { weekday: "long", month: "short", day: "numeric" });
+
+  return `${day}, ${time}`;
+}
+
+function UpcomingSessions() {
+  const [sessions, setSessions] = useState([]);
+  const [counselors, setCounselors] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get("/bookings/me", { params: { limit: 50 } })
+      .then(async (res) => {
+        const now = new Date();
+        const upcoming = res.data
+          .filter((b) => b.status === "APPROVED" && new Date(b.scheduled_for) >= now)
+          .sort((a, b) => new Date(a.scheduled_for) - new Date(b.scheduled_for))
+          .slice(0, 4);
+
+        setSessions(upcoming);
+
+        // fetch each unique counselor's public info
+        const ids = [...new Set(upcoming.map((b) => b.counselor_id))];
+        const res2 = await api.get("/counselors/");
+        const map = {};
+        res2.data.forEach((c) => { if (ids.includes(c.id)) map[c.id] = c; });
+        setCounselors(map);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <div className="dashboard-card">
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+        <h3 style={{ margin: 0 }}>Upcoming Sessions</h3>
+        <Link to="/dashboard/bookings" style={{ fontSize: 12, color: "var(--accent)", textDecoration: "none" }}>View all</Link>
+      </div>
+
+      {loading ? (
+        <p className="small-muted">Loading...</p>
+      ) : sessions.length === 0 ? (
+        <div className="empty-state" style={{ minHeight: "80px" }}>No upcoming sessions.</div>
+      ) : (
+        <div className="list-stack">
+          {sessions.map((b) => {
+            const c = counselors[b.counselor_id];
+            return (
+              <div key={b.id} className="simple-item" style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                {c?.profile_image_url ? (
+                  <img src={c.profile_image_url} alt={c.full_name}
+                    style={{ width: 42, height: 42, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
+                ) : (
+                  <div style={{ width: 42, height: 42, borderRadius: "50%", background: "rgba(202,163,143,0.15)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 16, color: "var(--accent)", flexShrink: 0 }}>
+                    {c?.full_name?.charAt(0) ?? "?"}
+                  </div>
+                )}
+                <div>
+                  <p style={{ margin: 0, fontWeight: 600, fontSize: 14, color: "var(--text-main)" }}>
+                    {c?.full_name ?? "Counselor"}
+                  </p>
+                  {c?.title && (
+                    <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)" }}>{c.title}</p>
+                  )}
+                  <p style={{ margin: 0, fontSize: 12, color: "var(--accent)" }}>
+                    {formatSessionTime(b.scheduled_for)}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Overview() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -54,20 +143,9 @@ function Overview() {
       {/* Welcome */}
       <div style={{ marginBottom: "28px" }}>
         <h1 className="dashboard-page-title">
-          Welcome back, <span style={{ color: "var(--accent)" }}>{user?.nickname}</span> 👋
+          Welcome back, <span style={{ color: "var(--accent)" }}>{user?.nickname}</span> 
         </h1>
         <p className="dashboard-page-subtitle">Here is a quick view of your wellness journey.</p>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="dashboard-card" style={{ marginBottom: "20px" }}>
-        <h3>Quick Actions</h3>
-        <div className="quick-links">
-          <Link className="quick-link-chip" to="/dashboard/ai-support">💬 Start AI Chat</Link>
-          <Link className="quick-link-chip" to="/dashboard/checkins">📝 New Check-in</Link>
-          <Link className="quick-link-chip" to="/dashboard/counselors">🔍 Find Counselor</Link>
-          <Link className="quick-link-chip" to="/dashboard/bookings">📅 View Bookings</Link>
-        </div>
       </div>
 
       {/* Top Stats Row */}
@@ -79,12 +157,12 @@ function Overview() {
         />
         <StatCard
           title="Avg Mood"
-          value={assessments_last_7_days?.avg_mood != null ? `${assessments_last_7_days.avg_mood.toFixed(1)}/10` : "—"}
+          value={assessments_last_7_days?.avg_mood != null ? `${assessments_last_7_days.avg_mood.toFixed(1)}` : "—"}
           label="Last 7 days"
         />
         <StatCard
           title="Avg Stress"
-          value={assessments_last_7_days?.avg_stress != null ? `${assessments_last_7_days.avg_stress.toFixed(1)}/10` : "—"}
+          value={assessments_last_7_days?.avg_stress != null ? `${assessments_last_7_days.avg_stress.toFixed(1)}` : "—"}
           label="Last 7 days"
           accent="#f5c95f"
         />
@@ -97,23 +175,8 @@ function Overview() {
 
       {/* Middle Row */}
       <div className="dashboard-grid dashboard-cards-3" style={{ marginBottom: "20px" }}>
-        {/* Mood Summary */}
-        <div className="dashboard-card">
-          <h3>Mood Summary</h3>
-          <p className="small-muted" style={{ marginBottom: "12px" }}>Last 7 days — {moods_last_7_days?.total ?? 0} entries</p>
-          {moods_last_7_days?.total > 0 ? (
-            <div className="list-stack">
-              {Object.entries(moods_last_7_days.counts).map(([mood, count]) => (
-                <div key={mood} className="simple-item" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span>{MOOD_EMOJI[mood] || "🔵"} {mood}</span>
-                  <span style={{ color: "var(--accent)", fontWeight: 600 }}>{count}x</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="empty-state" style={{ minHeight: "80px" }}>No mood entries this week.</div>
-          )}
-        </div>
+        {/* Upcoming Sessions */}
+        <UpcomingSessions />
 
         {/* Assessments Summary */}
         <div className="dashboard-card">
@@ -121,18 +184,43 @@ function Overview() {
           <p className="small-muted" style={{ marginBottom: "12px" }}>Last 7 days — {assessments_last_7_days?.checkins ?? 0} check-ins</p>
           <div className="list-stack">
             <div className="simple-item" style={{ display: "flex", justifyContent: "space-between" }}>
-              <span>Avg Mood</span>
+              <span>Average Mood</span>
               <span style={{ color: "var(--accent)" }}>{assessments_last_7_days?.avg_mood?.toFixed(1) ?? "—"}/10</span>
             </div>
             <div className="simple-item" style={{ display: "flex", justifyContent: "space-between" }}>
-              <span>Avg Stress</span>
+              <span>Average Stress</span>
               <span style={{ color: "#f5c95f" }}>{assessments_last_7_days?.avg_stress?.toFixed(1) ?? "—"}/10</span>
             </div>
             <div className="simple-item" style={{ display: "flex", justifyContent: "space-between" }}>
-              <span>Avg Sleep</span>
+              <span>Average Sleep</span>
               <span style={{ color: "#67d58c" }}>{assessments_last_7_days?.avg_sleep?.toFixed(1) ?? "—"}/10</span>
             </div>
           </div>
+        </div>
+
+        <div className="dashboard-card">
+          <h3 style={{marginBottom: "50px"}}>Daily Wellness Tip</h3>
+          <p style={{ lineHeight: 1.7, color: "var(--text-soft)", marginTop: "10px" }}>{tip}</p>
+        </div>
+        
+      </div>
+
+      {/* Recommended Content + Wellness Tip */}
+      <div className="dashboard-grid dashboard-cards-2" style={{ marginBottom: "20px" }}>
+        <div className="dashboard-card">
+          <h3>Recommended Content</h3>
+          {recommended_content?.length > 0 ? (
+            <div className="list-stack">
+              {recommended_content.map((c) => (
+                <div key={c.id} className="simple-item">
+                  <p style={{ margin: 0, fontWeight: 600 }}>{c.title}</p>
+                  <p className="small-muted" style={{ margin: "4px 0 0" }}>{c.category}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">No recommended content yet. Check back soon.</div>
+          )}
         </div>
 
         {/* Bookings Summary */}
@@ -158,30 +246,6 @@ function Overview() {
               <span className="status-pill approved">Approved</span>
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Recommended Content + Wellness Tip */}
-      <div className="dashboard-grid dashboard-cards-2" style={{ marginBottom: "20px" }}>
-        <div className="dashboard-card">
-          <h3>Recommended Content</h3>
-          {recommended_content?.length > 0 ? (
-            <div className="list-stack">
-              {recommended_content.map((c) => (
-                <div key={c.id} className="simple-item">
-                  <p style={{ margin: 0, fontWeight: 600 }}>{c.title}</p>
-                  <p className="small-muted" style={{ margin: "4px 0 0" }}>{c.category}</p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="empty-state">No recommended content yet. Check back soon.</div>
-          )}
-        </div>
-
-        <div className="dashboard-card">
-          <h3>🌿 Daily Wellness Tip</h3>
-          <p style={{ lineHeight: 1.7, color: "var(--text-soft)", marginTop: "10px" }}>{tip}</p>
         </div>
       </div>
     </div>

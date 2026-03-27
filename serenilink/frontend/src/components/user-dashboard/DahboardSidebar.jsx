@@ -30,7 +30,7 @@ function DashboardSidebar({ collapsed, setCollapsed }) {
     {
       title: "Wellness",
       items: [
-        { label: "Resources", icon: <LuLayers />, to: "/resources" },
+        { label: "Resources", icon: <LuLayers />, to: "/dashboard/resources" },
         { label: "Check-In", icon: <LuSmile />, to: "/dashboard/checkins" },
         { label: "Progress", icon: <LuChartNoAxesCombined />, to: "/dashboard/progress" },
         { label: "Exercises", icon: <LuLeaf />, to: "/dashboard/exercises" },
@@ -40,7 +40,7 @@ function DashboardSidebar({ collapsed, setCollapsed }) {
       title: "Activity",
       items: [
         { label: "Notifications", icon: <LuBell />, to: "/dashboard/notifications" },
-        { label: "Messages", icon: <LuMessageSquare />, to: "/dashboard/bookings" },
+        { label: "Messages", icon: <LuMessageSquare />, to: "/dashboard/messages" },
       ],
     },
     {

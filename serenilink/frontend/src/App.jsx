@@ -10,6 +10,7 @@ import Resources from "./pages/resources/Resources";
 import Login from "./pages/Login/Login";
 import Register from "./pages/register/Register";
 import CounselorApplication from "./pages/counselorApplication/CounselorApplication";
+import GuestAiSupport from "./pages/home/GuestAiSupport";
 
 // User dashboard
 import DashboardLayout from "./components/user-dashboard/DashboardLayout";
@@ -24,6 +25,8 @@ import Notifications from "./pages/user-dashboard/Notifications";
 import Settings from "./pages/user-dashboard/Settings";
 import AiSupport from "./pages/user-dashboard/AiSupport";
 import FindCounselors from "./pages/user-dashboard/FindCounselors";
+import DashboardResources from "./pages/user-dashboard/DashboardResources";
+import Messages from "./pages/user-dashboard/Messages";
 
 // Admin dashboard
 import AdminLayout from "./components/admin-dashboard/AdminLayout";
@@ -65,6 +68,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/counselor-application" element={<CounselorApplication />} />
+      <Route path="/guest-ai" element={<GuestAiSupport />} />
 
       {/* User Dashboard */}
       <Route path="/dashboard" element={<DashboardLayout />}>
@@ -79,6 +83,8 @@ function App() {
         <Route path="settings" element={<Settings />} />
         <Route path="ai-support" element={<AiSupport />} />
         <Route path="counselors" element={<FindCounselors />} />
+        <Route path="resources" element={<DashboardResources />} />
+        <Route path="messages" element={<Messages />} />
       </Route>
 
       {/* Admin Dashboard */}

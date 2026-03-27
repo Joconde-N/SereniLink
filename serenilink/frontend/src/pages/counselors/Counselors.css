@@ -245,11 +245,12 @@
   color: #8B6B5E;
   padding: 12px 20px;
   border: 1px solid #8B6B5E;
-  border-radius: 999px; 
+  border-radius: 999px;
   font-weight: 600;
   font-size: 0.95rem;
   display: inline-block;
   transition: 0.3s ease;
+  cursor: pointer;
 }
 
 .book-btn:hover {
@@ -277,14 +278,15 @@
   bottom: 35px;
   background: transparent;
   box-shadow: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
   width: auto;
   height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 999;
-
-  
 }
 
 .counselors-chat-btn .chat-svg {

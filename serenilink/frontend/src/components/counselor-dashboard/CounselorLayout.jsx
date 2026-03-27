@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Outlet, Navigate, useLocation } from "react-router-dom";
 import CounselorSidebar from "./CounselorSidebar";
+import NotificationBell from "../user-dashboard/NotificationBell";
 import { useAuth } from "../../context/AuthContext";
 
 function CounselorLayout() {
@@ -27,7 +28,10 @@ function CounselorLayout() {
   return (
     <div className="dashboard-shell">
       <CounselorSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-      <main className="dashboard-main">
+      <main className="dashboard-main" style={{ position: "relative" }}>
+        <div style={{ position: "absolute", top: "28px", right: "28px", zIndex: 10 }}>
+          <NotificationBell notifPath="/counselor/notifications" />
+        </div>
         <Outlet />
       </main>
     </div>

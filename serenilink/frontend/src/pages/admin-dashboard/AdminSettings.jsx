@@ -1,20 +1,31 @@
 import React, { useState } from "react";
+import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 
 function AdminSettings() {
   const { user } = useAuth();
   const [form, setForm] = useState({ current_password: "", new_password: "", confirm_password: "" });
   const [msg, setMsg]   = useState("");
+  const [saving, setSaving] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (form.new_password !== form.confirm_password) {
-      setMsg({ text: "New passwords do not match.", ok: false });
-      return;
+      setMsg({ text: "New passwords do not match.", ok: false }); return;
     }
-    // No password change endpoint in backend — inform user
-    setMsg({ text: "Password change is not yet supported by the API.", ok: false });
-    setTimeout(() => setMsg(""), 4000);
+    if (form.new_password.length < 6) {
+      setMsg({ text: "Password must be at least 6 characters.", ok: false }); return;
+    }
+    setSaving(true);
+    try {
+      await api.post("/auth/change-password", { new_password: form.new_password });
+      setMsg({ text: "Password updated successfully.", ok: true });
+      setForm({ current_password: "", new_password: "", confirm_password: "" });
+    } catch (err) {
+      setMsg({ text: err.response?.data?.detail || "Failed to update password.", ok: false });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -62,7 +73,7 @@ function AdminSettings() {
             <label className="form-label">Confirm New Password</label>
             <input className="form-input" type="password" value={form.confirm_password} onChange={(e) => setForm({ ...form, confirm_password: e.target.value })} required />
           </div>
-          <button className="primary-btn" type="submit" style={{ alignSelf: "flex-start" }}>Update Password</button>
+          <button className="primary-btn" type="submit" disabled={saving} style={{ alignSelf: "flex-start" }}>{saving ? "Updating..." : "Update Password"}</button>
         </form>
       </div>
     </div>

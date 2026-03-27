@@ -35,22 +35,19 @@ function CounselorNotifications() {
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
-        <div>
-          <h1 className="dashboard-page-title">Notifications</h1>
-          <p className="dashboard-page-subtitle">Stay updated on bookings and client activity.</p>
-        </div>
-        <div style={{ display: "flex", gap: "10px", alignItems: "center", marginTop: "8px" }}>
-          {unreadCount > 0 && (
-            <button className="secondary-btn" type="button" onClick={markAllRead} style={{ fontSize: "13px" }}>
-              Mark all read
-            </button>
-          )}
-          <label style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--text-soft)", fontSize: "14px", cursor: "pointer" }}>
-            <input type="checkbox" checked={unreadOnly} onChange={(e) => setUnreadOnly(e.target.checked)} />
-            Unread only
-          </label>
-        </div>
+      <h1 className="dashboard-page-title">Notifications</h1>
+      <p className="dashboard-page-subtitle">Stay updated on bookings and client activity.</p>
+
+      <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: "16px" }}>
+        <label style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--text-soft)", fontSize: "14px", cursor: "pointer" }}>
+          <input type="checkbox" checked={unreadOnly} onChange={(e) => setUnreadOnly(e.target.checked)} />
+          Unread only
+        </label>
+        {unreadCount > 0 && (
+          <button className="secondary-btn" type="button" onClick={markAllRead} style={{ fontSize: "13px" }}>
+            Mark all read
+          </button>
+        )}
       </div>
 
       {loading ? (

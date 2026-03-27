@@ -81,7 +81,7 @@ function AdminOverview() {
       {/* Welcome */}
       <div style={{ marginBottom: "28px" }}>
         <h1 className="dashboard-page-title">
-          Welcome, <span style={{ color: "var(--accent)" }}>{user?.nickname}</span> 👋
+          Welcome, <span style={{ color: "var(--accent)" }}>{user?.nickname}</span> 
         </h1>
         <p className="dashboard-page-subtitle">System overview — manage the entire SereniLink platform.</p>
       </div>
@@ -92,19 +92,6 @@ function AdminOverview() {
         </div>
       )}
 
-      {/* Quick Actions */}
-      <div className="dashboard-card" style={{ marginBottom: "20px" }}>
-        <h3>Quick Actions</h3>
-        <div className="quick-links">
-          <Link className="quick-link-chip" to="/admin/applications">📋 Applications</Link>
-          <Link className="quick-link-chip" to="/admin/bookings">📅 Bookings</Link>
-          <Link className="quick-link-chip" to="/admin/content">📝 Content</Link>
-          <Link className="quick-link-chip" to="/admin/exercises">🏋️ Exercises</Link>
-          <Link className="quick-link-chip" to="/admin/users">👥 Users</Link>
-          <Link className="quick-link-chip" to="/admin/insights">📊 Insights</Link>
-        </div>
-      </div>
-
       {/* Summary Cards Row 1 */}
       <div className="dashboard-grid dashboard-cards-4" style={{ marginBottom: "20px" }}>
         <StatCard title="Total Users"          value={t.users} />
@@ -113,63 +100,37 @@ function AdminOverview() {
         <StatCard title="Total Bookings"       value={t.bookings} />
       </div>
 
-      {/* Summary Cards Row 2 */}
-      <div className="dashboard-grid dashboard-cards-4" style={{ marginBottom: "20px" }}>
-        <StatCard title="Approved Bookings"   value={byStatus.APPROVED}   color="#67d58c" />
-        <StatCard title="Completed Bookings"  value={byStatus.COMPLETED}  color="var(--accent)" />
-        <StatCard title="Published Content"   value={t.published_content} color="var(--accent)" />
-        <StatCard title="Total Exercises"     value={exercises.length} />
-      </div>
 
-      {/* Pending Applications Preview */}
-      <div className="dashboard-card" style={{ marginBottom: "20px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
-          <h3 style={{ margin: 0 }}>Pending Counselor Applications</h3>
-          <Link to="/admin/applications" style={{ color: "var(--accent)", fontSize: "13px", textDecoration: "none" }}>View all →</Link>
-        </div>
-        {pending.length === 0 ? (
-          <div className="empty-state">No pending applications.</div>
-        ) : (
-          <div className="list-stack">
-            {pending.slice(0, 3).map((a) => (
-              <div key={a.id} className="simple-item">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "10px" }}>
-                  <div>
-                    <p style={{ margin: 0, fontWeight: 600 }}>{a.full_name}</p>
-                    <p className="small-muted" style={{ margin: "4px 0 0" }}>{a.specialization} {a.title ? `· ${a.title}` : ""}</p>
-                    {a.bio && <p className="small-muted" style={{ margin: "4px 0 0", fontStyle: "italic" }}>{a.bio.slice(0, 100)}{a.bio.length > 100 ? "…" : ""}</p>}
-                  </div>
-                  <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
-                    <button className="primary-btn" style={{ height: "36px", padding: "0 14px", fontSize: "13px" }} onClick={() => handleApplication(a.id, "approve")}>Approve</button>
-                    <button className="secondary-btn" style={{ height: "36px", padding: "0 14px", fontSize: "13px", color: "#f08f8f", borderColor: "rgba(239,68,68,0.3)" }} onClick={() => handleApplication(a.id, "reject")}>Reject</button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Bookings Overview + Payment Update */}
+      {/* Pending Applications + Payment Update — 2 col grid */}
       <div className="dashboard-grid dashboard-cards-2" style={{ marginBottom: "20px" }}>
-        {/* Bookings Overview */}
+
+        {/* Pending Applications Preview */}
         <div className="dashboard-card">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
-            <h3 style={{ margin: 0 }}>Bookings Overview</h3>
-            <Link to="/admin/bookings" style={{ color: "var(--accent)", fontSize: "13px", textDecoration: "none" }}>Manage →</Link>
+            <h3 style={{ margin: 0 }}>Pending Counselor Applications</h3>
+            <Link to="/admin/applications" style={{ color: "var(--accent)", fontSize: "13px", textDecoration: "none" }}>View all →</Link>
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "14px" }}>
-            {Object.entries(byStatus).map(([s, count]) => (
-              <span key={s} className={`status-pill ${STATUS_CLASS[s] ?? "pending"}`}>{s}: {count}</span>
-            ))}
-          </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-            {Object.entries(byPayment).map(([p, count]) => (
-              <span key={p} style={{ padding: "6px 10px", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(255,255,255,0.05)", color: PAYMENT_COLOR[p] ?? "var(--text-soft)" }}>
-                {p}: {count}
-              </span>
-            ))}
-          </div>
+          {pending.length === 0 ? (
+            <div className="empty-state">No pending applications.</div>
+          ) : (
+            <div className="list-stack">
+              {pending.slice(0, 3).map((a) => (
+                <div key={a.id} className="simple-item">
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "10px" }}>
+                    <div>
+                      <p style={{ margin: 0, fontWeight: 600 }}>{a.full_name}</p>
+                      <p className="small-muted" style={{ margin: "4px 0 0" }}>{a.specialization} {a.title ? `· ${a.title}` : ""}</p>
+                      {a.bio && <p className="small-muted" style={{ margin: "4px 0 0", fontStyle: "italic" }}>{a.bio.slice(0, 100)}{a.bio.length > 100 ? "…" : ""}</p>}
+                    </div>
+                    <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
+                      <button className="primary-btn" style={{ height: "36px", padding: "0 14px", fontSize: "13px" }} onClick={() => handleApplication(a.id, "approve")}>Approve</button>
+                      <button className="secondary-btn" style={{ height: "36px", padding: "0 14px", fontSize: "13px", color: "#f08f8f", borderColor: "rgba(239,68,68,0.3)" }} onClick={() => handleApplication(a.id, "reject")}>Reject</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Payment Update Preview */}
@@ -211,60 +172,10 @@ function AdminOverview() {
             </div>
           )}
         </div>
+
       </div>
 
-      {/* Content + Exercises Preview */}
-      <div className="dashboard-grid dashboard-cards-2" style={{ marginBottom: "20px" }}>
-        {/* Content Preview */}
-        <div className="dashboard-card">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
-            <h3 style={{ margin: 0 }}>Recent Content</h3>
-            <Link to="/admin/content" style={{ color: "var(--accent)", fontSize: "13px", textDecoration: "none" }}>Manage →</Link>
-          </div>
-          {content.length === 0 ? (
-            <div className="empty-state" style={{ minHeight: "100px" }}>No content yet.</div>
-          ) : (
-            <div className="list-stack">
-              {content.map((c) => (
-                <div key={c.id} className="simple-item" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div>
-                    <p style={{ margin: 0, fontWeight: 600, fontSize: "14px" }}>{c.title}</p>
-                    <p className="small-muted" style={{ margin: "2px 0 0" }}>{c.category}</p>
-                  </div>
-                  <span className={`status-pill ${c.is_published ? "approved" : "pending"}`}>
-                    {c.is_published ? "Published" : "Draft"}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Exercises Preview */}
-        <div className="dashboard-card">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
-            <h3 style={{ margin: 0 }}>Recent Exercises</h3>
-            <Link to="/admin/exercises" style={{ color: "var(--accent)", fontSize: "13px", textDecoration: "none" }}>Manage →</Link>
-          </div>
-          {exercises.length === 0 ? (
-            <div className="empty-state" style={{ minHeight: "100px" }}>No exercises yet.</div>
-          ) : (
-            <div className="list-stack">
-              {exercises.map((e) => (
-                <div key={e.id} className="simple-item" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div>
-                    <p style={{ margin: 0, fontWeight: 600, fontSize: "14px" }}>{e.title}</p>
-                    <p className="small-muted" style={{ margin: "2px 0 0" }}>{e.type}</p>
-                  </div>
-                  <span className={`status-pill ${e.is_active ? "approved" : "cancelled"}`}>
-                    {e.is_active ? "Active" : "Inactive"}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+      
 
       {/* Platform Insights */}
       <div className="dashboard-card">
