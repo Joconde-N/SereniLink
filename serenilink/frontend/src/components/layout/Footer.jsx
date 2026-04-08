@@ -6,13 +6,14 @@ function Footer() {
     <footer className="custom-footer">
       <div className="footer-top">
         <div className="footer-left">
+          <h2>SereniLink</h2>
           <p className="footer-description">
             SereniLink offers confidential AI support
             <br />
             and professional guidance for mental well-being.
           </p>
 
-          <h3>Social Links</h3>
+        
 
           <div className="social-icons">
             <a href="#" aria-label="X">
@@ -100,7 +101,6 @@ function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <h2>SereniLink</h2>
         <p>Copyright © SereniLink. Developed by Joconde</p>
       </div>
     </footer>

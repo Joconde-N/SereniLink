@@ -111,22 +111,29 @@ a {
 .footer-description {
   font-size: 1rem;
   line-height: 1;
-  margin-bottom: 40px;
-  color: #B0B0B0;
+  margin-bottom: 25px;
+  color: #e9e9e9;
 }
 
 .footer-left h3,
 .footer-right h3 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: #FFFFFF;
   margin-bottom: 20px;
   font-weight: 700;
 }
 
+.footer-left h2 {
+  color: #B0B0B0;
+  font-size: 1.35rem;
+  margin-bottom: 25px;
+}
+
 .social-icons {
   display: flex;
-  gap: 28px;
+  gap: 20px;
   align-items: center;
+  
 }
 
 .social-icons a {
@@ -156,7 +163,7 @@ a {
 .footer-links-grid div {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
 .footer-links-grid a {
@@ -169,23 +176,17 @@ a {
 }
 
 .footer-bottom {
-  border-top: 1px solid #B0B0B0;
+  border-top: 1px solid #b0b0b062;
   padding-top: 20px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  gap: 20px;
-}
-
-.footer-bottom h2 {
-  color: #B0B0B0;
-  font-size: 2rem;
-  font-weight: 700;
+ 
 }
 
 .footer-bottom p {
-  color: #F2F2F2;
-  font-size: 1rem;
+  color: #b0b0b0;
+  font-size: 0.9rem;
 }
 
 /* GENERAL PAGE PLACEHOLDERS */
