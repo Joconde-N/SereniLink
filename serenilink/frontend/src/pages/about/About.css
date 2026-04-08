@@ -48,7 +48,7 @@
 }
 
 .about-btn {
-  background: #8B6B5E;
+  background: #967364;
   color: #ffffff;
   padding: 14px 34px;
   border-radius: 999px;
@@ -120,7 +120,7 @@
 
 /* WHO */
 .who-section {
-  background: #090b0a;
+  background: #070808;
   padding: 70px 70px 40px;
   text-align: center;
 }
@@ -143,7 +143,7 @@
 .who-box {
   max-width: 1080px;
   margin: 0 auto;
-  background: #2b2d2b;
+  background: #1A1D1E;
   border-radius: 6px;
   padding: 34px 50px;
 }
@@ -156,7 +156,7 @@
 
 /* MISSION */
 .mission-section {
-  background: #090b0a;
+  background: #070808;
   padding: 40px 70px 60px;
   display: grid;
   grid-template-columns: 1fr 0.9fr;
@@ -191,7 +191,7 @@
 }
 
 .mission-text p {
-  color: #f2f2f2;
+  color: #ffffff;
   font-size: 1rem;
   line-height: 1.6;
   margin-bottom: 28px;
@@ -200,14 +200,14 @@
 
 /* VISION */
 .vision-section {
-  background: #090b0a;
+  background: #070808;
   padding: 20px 70px 60px;
 }
 
 .vision-box {
   max-width: 1080px;
   margin: 0 auto;
-  background: #2b2d2b;
+  background: #1A1D1E;
   border-radius: 6px;
   padding: 28px 50px 36px;
   text-align: center;
@@ -218,7 +218,7 @@
 }
 
 .vision-box p {
-  color: #f2f2f2;
+  color: #ffffff;
   font-size: 1rem;
   line-height: 1.65;
   max-width: 850px;
@@ -228,7 +228,7 @@
 /* VALUES */
 .values-section {
   position: relative;
-  background: #090b0a;
+  background: #070808;
   padding: 30px 70px 110px;
   text-align: center;
   overflow: hidden;
@@ -307,9 +307,8 @@
   justify-self: end;
 }
 
-/* wider cards */
 .value-card {
-  background: #2B2D2B;
+  background: #1A1D1E;
   border-radius: 8px;
   padding: 34px 30px;
   width: 100%;
@@ -342,7 +341,7 @@
 .value-card p {
   font-size: 0.98rem;
   line-height: 1.6;
-  color: #F2F2F2;
+  color: #ffffff;
   max-width: 240px;
   margin: 0 auto;
 }

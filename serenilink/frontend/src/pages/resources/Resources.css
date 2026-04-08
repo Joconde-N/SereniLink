@@ -145,6 +145,11 @@
   white-space: nowrap;
 }
 
+.section-heading-row h2 span{
+  color: #E19A86;
+}
+
+
 .section-line {
   height: 1px;
   background: rgba(203, 180, 167, 0.6);
@@ -295,7 +300,7 @@
   border: none;
   color: #ffffff;
   text-decoration: underline;
-  font-size: 1.2rem;
+  font-size: 1rem;
   cursor: pointer;
 }
 

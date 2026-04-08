@@ -58,7 +58,7 @@
 }
 
 .home-btn {
-  background: #8B6B5E;
+  background: #967364;
   color: #ffffff;
   padding: 14px 30px;
   border-radius: 999px;
@@ -128,7 +128,7 @@
 /* WHY */
 .why-section {
   padding: 80px 70px 60px;
-  background: #090b0a;
+  background: #070808;
   text-align: center;
 }
 
@@ -157,7 +157,7 @@
 }
 
 .info-card {
-  background: #2B2D2B;
+  background: #1A1D1E;
   border-radius: 8px;
   padding: 28px 24px;
   text-align: left;
@@ -173,20 +173,20 @@
 }
 
 .feature-svg {
-  width: 48px;
-  height: 48px;
+  width: 35px;
+  height: 35px;
   display: block;
 }
 
 .info-card h3 {
   color: #967364;
-  font-size: 1.4rem;
-  margin-bottom: 18px;
+  font-size: 1.3rem;
+  margin-bottom: 10px;
 }
 
 .info-card p {
-  color: #F2F2F2;
-  line-height: 1.6;
+  color: #FFFFFF;
+  line-height: 1.55;
   font-size: 1rem;
 }
 
@@ -197,7 +197,7 @@
   grid-template-columns: 1.1fr 0.9fr;
   gap: 40px;
   align-items: center;
-  background: #090b0a;
+  background: #070808;
 }
 
 .resources-section h2 {
@@ -208,7 +208,7 @@
 .resources-subtitle {
   font-family: Georgia, "Times New Roman", serif;
   font-style: italic;
-  color: #F2F2F2;
+  color: #ffffff;
   font-size: 1.4rem;
   margin-bottom: 28px;
 }
@@ -223,7 +223,7 @@
   display: flex;
   gap: 18px;
   align-items: flex-start;
-  background: #2B2D2B;
+  background: #1A1D1E;
   padding: 24px 22px;
   border-radius: 8px;
 }
@@ -238,19 +238,19 @@
 }
 
 .resource-svg {
-  width: 48px;
-  height: 48px;
+  width: 35px;
+  height: 35px;
   display: block;
 }
 
 .resource-card h3 {
   color: #967364;
-  font-size: 1.35rem;
+  font-size: 1.3rem;
   margin-bottom: 10px;
 }
 
 .resource-card p {
-  color: #F2F2F2;
+  color: #FFFFFF;
   line-height: 1.55;
 }
 
@@ -276,7 +276,7 @@
 .works-section {
   padding: 70px;
   text-align: center;
-  background: #090b0a;
+  background: #070808;
 }
 
 .steps {
@@ -294,7 +294,7 @@
   height: 70px;
   margin: 0 auto 20px;
   border-radius: 50%;
-  background: #8B6B5E;
+  background: #967364;
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -304,7 +304,7 @@
 }
 
 .step-box p {
-  color: #F2F2F2;
+  color: #FFFFFF;
   max-width: 260px;
   margin: 0 auto;
   line-height: 1.6;
@@ -315,7 +315,7 @@
   position: relative;
   padding: 60px 70px 100px;
   text-align: center;
-  background: #090b0a;
+  background: #070808;
   overflow: hidden;
 }
 
@@ -328,7 +328,7 @@
 }
 
 .tool-card {
-  background: #2B2D2B;
+  background: #1A1D1E;
   border-radius: 8px;
   padding: 30px 20px;
   min-height: 130px;
@@ -336,25 +336,25 @@
 
 .tool-icon {
   color: #967364;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
   display: flex;
   justify-content: center;
 }
 
 .tool-svg {
-  width: 48px;
-  height: 48px;
+  width: 35px;
+  height: 35px;
   display: block;
 }
 
 .tool-card h3 {
   color: #967364;
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   margin-bottom: 10px;
 }
 
 .tool-card p {
-  color: #F2F2F2;
+  color: #FFFFFF;
 }
 
 /* Decorative rings */

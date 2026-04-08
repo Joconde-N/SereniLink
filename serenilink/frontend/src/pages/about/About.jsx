@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./About.css";
+import { HandFist, HatGlasses, LockKeyholeOpen } from "lucide-react";
 
 import aboutHeroImage from "../../assets/about-hero-woman.png";
 import missionImage from "../../assets/mental-health-laptop.png";
@@ -105,16 +106,7 @@ function About() {
         <div className="values-grid">
           <div className="value-card value-top">
             <div className="value-icon">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 32 32"
-                className="value-svg"
-              >
-                <path
-                  fill="currentColor"
-                  d="M13.063 4c-.876 0-1.645.45-2.188 1.031c-.543.582-.934 1.309-1.281 2.094c-.531 1.21-.91 2.555-1.25 3.813c-1.086.316-2.008.71-2.75 1.187C4.727 12.684 4 13.457 4 14.5c0 .906.555 1.633 1.25 2.156c.594.446 1.324.817 2.188 1.125c.05.23.125.465.218.688c-.843.476-2.18 1.398-3.468 3.156l-.594.844l.844.593l3.28 2.25L6.376 28h19.25l-1.344-2.688l3.282-2.25l.843-.593l-.593-.844c-1.29-1.758-2.625-2.68-3.47-3.156a4 4 0 0 0 .22-.688c.863-.308 1.593-.68 2.187-1.125c.695-.523 1.25-1.25 1.25-2.156c0-1.043-.727-1.816-1.594-2.375c-.742-.477-1.664-.871-2.75-1.188c-.375-1.304-.789-2.671-1.312-3.874c-.34-.778-.715-1.493-1.25-2.063s-1.297-1-2.157-1c-.582 0-1.023.16-1.5.281c-.476.121-.957.219-1.437.219c-.96 0-1.766-.5-2.938-.5"
-                />
-              </svg>
+              <HatGlasses className="value-svg" />
             </div>
             <h3>Confidentiality</h3>
             <p>We protect user privacy and ensure secure communication.</p>
@@ -122,18 +114,7 @@ function About() {
 
           <div className="value-card value-left">
             <div className="value-icon">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                className="value-svg"
-              >
-                <path
-                  fill="currentColor"
-                  fillRule="evenodd"
-                  d="M6.5 6.5a5.5 5.5 0 1 1 11 0v5.17a7 7 0 1 1-2-1.733V6.5a3.5 3.5 0 1 0-7 0V8h-2zM12 11a5 5 0 1 0 0 10a5 5 0 0 0 0-10m0 7a2 2 0 1 0 0-4a2 2 0 0 0 0 4"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <LockKeyholeOpen className="value-svg" />
             </div>
             <h3>Accessibility</h3>
             <p>Support should be available to every young person.</p>
@@ -141,23 +122,7 @@ function About() {
 
           <div className="value-card value-right">
             <div className="value-icon">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 14 14"
-                className="value-svg"
-              >
-                <g
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1"
-                >
-                  <path d="M3.901 13.407v-2.464c-1.304-.452-2.18-1.97-2.18-3.754c0-1.063.24-2.174 1.42-2.174h2.993a1.111 1.111 0 0 1 .322 2.174l-1.71.519c.874 0 1.948.83 1.925 1.905m3.144 3.795v-2.465s.587-.293 1.2-.88c1.181-1.131 1.335-2.919 1.016-4.523c-.107-.534-.26-1.076-.477-1.532m-8.886.934V3.056a1.478 1.478 0 0 1 2.957 0v1.886" />
-                  <path d="M5.625 4.554V2.072a1.48 1.48 0 1 1 2.959 0v2.482a1.48 1.48 0 0 1-1.365 1.474" />
-                  <path d="M8.584 3.057a1.479 1.479 0 1 1 2.957 0v1.27a1.479 1.479 0 1 1-2.957 0z" />
-                </g>
-              </svg>
+              <HandFist className="value-svg" />
             </div>
             <h3>Empowerment</h3>
             <p>

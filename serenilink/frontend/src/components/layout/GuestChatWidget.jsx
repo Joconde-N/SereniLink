@@ -85,7 +85,7 @@ function GuestChatWidget() {
         padding: "13px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0,
       }}>
         <div>
-          <p style={{ margin: 0, fontWeight: 700, fontSize: "14px", color: "#f4f4f4" }}>AI Support Assistant</p>
+          <p style={{ margin: 0, fontWeight: 700, fontSize: "14px", color: "#f4f4f4" }}>SereniLinkAI</p>
           <p style={{ margin: 0, fontSize: "11px", color: messagesLeft > 1 ? "#67d58c" : "#f5c95f" }}>
             {messagesLeft} message{messagesLeft !== 1 ? "s" : ""} left ·{" "}
             <Link to="/register" style={{ color: "#E19A86", textDecoration: "none" }}>Sign up</Link>

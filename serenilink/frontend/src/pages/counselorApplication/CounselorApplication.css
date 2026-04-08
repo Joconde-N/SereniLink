@@ -23,7 +23,7 @@
 .register-brand {
   font-size: 22px;
   font-weight: 700;
-  color: #ffffff;
+  color: #b0b0b0;
 }
 
 .register-back {
@@ -207,7 +207,7 @@
 
 .counselor-check input {
   margin-top: 3px;
-  accent-color: #8B6B5E;
+  accent-color: #967364;
 }
 
 .submit-btn {
@@ -215,7 +215,7 @@
   height: 60px;
   border: none;
   border-radius: 14px;
-  background: #8B6B5E;
+  background: #967364;
   color: #ffffff;
   font-size: 18px;
   font-weight: 700;

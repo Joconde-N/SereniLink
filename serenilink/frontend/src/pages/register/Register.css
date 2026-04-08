@@ -2,7 +2,7 @@
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  background: #050505;
+  background: #070808;
   color: #ffffff;
   position: relative;
   overflow: hidden;
@@ -23,9 +23,9 @@
 }
 
 .register-brand {
-  font-size: 21px;
+  font-size: 22px;
   font-weight: 700;
-  color: #ffffff;
+  color: #B0B0B0;
 }
 
 .register-back {
@@ -127,7 +127,7 @@
 }
 
 .register-subtext a {
-  color: #b88b77;
+  color: #E19A86;
   text-decoration: none;
   font-weight: 600;
 }
@@ -139,7 +139,7 @@
 .register-field label {
   display: block;
   margin-bottom: 10px;
-  color: #d9dde7;
+  color: #aeb4c1;
   font-size: 15px;
   font-weight: 500;
 }

@@ -30,7 +30,7 @@
 
 .login-back {
   text-decoration: none;
-  color: #aab0c4;
+  color: #aeb4c1;
   font-size: 15px;
   font-weight: 500;
 }
@@ -155,7 +155,7 @@
   display: block;
   margin-bottom: 10px;
   font-size: 15px;
-  color: #d9dde7;
+  color: #aeb4c1;
   font-weight: 500;
 }
 
@@ -165,14 +165,14 @@
   border: none;
   outline: none;
   border-radius: 14px;
-  background: #151515;
+  background: #1A1D1E;
   color: #ffffff;
   padding: 0 18px;
   font-size: 16px;
 }
 
 .login-field input::placeholder {
-  color: #475778;
+  color: #98a1b3;
 }
 
 .login-password-wrap {
@@ -215,7 +215,7 @@
 }
 
 .login-forgot {
-  color: #b88b77;
+  color: #E19A86;
   font-size: 14px;
   text-decoration: none;
 }
@@ -225,7 +225,7 @@
   height: 56px;
   border: none;
   border-radius: 12px;
-  background: #a88271;
+  background: #967364;
   color: #ffffff;
   font-size: 17px;
   font-weight: 700;
@@ -249,7 +249,7 @@
 }
 
 .login-bottom-links a {
-  color: #b88b77;
+  color: #E19A86;
   text-decoration: none;
   font-weight: 600;
 }

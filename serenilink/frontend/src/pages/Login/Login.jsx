@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import loginImage from "../../assets/login.png";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import { LuEye, LuEyeOff } from "react-icons/lu";
 
 function Login() {
   const navigate = useNavigate();
@@ -118,7 +119,7 @@ function Login() {
                   onClick={() => setShowPassword(!showPassword)}
                   style={{ cursor: "pointer" }}
                 >
-                  {showPassword ? "◉" : "◎"}
+                  {showPassword ? <LuEyeOff /> : <LuEye />}
                 </span>
               </div>
             </div>

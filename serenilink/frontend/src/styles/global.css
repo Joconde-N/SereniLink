@@ -35,7 +35,7 @@ a {
 
 .nav-logo a {
   color: #B0B0B0;
-  font-size: 2rem;
+  font-size: 1.9rem;
   font-weight: 700;
 }
 
@@ -65,69 +65,61 @@ a {
 
 .theme-icon-btn {
   background: transparent;
-  border: 2px solid #3a3a3a;
-  border-radius: 10px;
+  border: none;
   cursor: pointer;
-  padding: 5px 7px;
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: 0.3s ease;
-}
-
-.theme-svg {
-  width: 28px;
-  height: 28px;
-  display: block;
   color: #B0B0B0;
-  transition: 0.3s ease;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .theme-icon-btn:hover {
-  border-color: #A68B7E;
-  background: rgba(166, 139, 126, 0.08);
-}
-
-.theme-icon-btn:hover .theme-svg {
-  color: #A68B7E;
+  background: rgba(255, 255, 255, 0.1);
+  color: #E19A86;
 }
 
 .login-btn {
-  background: #8B6B5E;
+  background: #967364;
   color: #FFFFFF;
-  padding: 11px 24px;
+  padding: 11px 15px;
   border-radius: 14px;
-  height: 42px;
+  height: 40px;
   font-weight: 600;
   display: inline-block;
 }
 
 /* FOOTER */
 .custom-footer {
-  background: #0A0A0A;
+  background: #000000;
   color: #F2F2F2;
-  padding: 50px 60px 25px;
+  padding: 35px 60px 25px;
 }
 
 .footer-top {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 40px;
-  padding-bottom: 30px;
+  padding-bottom: 25px;
 }
 
 .footer-description {
-  font-size: 1.1rem;
-  line-height: 1.5;
+  font-size: 1rem;
+  line-height: 1;
   margin-bottom: 40px;
-  color: #F2F2F2;
+  color: #B0B0B0;
 }
 
 .footer-left h3,
 .footer-right h3 {
-  font-size: 2rem;
+  font-size: 1.5rem;
   color: #FFFFFF;
-  margin-bottom: 22px;
+  margin-bottom: 20px;
   font-weight: 700;
 }
 
@@ -150,8 +142,8 @@ a {
 }
 
 .social-svg {
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
   display: block;
 }
 
@@ -168,8 +160,8 @@ a {
 }
 
 .footer-links-grid a {
-  color: #F2F2F2;
-  font-size: 1.2rem;
+  color: #B0B0B0;
+  font-size: 1rem;
 }
 
 .footer-links-grid a:hover {
@@ -178,7 +170,7 @@ a {
 
 .footer-bottom {
   border-top: 1px solid #B0B0B0;
-  padding-top: 24px;
+  padding-top: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -187,13 +179,13 @@ a {
 
 .footer-bottom h2 {
   color: #B0B0B0;
-  font-size: 2.4rem;
+  font-size: 2rem;
   font-weight: 700;
 }
 
 .footer-bottom p {
   color: #F2F2F2;
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 /* GENERAL PAGE PLACEHOLDERS */

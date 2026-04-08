@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./Resources.css";
 import api from "../../api/axios";
+import { LuSearch, LuFilter } from "react-icons/lu";
 
 import featuredVideo from "../../assets/resources/featured-video.jpg";
 import featuredMusic from "../../assets/resources/featured-music.jpg";
@@ -140,12 +141,7 @@ function Resources() {
           <div className="resources-toolbar">
             <form className="resources-search-box" onSubmit={handleSearch}>
               <span className="resources-search-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="toolbar-svg">
-                  <path
-                    fill="currentColor"
-                    d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5A6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5S14 7.01 14 9.5S11.99 14 9.5 14"
-                  />
-                </svg>
+                <LuSearch />
               </span>
               <input
                 type="text"
@@ -191,7 +187,7 @@ function Resources() {
             )}
 
             <div className="section-heading-row all-row">
-              <h2>All Resources</h2>
+              <h2>All <span>Resources</span></h2>
               <div className="section-line"></div>
             </div>
 
@@ -202,7 +198,7 @@ function Resources() {
                   className={`resource-tab${activeTab === tab ? " active" : ""}`}
                   onClick={() => setActiveTab(tab)}
                 >
-                  {tab}s
+                  {tab}
                 </button>
               ))}
             </div>
