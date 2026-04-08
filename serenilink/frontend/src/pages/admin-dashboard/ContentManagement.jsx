@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
 
-const EMPTY_FORM = { title: "", summary: "", body: "", category: "", tags: "", is_published: false };
+const EMPTY_FORM = { title: "", summary: "", body: "", category: "", tags: "", video_url: "", is_published: false };
 
 function ContentManagement() {
   const [items, setItems]       = useState([]);
@@ -34,7 +34,7 @@ function ContentManagement() {
     setForm({
       title: item.title, summary: item.summary ?? "",
       body: item.body, category: item.category,
-      tags: item.tags ?? "", is_published: item.is_published,
+      tags: item.tags ?? "", video_url: item.video_url ?? "", is_published: item.is_published,
     });
     setEditId(item.id);
     setShowForm(true);
@@ -122,6 +122,10 @@ function ContentManagement() {
               <div>
                 <label className="form-label">Summary</label>
                 <input className="form-input" value={form.summary} onChange={(e) => setForm({ ...form, summary: e.target.value })} />
+              </div>
+              <div>
+                <label className="form-label">Video URL (YouTube — for Video category only)</label>
+                <input className="form-input" placeholder="https://www.youtube.com/watch?v=..." value={form.video_url} onChange={(e) => setForm({ ...form, video_url: e.target.value })} />
               </div>
               <div>
                 <label className="form-label">Body *</label>

@@ -28,7 +28,7 @@ def list_content(
             (Content.body.ilike(like)) |
             (Content.tags.ilike(like))
         )
-    return query.order_by(Content.created_at.desc()).offset(skip).limit(limit).all()
+    return query.order_by(Content.title.asc()).offset(skip).limit(limit).all()
 
 @router.get("/{content_id}", response_model=ContentOut)
 def get_content(content_id: int, db: Session = Depends(get_db)):

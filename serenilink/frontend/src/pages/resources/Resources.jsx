@@ -10,7 +10,7 @@ import featuredArticle from "../../assets/resources/featured-article.jpg";
 
 const CATEGORY_IMAGES = {
   video: featuredVideo,
-  music: featuredMusic,
+  audio: featuredMusic,
   article: featuredArticle,
 };
 
@@ -22,7 +22,7 @@ function getCategoryImage(category) {
 function getActionLabel(category) {
   const key = (category || "").toLowerCase();
   if (key === "video") return "Watch Now";
-  if (key === "music") return "Listen Now";
+  if (key === "audio") return "Listen Now";
   return "Read Now";
 }
 
@@ -38,7 +38,7 @@ function ResourceCard({ item }) {
         />
         <div className="resource-badge">{item.category}</div>
 
-        {(cat === "video" || cat === "music") && (
+        {(cat === "video" || cat === "audio") && (
           <div className="resource-center-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="play-svg">
               <path
@@ -75,7 +75,7 @@ function ResourceCard({ item }) {
           })}{" "}
           | {item.category}
         </p>
-        <Link to="/login" className="resource-action-btn">
+        <Link to={`/resources/${item.id}`} className="resource-action-btn">
           {getActionLabel(item.category)}
         </Link>
       </div>
@@ -93,12 +93,12 @@ function Resources() {
   const [hasMore, setHasMore] = useState(true);
   const LIMIT = 9;
 
-  const fetchContent = async (newSkip = 0, append = false) => {
+  const fetchContent = async (newSkip = 0, append = false, currentSearch = search, currentTab = activeTab) => {
     setLoading(true);
     try {
       const params = { skip: newSkip, limit: LIMIT };
-      if (search) params.q = search;
-      if (activeTab !== "All") params.category = activeTab;
+      if (currentSearch) params.q = currentSearch;
+      if (currentTab !== "All") params.category = currentTab;
 
       const res = await api.get("/content/", { params });
       const data = res.data;
@@ -115,17 +115,17 @@ function Resources() {
 
   useEffect(() => {
     setSkip(0);
-    fetchContent(0, false);
+    fetchContent(0, false, search, activeTab);
   }, [activeTab]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     setSkip(0);
-    fetchContent(0, false);
+    fetchContent(0, false, search, activeTab);
   };
 
-  const featured = allItems.slice(0, 3);
-  const rest = allItems.slice(3);
+  const featured = activeTab === "All" && !search ? allItems.slice(0, 3) : [];
+  const rest = activeTab === "All" && !search ? allItems.slice(3) : allItems;
 
   return (
     <div className="resources-page">
@@ -152,8 +152,25 @@ function Resources() {
               />
             </form>
 
-            <div className="resources-filter-box">
-              <span>Filter by Type</span>
+            <div className="resources-filter-box" style={{ position: "relative" }}>
+              <select
+                value={activeTab}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setActiveTab(val);
+                  setSkip(0);
+                  fetchContent(0, false, search, val);
+                }}
+                style={{
+                  position: "absolute", inset: 0, opacity: 0,
+                  width: "100%", height: "100%", cursor: "pointer",
+                }}
+              >
+                {["All", "Video", "Audio", "Article"].map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+              <span>{activeTab === "All" ? "Filter by Type" : activeTab}</span>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="toolbar-svg filter-svg">
                 <path
                   fill="currentColor"
@@ -175,7 +192,7 @@ function Resources() {
             {featured.length > 0 && (
               <>
                 <div className="section-heading-row">
-                  <h2>Featured Resources</h2>
+                  <h2>Featured <span>Resources</span></h2>
                   <div className="section-line"></div>
                 </div>
                 <div className="resources-grid featured-grid">
@@ -192,11 +209,15 @@ function Resources() {
             </div>
 
             <div className="resource-tabs">
-              {["All", "Video", "Music", "Article"].map((tab) => (
+              {["All", "Video", "Audio", "Article"].map((tab) => (
                 <button
                   key={tab}
                   className={`resource-tab${activeTab === tab ? " active" : ""}`}
-                  onClick={() => setActiveTab(tab)}
+                  onClick={() => {
+                    setActiveTab(tab);
+                    setSkip(0);
+                    fetchContent(0, false, search, tab);
+                  }}
                 >
                   {tab}
                 </button>
@@ -221,7 +242,7 @@ function Resources() {
           <div className="view-more-wrap">
             <button
               className="view-more-btn"
-              onClick={() => fetchContent(skip, true)}
+              onClick={() => fetchContent(skip, true, search, activeTab)}
               disabled={loading}
             >
               {loading ? "Loading..." : "View More"}

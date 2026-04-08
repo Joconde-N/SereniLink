@@ -7,6 +7,7 @@ import Home from "./pages/home/Home";
 import About from "./pages/about/About";
 import Counselors from "./pages/counselors/Counselors";
 import Resources from "./pages/resources/Resources";
+import ResourceView from "./pages/resources/ResourceView";
 import Login from "./pages/Login/Login";
 import Register from "./pages/register/Register";
 import CounselorApplication from "./pages/counselorApplication/CounselorApplication";
@@ -65,6 +66,7 @@ function App() {
         <Route path="counselors" element={<Counselors />} />
         <Route path="resources" element={<Resources />} />
       </Route>
+      <Route path="/resources/:id" element={<ResourceView />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/counselor-application" element={<CounselorApplication />} />

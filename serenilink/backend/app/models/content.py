@@ -16,6 +16,8 @@ class Content(Base):
     category: Mapped[str] = mapped_column(String(60), index=True, nullable=False)
     tags: Mapped[str] = mapped_column(String(200), nullable=True)
 
+    video_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+
     is_published: Mapped[bool] = mapped_column(Boolean, default=True)
     
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

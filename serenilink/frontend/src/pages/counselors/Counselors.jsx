@@ -21,8 +21,9 @@ function CounselorModal({ counselor, onClose }) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="counselor-modal-body"
         style={{
-          background: "#1a1a1d", borderRadius: 20, width: "100%", maxWidth: 680,
+          background: "#1a1a1d", borderRadius: 0, width: "100%", maxWidth: 680,
           maxHeight: "90vh", overflowY: "auto", border: "1px solid rgba(255,255,255,0.08)",
           boxShadow: "0 24px 60px rgba(0,0,0,0.5)",
         }}
