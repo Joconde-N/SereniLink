@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./Counselors.css";
 import api from "../../api/axios";
+import { LuSearch, LuFilter } from "react-icons/lu";
 
 const FALLBACK_IMAGE = "https://ui-avatars.com/api/?background=a78bfa&color=fff&size=200&name=";
 
@@ -204,14 +205,9 @@ function Counselors() {
 
       <section className="counselors-list-section">
         <div className="counselors-top-bar">
-          <div className="search-box">
-            <span className="search-icon-wrap">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="search-icon">
-                <path
-                  fill="currentColor"
-                  d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5A6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5S14 7.01 14 9.5S11.99 14 9.5 14"
-                />
-              </svg>
+          <form className="counselors-search-box" onSubmit={(e) => e.preventDefault()}>
+            <span className="counselors-search-icon">
+              <LuSearch />
             </span>
             <input
               type="text"
@@ -220,20 +216,27 @@ function Counselors() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-          </div>
+          </form>
 
-          <select
-            className="counselors-filter"
-            value={specialization}
-            onChange={(e) => { setSpecialization(e.target.value); setSkip(0); }}
-          >
-            <option value="">Filter Counselors Professions</option>
-            <option value="Anxiety">Anxiety</option>
-            <option value="Depression">Depression</option>
-            <option value="Trauma">Trauma</option>
-            <option value="Youth Counseling">Youth Counseling</option>
-            <option value="Relationship Counseling">Relationship Counseling</option>
-          </select>
+          <div className="counselors-filter-box" style={{ position: "relative" }}>
+            <select
+              value={specialization}
+              onChange={(e) => { setSpecialization(e.target.value); setSkip(0); }}
+              style={{
+                position: "absolute", inset: 0, opacity: 0,
+                width: "100%", height: "100%", cursor: "pointer",
+              }}
+            >
+              <option value="">Filter by Profession</option>
+              <option value="Anxiety">Anxiety</option>
+              <option value="Depression">Depression</option>
+              <option value="Trauma">Trauma</option>
+              <option value="Youth Counseling">Youth Counseling</option>
+              <option value="Relationship Counseling">Relationship Counseling</option>
+            </select>
+            <span>{specialization || "Filter by Profession"}</span>
+            <LuFilter className="counselors-filter-icon" />
+          </div>
         </div>
 
         {error && <p style={{ color: "red", textAlign: "center", padding: "20px" }}>{error}</p>}

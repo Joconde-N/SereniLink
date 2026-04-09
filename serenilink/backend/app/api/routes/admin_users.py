@@ -11,17 +11,49 @@ router = APIRouter(prefix="/admin/users", tags=["Admin Users"])
 def list_users(db: Session = Depends(get_db), _admin=Depends(require_admin)):
     users = db.query(User).order_by(User.id.asc()).all()
     return [
-        {"id": u.id, "nickname": getattr(u, "nickname", None), "email": getattr(u, "email", None), "role": u.role}
+        {
+            "id": u.id,
+            "nickname": u.nickname,
+            "email": u.email,
+            "role": u.role,
+            "is_active": u.is_active,
+            "created_at": u.created_at.isoformat() if u.created_at else None,
+        }
         for u in users
     ]
 
 
 @router.patch("/{user_id}/promote")
-def promote_user_to_admin(user_id: int, db: Session = Depends(get_db), _admin=Depends(require_admin)):
+def promote_user(user_id: int, db: Session = Depends(get_db), admin=Depends(require_admin)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-
+    if user.id == admin.id:
+        raise HTTPException(status_code=400, detail="Cannot change your own role.")
     user.role = "admin"
     db.commit()
-    return {"message": "User promoted to admin", "user_id": user.id}
+    return {"message": "User promoted to admin", "role": user.role}
+
+
+@router.patch("/{user_id}/demote")
+def demote_user(user_id: int, db: Session = Depends(get_db), admin=Depends(require_admin)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.id == admin.id:
+        raise HTTPException(status_code=400, detail="Cannot change your own role.")
+    user.role = "user"
+    db.commit()
+    return {"message": "User demoted to user", "role": user.role}
+
+
+@router.patch("/{user_id}/toggle-active")
+def toggle_active(user_id: int, db: Session = Depends(get_db), admin=Depends(require_admin)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.id == admin.id:
+        raise HTTPException(status_code=400, detail="Cannot deactivate your own account.")
+    user.is_active = not user.is_active
+    db.commit()
+    return {"message": "Status updated", "is_active": user.is_active}

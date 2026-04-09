@@ -1,17 +1,40 @@
 import secrets
 import string
+import json
+import shutil
 from datetime import datetime
+from pathlib import Path
+from typing import Optional, List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, require_admin
 from app.models.counselor_application import CounselorApplication
 from app.models.counselor import Counselor
 from app.models.user import User
-from app.schemas.counselor_application import CounselorApplicationCreate, CounselorApplicationOut
+from app.schemas.counselor_application import CounselorApplicationOut
 
 router = APIRouter(prefix="/counselor-applications", tags=["Counselor Applications"])
+
+UPLOAD_DIR = Path("uploads/applications")
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
+ALLOWED_CERT_TYPES  = {"application/pdf", "image/jpeg", "image/png"}
+MAX_FILE_SIZE       = 5 * 1024 * 1024  # 5 MB
+
+
+def _save_file(file: UploadFile, subfolder: str) -> str:
+    dest = UPLOAD_DIR / subfolder
+    dest.mkdir(parents=True, exist_ok=True)
+    ext      = Path(file.filename).suffix
+    filename = f"{secrets.token_hex(12)}{ext}"
+    path     = dest / filename
+    with path.open("wb") as f:
+        shutil.copyfileobj(file.file, f)
+    return f"/uploads/applications/{subfolder}/{filename}"
 
 
 def _generate_temp_password(length: int = 12) -> str:
@@ -20,10 +43,9 @@ def _generate_temp_password(length: int = 12) -> str:
 
 
 def _generate_nickname(full_name: str, db: Session) -> str:
-    """Derive a unique nickname from full_name."""
-    base = full_name.strip().lower().replace(" ", "_")[:30]
+    base     = full_name.strip().lower().replace(" ", "_")[:30]
     nickname = base
-    counter = 1
+    counter  = 1
     while db.query(User).filter(User.nickname == nickname).first():
         nickname = f"{base}_{counter}"
         counter += 1
@@ -31,19 +53,74 @@ def _generate_nickname(full_name: str, db: Session) -> str:
 
 
 @router.post("/", response_model=CounselorApplicationOut, status_code=201)
-def submit_application(
-    payload: CounselorApplicationCreate,
+async def submit_application(
+    full_name:              str           = Form(...),
+    email:                  str           = Form(...),
+    phone_number:           Optional[str] = Form(None),
+    title:                  Optional[str] = Form(None),
+    specialization:         str           = Form(...),
+    bio:                    Optional[str] = Form(None),
+    years_of_experience:    Optional[int] = Form(None),
+    counseling_approach:    Optional[str] = Form(None),
+    highest_certification:  Optional[str] = Form(None),
+    issuing_institution:    Optional[str] = Form(None),
+    general_location:       Optional[str] = Form(None),
+    office_address:         Optional[str] = Form(None),
+    offers_online:          bool          = Form(True),
+    offers_in_person:       bool          = Form(False),
+    languages_offered:      Optional[str] = Form(None),
+    preferred_session_type: Optional[str] = Form(None),
+    preferred_duration:     Optional[str] = Form(None),
+    profile_image:          Optional[UploadFile] = File(None),
+    certifications:         Optional[List[UploadFile]] = File(None),
     db: Session = Depends(get_db),
 ):
-    # Prevent duplicate applications from same email
     existing = db.query(CounselorApplication).filter(
-        CounselorApplication.email == payload.email,
+        CounselorApplication.email == email,
         CounselorApplication.status == "PENDING",
     ).first()
     if existing:
         raise HTTPException(status_code=409, detail="An application with this email is already pending.")
 
-    item = CounselorApplication(**payload.model_dump())
+    # Profile image
+    profile_image_url = None
+    if profile_image and profile_image.filename:
+        if profile_image.content_type not in ALLOWED_IMAGE_TYPES:
+            raise HTTPException(status_code=400, detail="Profile image must be JPG, PNG, or WebP.")
+        profile_image_url = _save_file(profile_image, "profiles")
+
+    # Certifications (max 3)
+    cert_urls: List[str] = []
+    if certifications:
+        valid_certs = [c for c in certifications if c and c.filename]
+        if len(valid_certs) > 3:
+            raise HTTPException(status_code=400, detail="Maximum 3 certification files allowed.")
+        for cert in valid_certs:
+            if cert.content_type not in ALLOWED_CERT_TYPES:
+                raise HTTPException(status_code=400, detail=f"Unsupported file type: {cert.content_type}. Use PDF, JPG, or PNG.")
+            cert_urls.append(_save_file(cert, "certifications"))
+
+    item = CounselorApplication(
+        full_name=full_name,
+        email=email,
+        phone_number=phone_number or None,
+        title=title or None,
+        specialization=specialization,
+        bio=bio or None,
+        years_of_experience=years_of_experience,
+        counseling_approach=counseling_approach or None,
+        highest_certification=highest_certification or None,
+        issuing_institution=issuing_institution or None,
+        general_location=general_location or None,
+        office_address=office_address or None,
+        offers_online=offers_online,
+        offers_in_person=offers_in_person,
+        languages_offered=languages_offered or None,
+        preferred_session_type=preferred_session_type or None,
+        preferred_duration=preferred_duration or None,
+        profile_image_url=profile_image_url,
+        certification_urls=cert_urls if cert_urls else None,
+    )
     db.add(item)
     db.commit()
     db.refresh(item)
@@ -86,20 +163,16 @@ def approve_application(
     if item.status != "PENDING":
         raise HTTPException(status_code=409, detail=f"Application is already {item.status}")
 
-    # lazy imports to avoid slow startup
     from app.core.security import hash_password
     from app.core.email import send_counselor_credentials
 
-    # Check if a user account already exists for this email
     existing_user = db.query(User).filter(User.email == item.email).first()
     if existing_user:
         raise HTTPException(status_code=409, detail="A user account with this email already exists.")
 
-    # Generate credentials
     temp_password = _generate_temp_password()
-    nickname = _generate_nickname(item.full_name, db)
+    nickname      = _generate_nickname(item.full_name, db)
 
-    # Create user account
     user = User(
         nickname=nickname,
         email=item.email,
@@ -109,9 +182,8 @@ def approve_application(
         must_change_password=True,
     )
     db.add(user)
-    db.flush()  # get user.id without committing
+    db.flush()
 
-    # Create counselor profile from application data
     counselor = Counselor(
         user_id=user.id,
         full_name=item.full_name,
@@ -132,19 +204,17 @@ def approve_application(
         languages_offered=item.languages_offered,
         preferred_session_type=item.preferred_session_type,
         preferred_duration=item.preferred_duration,
+        profile_image_url=item.profile_image_url,
         application_status="APPROVED",
         is_active=True,
     )
     db.add(counselor)
 
-    # Mark application as approved
-    item.status = "APPROVED"
+    item.status      = "APPROVED"
     item.reviewed_at = datetime.utcnow()
-
     db.commit()
     db.refresh(item)
 
-    # Send credentials email (non-blocking — logs warning if SMTP not configured)
     send_counselor_credentials(
         to_email=item.email,
         full_name=item.full_name,
@@ -167,7 +237,7 @@ def reject_application(
     if item.status != "PENDING":
         raise HTTPException(status_code=409, detail=f"Application is already {item.status}")
 
-    item.status = "REJECTED"
+    item.status      = "REJECTED"
     item.reviewed_at = datetime.utcnow()
     db.commit()
     db.refresh(item)

@@ -14,6 +14,10 @@ const PAYMENT_STYLE = {
   WAIVED:  { color: "#caa38f" },
 };
 const STATUS_TABS = ["ALL", "PENDING", "APPROVED", "DECLINED", "COMPLETED", "CANCELLED"];
+
+function tabLabel(t) {
+  return t === "ALL" ? "All" : t.charAt(0) + t.slice(1).toLowerCase();
+}
 const BOOKING_STATUSES = ["PENDING", "APPROVED", "DECLINED", "COMPLETED", "CANCELLED"];
 const PAYMENT_STATUSES = ["PENDING", "PAID", "WAIVED"];
 
@@ -124,7 +128,7 @@ function BookingsManagement() {
               color: tab === t ? "#111" : "var(--text-soft)",
             }}
           >
-            {t}
+            {tabLabel(t)}
           </button>
         ))}
       </div>

@@ -7,7 +7,6 @@ import {
   LuFileText,
   LuDumbbell,
   LuUsers,
-  LuUserCheck,
   LuChartBar,
   LuUser,
   LuSettings,
@@ -31,9 +30,8 @@ const SECTIONS = [
   {
     title: "Monitoring",
     items: [
-      { label: "Users",      icon: <LuUsers />,     to: "/admin/users" },
-      { label: "Counselors", icon: <LuUserCheck />, to: "/admin/counselors" },
-      { label: "Insights",   icon: <LuChartBar />, to: "/admin/insights" },
+      { label: "Users",    icon: <LuUsers />,    to: "/admin/users" },
+      { label: "Insights",  icon: <LuChartBar />, to: "/admin/insights" },
     ],
   },
   {

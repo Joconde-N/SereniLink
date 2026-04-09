@@ -22,6 +22,28 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotStatus, setForgotStatus] = useState("");
+  const [forgotError, setForgotError] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+
+  const handleForgotSubmit = async (e) => {
+    e.preventDefault();
+    setForgotError("");
+    setForgotStatus("");
+    setForgotLoading(true);
+    try {
+      await api.post("/auth/forgot-password", { email: forgotEmail });
+      setForgotStatus("If that email is registered, a reset link has been sent.");
+      setForgotEmail("");
+    } catch {
+      setForgotError("Something went wrong. Please try again.");
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
@@ -129,9 +151,9 @@ function Login() {
                 <input type="checkbox" />
                 <span>Remember Me</span>
               </label>
-              <a href="/" onClick={(e) => e.preventDefault()} className="login-forgot">
+              <button type="button" onClick={() => { setShowForgot(true); setForgotStatus(""); setForgotError(""); }} className="login-forgot">
                 Forgot Password?
-              </a>
+              </button>
             </div>
 
             <button type="submit" className="login-btn" disabled={loading}>
@@ -150,6 +172,33 @@ function Login() {
           </div>
         </div>
       </div>
+      {showForgot && (
+        <div className="forgot-overlay" onClick={() => setShowForgot(false)}>
+          <div className="forgot-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="forgot-close" onClick={() => setShowForgot(false)}>✕</button>
+            <h3>Reset Password</h3>
+            <p>Enter your email address and we'll send you a reset link.</p>
+            {forgotStatus ? (
+              <p className="forgot-success">{forgotStatus}</p>
+            ) : (
+              <form onSubmit={handleForgotSubmit}>
+                {forgotError && <p className="forgot-error">{forgotError}</p>}
+                <input
+                  type="email"
+                  placeholder="Your email address"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  required
+                  className="forgot-input"
+                />
+                <button type="submit" className="forgot-btn" disabled={forgotLoading}>
+                  {forgotLoading ? "Sending..." : "Send Reset Link"}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

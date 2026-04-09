@@ -9,6 +9,7 @@ import Counselors from "./pages/counselors/Counselors";
 import Resources from "./pages/resources/Resources";
 import ResourceView from "./pages/resources/ResourceView";
 import Login from "./pages/Login/Login";
+import ResetPassword from "./pages/Login/ResetPassword";
 import Register from "./pages/register/Register";
 import CounselorApplication from "./pages/counselorApplication/CounselorApplication";
 import GuestAiSupport from "./pages/home/GuestAiSupport";
@@ -68,6 +69,7 @@ function App() {
       </Route>
       <Route path="/resources/:id" element={<ResourceView />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/register" element={<Register />} />
       <Route path="/counselor-application" element={<CounselorApplication />} />
       <Route path="/guest-ai" element={<GuestAiSupport />} />

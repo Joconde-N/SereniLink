@@ -116,13 +116,7 @@ function Resources() {
   useEffect(() => {
     setSkip(0);
     fetchContent(0, false, search, activeTab);
-  }, [activeTab]);
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setSkip(0);
-    fetchContent(0, false, search, activeTab);
-  };
+  }, [activeTab, search]);
 
   const featured = activeTab === "All" && !search ? allItems.slice(0, 3) : [];
   const rest = activeTab === "All" && !search ? allItems.slice(3) : allItems;
@@ -139,7 +133,7 @@ function Resources() {
           <p>Explore videos, music, and articles curated to support your mental health journey.</p>
 
           <div className="resources-toolbar">
-            <form className="resources-search-box" onSubmit={handleSearch}>
+            <form className="resources-search-box" onSubmit={(e) => e.preventDefault()}>
               <span className="resources-search-icon">
                 <LuSearch />
               </span>
@@ -148,7 +142,7 @@ function Resources() {
                 placeholder="Search resources"
                 className="resources-search-input"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => { setSearch(e.target.value); }}
               />
             </form>
 
@@ -171,12 +165,7 @@ function Resources() {
                 ))}
               </select>
               <span>{activeTab === "All" ? "Filter by Type" : activeTab}</span>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="toolbar-svg filter-svg">
-                <path
-                  fill="currentColor"
-                  d="M3 5.25A2.25 2.25 0 0 1 5.25 3h13.5A2.25 2.25 0 0 1 21 5.25c0 .53-.187 1.042-.528 1.447L14.25 14v4.19c0 .344-.177.663-.469.844l-3 1.875A1 1 0 0 1 9.25 20v-6L3.528 6.697A2.25 2.25 0 0 1 3 5.25"
-                />
-              </svg>
+              <LuFilter className="toolbar-svg filter-svg" />
             </div>
           </div>
         </div>

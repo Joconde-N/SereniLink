@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 
 from app.core.config import settings
 from app.api.routes.health import router as health_router
@@ -25,6 +27,10 @@ from app.models import User, Content, Assessment, Counselor, CounselorApplicatio
 from app.db.base import Base
 
 app = FastAPI(title=settings.APP_NAME)
+
+UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR.mkdir(exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 app.add_middleware(
     CORSMiddleware, 

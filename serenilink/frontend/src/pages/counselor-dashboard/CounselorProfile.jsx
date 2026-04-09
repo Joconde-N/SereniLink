@@ -148,25 +148,9 @@ export default function CounselorProfile() {
   return (
     <div>
       {/* Page header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-        <div>
-          <h1 className="dashboard-page-title" style={{ marginBottom: 4 }}>My Profile</h1>
-          <p className="dashboard-page-subtitle" style={{ margin: 0 }}>How clients see you on SereniLink</p>
-        </div>
-        {!editing ? (
-          <button className="primary-btn" onClick={() => setEditing(true)} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <LuPencil size={16} /> Edit Profile
-          </button>
-        ) : (
-          <div style={{ display: "flex", gap: 10 }}>
-            <button className="secondary-btn" onClick={handleCancel} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <LuX size={16} /> Cancel
-            </button>
-            <button className="primary-btn" onClick={handleSave} disabled={saving} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <LuCheck size={16} /> {saving ? "Saving..." : "Save Changes"}
-            </button>
-          </div>
-        )}
+      <div style={{ marginBottom: 24 }}>
+        <h1 className="dashboard-page-title" style={{ marginBottom: 4 }}>My Profile</h1>
+        <p className="dashboard-page-subtitle" style={{ margin: 0 }}>How clients see you on SereniLink</p>
       </div>
 
       {msg.text && (
@@ -269,8 +253,23 @@ export default function CounselorProfile() {
                 )}
 
                 <div style={{ display: "flex", gap: 12 }}>
-                  <button className="primary-btn" onClick={() => navigate("/counselor/availability")}>Manage Availability</button>
-                  <button className="secondary-btn" onClick={() => navigate("/counselor/messages")}>View Messages</button>
+                  {!editing ? (
+                    <>
+                      <button className="primary-btn" onClick={() => navigate("/counselor/availability")}>Manage Availability</button>
+                      <button className="secondary-btn" onClick={() => setEditing(true)} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <LuPencil size={16} /> Edit Profile
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button className="secondary-btn" onClick={handleCancel} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <LuX size={16} /> Cancel
+                      </button>
+                      <button className="primary-btn" onClick={handleSave} disabled={saving} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <LuCheck size={16} /> {saving ? "Saving..." : "Save Changes"}
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

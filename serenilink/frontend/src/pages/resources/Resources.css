@@ -29,7 +29,8 @@
 }
 
 .resources-hero-content p {
-  font-size: 1.4rem;
+  font-style: italic;
+  font-size: 1.35rem;
   color: #e6dfd8;
   margin-bottom: 34px;
   line-height: 1.5;
@@ -75,7 +76,7 @@
 
 .resources-search-box,
 .resources-filter-box {
-  background: linear-gradient(90deg, #2a2a2a, #32302e);
+  background: #1A1D1E;
   border-radius: 999px;
   min-height: 50px;
   display: flex;
@@ -123,6 +124,11 @@
 
 .filter-svg {
   color: #b89381;
+}
+
+.resources-filter-box select option {
+  background: #1A1D1E;
+  color: #ffffff;
 }
 
 /* MAIN */

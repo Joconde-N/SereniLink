@@ -1,6 +1,7 @@
 from datetime import datetime
-from sqlalchemy import Integer, String, Boolean, DateTime, Text
+from sqlalchemy import Integer, String, Boolean, DateTime, Text, JSON
 from sqlalchemy.orm import Mapped, mapped_column
+from typing import Optional, List
 
 from app.db.base import Base
 
@@ -36,6 +37,10 @@ class CounselorApplication(Base):
     languages_offered: Mapped[str | None] = mapped_column(String(200), nullable=True)
     preferred_session_type: Mapped[str | None] = mapped_column(String(50), nullable=True)
     preferred_duration: Mapped[str | None] = mapped_column(String(20), nullable=True)
+
+    # Uploaded files
+    profile_image_url: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    certification_urls: Mapped[Optional[List[str]]] = mapped_column(JSON, nullable=True)
 
     # Workflow
     status: Mapped[str] = mapped_column(String(20), default="PENDING", index=True)

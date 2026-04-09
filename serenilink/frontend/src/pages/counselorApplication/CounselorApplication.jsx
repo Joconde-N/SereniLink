@@ -11,6 +11,8 @@ function CounselorApplication() {
   const [loading, setLoading] = useState(false);
 
   const [profilePreview, setProfilePreview] = useState(null);
+  const [profileFile, setProfileFile]       = useState(null);
+  const [certFiles, setCertFiles]           = useState([]);
 
   const [form, setForm] = useState({
     full_name: "", email: "", phone_number: "", general_location: "",
@@ -19,7 +21,6 @@ function CounselorApplication() {
     highest_certification: "", issuing_institution: "",
     office_address: "", offers_online: true, offers_in_person: false,
     languages_offered: "", preferred_session_type: "Video Call", preferred_duration: "30 Minutes",
-    profile_image_url: "",
   });
 
   const set = (e) => {
@@ -30,9 +31,13 @@ function CounselorApplication() {
   const handleProfilePic = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setProfilePreview(url);
-    setForm((prev) => ({ ...prev, profile_image_url: url }));
+    setProfileFile(file);
+    setProfilePreview(URL.createObjectURL(file));
+  };
+
+  const handleCertFiles = (e) => {
+    const files = Array.from(e.target.files).slice(0, 3);
+    setCertFiles(files);
   };
 
   const handleSubmit = async (e) => {
@@ -42,19 +47,28 @@ function CounselorApplication() {
 
     setLoading(true);
     try {
-      await api.post("/counselor-applications/", {
-        ...form,
-        years_of_experience: form.years_of_experience ? parseInt(form.years_of_experience) : null,
-        phone_number: form.phone_number || null,
-        title: form.title || null,
-        bio: form.bio || null,
-        counseling_approach: form.counseling_approach || null,
-        highest_certification: form.highest_certification || null,
-        issuing_institution: form.issuing_institution || null,
-        general_location: form.general_location || null,
-        office_address: form.office_address || null,
-        languages_offered: form.languages_offered || null,
-      });
+      const fd = new FormData();
+      fd.append("full_name",              form.full_name);
+      fd.append("email",                  form.email);
+      fd.append("specialization",         form.specialization);
+      fd.append("offers_online",          form.offers_online);
+      fd.append("offers_in_person",       form.offers_in_person);
+      if (form.phone_number)           fd.append("phone_number",           form.phone_number);
+      if (form.title)                  fd.append("title",                  form.title);
+      if (form.years_of_experience)    fd.append("years_of_experience",    parseInt(form.years_of_experience));
+      if (form.bio)                    fd.append("bio",                    form.bio);
+      if (form.counseling_approach)    fd.append("counseling_approach",    form.counseling_approach);
+      if (form.highest_certification)  fd.append("highest_certification",  form.highest_certification);
+      if (form.issuing_institution)    fd.append("issuing_institution",    form.issuing_institution);
+      if (form.general_location)       fd.append("general_location",       form.general_location);
+      if (form.office_address)         fd.append("office_address",         form.office_address);
+      if (form.languages_offered)      fd.append("languages_offered",      form.languages_offered);
+      if (form.preferred_session_type) fd.append("preferred_session_type", form.preferred_session_type);
+      if (form.preferred_duration)     fd.append("preferred_duration",     form.preferred_duration);
+      if (profileFile)                 fd.append("profile_image",          profileFile);
+      certFiles.forEach((f) =>         fd.append("certifications",         f));
+
+      await api.post("/counselor-applications/", fd, { headers: { "Content-Type": "multipart/form-data" } });
       setSuccess("Application submitted! We will review it and send your login credentials to your email once approved.");
       setTimeout(() => navigate("/"), 4000);
     } catch (err) {
@@ -181,11 +195,15 @@ function CounselorApplication() {
             </div>
 
             <div className="field no-margin">
-              <label>Upload Credentials (Certifications, Licenses)</label>
+              <label>Upload Credentials (Certifications, Licenses) — max 3 files</label>
               <div className="upload-box">
-                <input type="file" />
-                <p>Click to upload or drag and drop</p>
-                <span>PDF, JPG, or PNG (Max 5MB per file)</span>
+                <input type="file" multiple accept=".pdf,image/*" onChange={handleCertFiles} />
+                {certFiles.length > 0 ? (
+                  <p>{certFiles.map((f) => f.name).join(", ")}</p>
+                ) : (
+                  <p>Click to upload or drag and drop</p>
+                )}
+                <span>PDF, JPG, or PNG (Max 5MB per file, up to 3 files)</span>
               </div>
             </div>
           </section>

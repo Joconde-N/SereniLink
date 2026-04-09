@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List, Optional
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -45,6 +46,8 @@ class CounselorApplicationOut(BaseModel):
     languages_offered: str | None
     preferred_session_type: str | None
     preferred_duration: str | None
+    profile_image_url: str | None
+    certification_urls: Optional[List[str]]
     status: str
     created_at: datetime
     reviewed_at: datetime | None

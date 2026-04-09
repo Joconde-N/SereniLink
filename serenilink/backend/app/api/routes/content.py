@@ -7,6 +7,24 @@ from app.schemas.content import ContentCreate, ContentUpdate, ContentOut
 
 router = APIRouter(prefix="/content", tags=["Content"])
 
+@router.get("/admin/all", response_model=list[ContentOut])
+def list_all_content(
+    db: Session = Depends(get_db),
+    _admin=Depends(require_admin),
+    q: str | None = None,
+    category: str | None = None,
+    skip: int = 0,
+    limit: int = Query(default=100, le=200),
+):
+    query = db.query(Content)
+    if category:
+        query = query.filter(Content.category.ilike(f"%{category}%"))
+    if q:
+        like = f"%{q}%"
+        query = query.filter((Content.title.ilike(like)) | (Content.summary.ilike(like)))
+    return query.order_by(Content.created_at.desc()).offset(skip).limit(limit).all()
+
+
 @router.get("/", response_model=list[ContentOut])
 def list_content(
     db: Session = Depends(get_db),

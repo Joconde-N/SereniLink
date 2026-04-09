@@ -182,7 +182,7 @@ function AdminOverview() {
         <h3>Platform Insights</h3>
         <div className="dashboard-grid dashboard-cards-4">
           {[
-            { label: "Total Content",      value: t.content },
+            { label: "Total Exercises",    value: t.exercises ?? exercises.length, color: "var(--accent)" },
             { label: "Published Content",  value: t.published_content, color: "#67d58c" },
             { label: "Total Assessments",  value: t.assessments },
             { label: "Mood Entries",       value: t.mood_entries, color: "var(--accent)" },
