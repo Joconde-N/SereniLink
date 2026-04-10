@@ -19,6 +19,7 @@ function BookingModal({ counselor, onClose, onBooked }) {
   }, [counselor.id]);
 
   const handleBook = async () => {
+    if (slots.length === 0) { setError("This counselor has no available slots. Please check back later."); return; }
     if (!selectedSlot) { setError("Please select a time slot."); return; }
     setSubmitting(true);
     setError("");
@@ -97,7 +98,7 @@ function BookingModal({ counselor, onClose, onBooked }) {
 
         <div style={{ display: "flex", gap: "10px" }}>
           <button className="secondary-btn" onClick={onClose} style={{ flex: 1 }}>Cancel</button>
-          <button className="primary-btn" onClick={handleBook} disabled={submitting || !selectedSlot} style={{ flex: 1 }}>
+          <button className="primary-btn" onClick={handleBook} disabled={submitting} style={{ flex: 1 }}>
             {submitting ? "Booking..." : "Confirm Booking"}
           </button>
         </div>
@@ -193,46 +194,65 @@ function FindCounselors() {
       ) : (
         <div className="dashboard-grid dashboard-cards-3">
           {displayed.map((c) => (
-            <div className="dashboard-card" key={c.id}>
-              <div style={{ display: "flex", gap: "14px", alignItems: "flex-start", marginBottom: "14px" }}>
+            <div key={c.id} style={{
+              background: "linear-gradient(160deg, #1c1c1f 0%, #171719 100%)",
+              border: "1px solid rgba(176,176,176,0.09)",
+              borderRadius: "20px",
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column",
+              boxShadow: "0 6px 28px rgba(0,0,0,0.22)",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+            }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 14px 40px rgba(0,0,0,0.32)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 6px 28px rgba(0,0,0,0.22)"; }}
+            >
+              {/* Top section: image left, info right */}
+              <div style={{ display: "flex", gap: "14px", padding: "18px 18px 14px" }}>
                 <img
                   src={c.profile_image_url || FALLBACK(c.full_name)}
                   alt={c.full_name}
-                  style={{ width: "56px", height: "56px", borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
+                  style={{ width: "72px", height: "90px", borderRadius: "10px", objectFit: "cover", flexShrink: 0 }}
                   onError={(e) => { e.target.src = FALLBACK(c.full_name); }}
                 />
-                <div>
-                  <h3 style={{ margin: "0 0 4px", fontSize: "16px" }}>{c.full_name}</h3>
-                  <p className="small-muted" style={{ margin: 0 }}>{c.title || c.specialization}</p>
+                <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: "6px", minWidth: 0 }}>
+                  <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "#f4f4f4", lineHeight: 1.3 }}>{c.full_name}</h3>
+                  <p style={{ margin: 0, fontSize: "12px", color: "var(--accent)", fontWeight: 500 }}>{c.title || "Counselor"}</p>
+                  <p style={{ margin: 0, fontSize: "12px", color: "#9ca3af", fontWeight: 500 }}>{c.specialization}</p>
+                  {c.general_location && (
+                    <p style={{ margin: 0, fontSize: "11px", color: "var(--text-muted)" }}>📍 {c.general_location}</p>
+                  )}
                 </div>
               </div>
 
+              {/* Divider */}
+              <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", margin: "0 18px" }} />
+
+              {/* Bio */}
               {c.bio && (
-                <p style={{ color: "var(--text-soft)", fontSize: "13px", marginBottom: "12px", lineHeight: 1.6 }}>
-                  {c.bio.slice(0, 120)}{c.bio.length > 120 ? "..." : ""}
+                <p style={{ margin: 0, padding: "14px 18px", color: "var(--text-soft)", fontSize: "13px", lineHeight: 1.65,
+                  display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden",
+                }}>
+                  {c.bio}
                 </p>
               )}
 
-              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "14px" }}>
-                <span style={{ padding: "4px 10px", borderRadius: "999px", background: "rgba(202,163,143,0.1)", color: "var(--accent)", fontSize: "12px" }}>
-                  {c.specialization}
-                </span>
-                {c.offers_online && <span style={{ padding: "4px 10px", borderRadius: "999px", background: "rgba(103,213,140,0.1)", color: "#67d58c", fontSize: "12px" }}>Online</span>}
-                {c.offers_in_person && <span style={{ padding: "4px 10px", borderRadius: "999px", background: "rgba(147,112,219,0.1)", color: "#b39ddb", fontSize: "12px" }}>In-Person</span>}
+              {/* Book button */}
+              <div style={{ padding: "12px 18px 18px", marginTop: "auto" }}>
+                <button
+                  type="button"
+                  onClick={() => setBooking(c)}
+                  style={{
+                    width: "100%", height: "38px", borderRadius: "10px", border: "none",
+                    background: "#a86955", color: "#fff", fontSize: "13px",
+                    fontWeight: 600, cursor: "pointer", transition: "background 0.2s ease",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "#c07a62"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "#a86955"; }}
+                >
+                  Book Session
+                </button>
               </div>
-
-              {c.general_location && (
-                <p className="small-muted" style={{ marginBottom: "14px", fontSize: "13px" }}>📍 {c.general_location}</p>
-              )}
-
-              <button
-                className="primary-btn"
-                type="button"
-                onClick={() => setBooking(c)}
-                style={{ width: "100%" }}
-              >
-                Book Session
-              </button>
             </div>
           ))}
         </div>
@@ -240,8 +260,17 @@ function FindCounselors() {
 
       {hasMore && !search && (
         <div style={{ textAlign: "center", marginTop: "24px" }}>
-          <button className="secondary-btn" type="button" onClick={() => fetchCounselors(skip, true)} disabled={loading}>
-            {loading ? "Loading..." : "Load More"}
+          <button
+            type="button"
+            onClick={() => fetchCounselors(skip, true)}
+            disabled={loading}
+            style={{
+              background: "transparent", border: "none",
+              color: "var(--accent)", fontSize: 13, fontWeight: 600,
+              cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6,
+            }}
+          >
+            {loading ? "Loading..." : <>Load More <span style={{ fontSize: 16 }}>→</span></>}
           </button>
         </div>
       )}

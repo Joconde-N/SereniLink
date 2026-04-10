@@ -23,7 +23,7 @@ from app.api.routes.admin_users import router as admin_users_router
 from app.api.routes.ai_guest import router as ai_guest_router
 
 from app.db.session import engine
-from app.models import User, Content, Assessment, Counselor, CounselorApplication, Booking, Progress, ChatMessage, AvailabilitySlot, AIConversation, AIMessage, MoodEntry, Exercise, Notification
+from app.models import User, Content, Assessment, Counselor, CounselorApplication, Booking, Progress, ChatMessage, AvailabilitySlot, AIConversation, AIMessage, MoodEntry, Exercise, ExerciseLog, Notification, UserAISummary
 from app.db.base import Base
 
 app = FastAPI(title=settings.APP_NAME)

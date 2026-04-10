@@ -1,8 +1,11 @@
+from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db, require_admin
+from app.api.deps import get_db, require_admin, get_current_user
 from app.models.exercise import Exercise
+from app.models.exercise_log import ExerciseLog
+from app.models.user import User
 from app.schemas.exercise import ExerciseCreate, ExerciseUpdate, ExerciseOut
 
 router = APIRouter(prefix="/exercises", tags=["Exercises"])
@@ -24,6 +27,19 @@ def list_exercises(
 @router.get("/admin/all", response_model=list[ExerciseOut])
 def list_all_exercises(db: Session = Depends(get_db), _admin=Depends(require_admin)):
     return db.query(Exercise).order_by(Exercise.created_at.asc()).all()
+
+
+@router.get("/completed/today")
+def get_completed_today(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    today = date.today()
+    logs = db.query(ExerciseLog).filter(
+        ExerciseLog.user_id == current_user.id,
+        ExerciseLog.completed_on == today,
+    ).all()
+    return {"completed_ids": [log.exercise_id for log in logs]}
 
 
 @router.get("/{exercise_id}", response_model=ExerciseOut)
@@ -64,3 +80,25 @@ def toggle_exercise(exercise_id: int, db: Session = Depends(get_db), _admin=Depe
     db.commit()
     db.refresh(item)
     return item
+
+
+@router.post("/{exercise_id}/complete")
+def complete_exercise(
+    exercise_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    today = date.today()
+    existing = db.query(ExerciseLog).filter(
+        ExerciseLog.user_id == current_user.id,
+        ExerciseLog.exercise_id == exercise_id,
+        ExerciseLog.completed_on == today,
+    ).first()
+    if existing:
+        db.delete(existing)
+        db.commit()
+        return {"completed": False}
+    log = ExerciseLog(user_id=current_user.id, exercise_id=exercise_id, completed_on=today)
+    db.add(log)
+    db.commit()
+    return {"completed": True}

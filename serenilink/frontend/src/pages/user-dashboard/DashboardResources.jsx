@@ -1,24 +1,27 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { LuVideo, LuHeadphones, LuBookOpen, LuArrowRight } from "react-icons/lu";
 import api from "../../api/axios";
 
-const TABS = ["All", "Video", "Music", "Article"];
+const TABS = ["All", "Video", "Audio", "Article"];
 const LIMIT = 9;
 
 function getActionLabel(category) {
   const key = (category || "").toLowerCase();
   if (key === "video") return "Watch Now";
-  if (key === "music") return "Listen Now";
+  if (key === "audio") return "Listen Now";
   return "Read Now";
 }
 
 function getCategoryIcon(category) {
   const key = (category || "").toLowerCase();
-  if (key === "video") return "🎥";
-  if (key === "music") return "🎵";
-  return "📖";
+  if (key === "video") return <LuVideo size={18} color="#7eb8f7" />;
+  if (key === "audio") return <LuHeadphones size={18} color="#a78bfa" />;
+  return <LuBookOpen size={18} color="#9ca3af" />;
 }
 
 function DashboardResources() {
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("All");
@@ -118,7 +121,7 @@ function DashboardResources() {
           {items.map((item) => (
             <div key={item.id} className="dashboard-card" style={{ padding: 0, overflow: "hidden" }}>
               <div style={{ padding: "18px 18px 0", display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ fontSize: 22 }}>{getCategoryIcon(item.category)}</span>
+                <span style={{ display: "flex", alignItems: "center" }}>{getCategoryIcon(item.category)}</span>
                 <span style={{
                   fontSize: 11, fontWeight: 600, color: "var(--accent)",
                   background: "rgba(202,163,143,0.12)", padding: "3px 10px", borderRadius: 999,
@@ -142,16 +145,19 @@ function DashboardResources() {
                 <p style={{ margin: "0 0 14px", fontSize: 11, color: "var(--text-muted)" }}>
                   {new Date(item.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                 </p>
-                <button
-                  type="button"
-                  style={{
-                    height: 34, padding: "0 16px", borderRadius: 10, fontSize: 13,
-                    fontWeight: 600, cursor: "pointer", border: "none",
-                    background: "var(--accent)", color: "#111",
-                  }}
-                >
-                  {getActionLabel(item.category)}
-                </button>
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/resources/${item.id}`)}
+                    style={{
+                      height: 30, padding: "0 12px", borderRadius: 9, fontSize: 13,
+                      fontWeight: 600, cursor: "pointer", border: "none",
+                      background: "#a86955", color: "#ffffff",
+                    }}
+                  >
+                    {getActionLabel(item.category)}
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -159,16 +165,24 @@ function DashboardResources() {
       )}
 
       {hasMore && !loading && (
-        <div style={{ textAlign: "center", marginTop: 28 }}>
+        <div style={{ textAlign: "center", marginTop: 32 }}>
           <button
             type="button"
             onClick={() => fetchContent(skip, true)}
             style={{
-              background: "transparent", border: "none", color: "var(--text-main)",
-              textDecoration: "underline", fontSize: 14, cursor: "pointer",
+              background: "transparent",
+              border: "none",
+              color: "var(--accent)",
+              padding: "8px 0",
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
             }}
           >
-            View More
+            Load More <LuArrowRight size={14} />
           </button>
         </div>
       )}

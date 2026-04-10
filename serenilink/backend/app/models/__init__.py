@@ -11,4 +11,6 @@ from .ai_conversation import AIConversation
 from .ai_message import AIMessage
 from .mood import MoodEntry
 from .exercise import Exercise
+from .exercise_log import ExerciseLog
 from .notification import Notification
+from .user_ai_summary import UserAISummary

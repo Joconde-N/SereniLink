@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import api from "../../api/axios";
 
 const TREND_COLOR = { IMPROVING: "#67d58c", STABLE: "#f5c95f", DECLINING: "#f08f8f" };
@@ -54,6 +55,8 @@ function StreakCard({ streak }) {
   );
 }
 
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
 function WellnessChart({ data, days }) {
   if (!data || data.length === 0) {
     return (
@@ -63,89 +66,43 @@ function WellnessChart({ data, days }) {
     );
   }
 
-  const W = 600, H = 200, PAD = { top: 16, right: 16, bottom: 32, left: 32 };
-  const innerW = W - PAD.left - PAD.right;
-  const innerH = H - PAD.top - PAD.bottom;
-  const max = 10;
+  const formatted = data.map((d) => ({
+    ...d,
+    label: days === 7
+      ? DAYS[new Date(d.date).getDay()]
+      : new Date(d.date).toLocaleDateString([], { month: "short", day: "numeric" }),
+  }));
 
-  const xStep = data.length > 1 ? innerW / (data.length - 1) : innerW;
-
-  const toX = (i) => PAD.left + (data.length > 1 ? i * xStep : innerW / 2);
-  const toY = (v) => PAD.top + innerH - ((v ?? 0) / max) * innerH;
-
-  const linePath = (key) =>
-    data
-      .map((d, i) => (d[key] != null ? `${i === 0 ? "M" : "L"}${toX(i)},${toY(d[key])}` : ""))
-      .filter(Boolean)
-      .join(" ");
-
-  const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const formatLabel = (str) => {
-    const d = new Date(str);
-    return DAYS[d.getDay()];
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (!active || !payload?.length) return null;
+    return (
+      <div style={{ background: "#1a1a1d", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "10px 14px", fontSize: "12px" }}>
+        <p style={{ margin: "0 0 6px", color: "var(--text-muted)" }}>{label}</p>
+        {payload.map((p) => (
+          <p key={p.dataKey} style={{ margin: "2px 0", color: p.color }}>
+            {p.name}: <strong>{p.value?.toFixed(1)}</strong>
+          </p>
+        ))}
+      </div>
+    );
   };
 
-  const segments = days === 30
-    ? [[1, 7], [8, 14], [15, 21], [22, 31]]
-    : null;
-
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }}>
-      {/* Y gridlines */}
-      {[0, 2.5, 5, 7.5, 10].map((v) => {
-        const y = toY(v);
-        return (
-          <g key={v}>
-            <line x1={PAD.left} x2={W - PAD.right} y1={y} y2={y} stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
-            <text x={PAD.left - 4} y={y + 4} textAnchor="end" fontSize="9" fill="rgba(255,255,255,0.3)">{v}</text>
-          </g>
-        );
-      })}
-
-      {/* Metric lines */}
-      {METRICS.map(({ key, color }) => (
-        <path key={key} d={linePath(key)} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
-      ))}
-
-      {/* Dots */}
-      {METRICS.map(({ key, color }) =>
-        data.map((d, i) =>
-          d[key] != null ? (
-            <circle key={`${key}-${i}`} cx={toX(i)} cy={toY(d[key])} r="3" fill={color} />
-          ) : null
-        )
-      )}
-
-      {/* X labels */}
-      {segments
-        ? segments.map(([start, end]) => {
-            const label = `${start}–${end}`;
-            // find indices of data points within this segment
-            const indices = data
-              .map((d, i) => ({ day: new Date(d.date).getDate(), i }))
-              .filter(({ day }) => day >= start && day <= end)
-              .map(({ i }) => i);
-            if (indices.length === 0) return null;
-            const midX = (toX(indices[0]) + toX(indices[indices.length - 1])) / 2;
-            const segX1 = toX(indices[0]);
-            const segX2 = toX(indices[indices.length - 1]);
-            return (
-              <g key={label}>
-                <line x1={segX1} x2={segX2} y1={H - PAD.bottom + 6} y2={H - PAD.bottom + 6}
-                  stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
-                <text x={midX} y={H - 6} textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.4)">
-                  Days {label}
-                </text>
-              </g>
-            );
-          })
-        : data.map((d, i) => (
-            <text key={i} x={toX(i)} y={H - 6} textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.4)">
-              {formatLabel(d.date)}
-            </text>
-          ))
-      }
-    </svg>
+    <ResponsiveContainer width="100%" height={220}>
+      <LineChart data={formatted} margin={{ top: 8, right: 16, bottom: 0, left: -16 }}>
+        <CartesianGrid stroke="rgba(255,255,255,0.06)" strokeDasharray="4 4" vertical={false} />
+        <XAxis dataKey="label" tick={{ fill: "rgba(255,255,255,0.35)", fontSize: 11 }} axisLine={false} tickLine={false} />
+        <YAxis domain={[0, 10]} tick={{ fill: "rgba(255,255,255,0.35)", fontSize: 11 }} axisLine={false} tickLine={false} />
+        <Tooltip content={<CustomTooltip />} />
+        {METRICS.map(({ key, label, color }) => (
+          <Line
+            key={key} type="monotone" dataKey={key} name={label}
+            stroke={color} strokeWidth={2} dot={{ r: 3, fill: color }}
+            activeDot={{ r: 5 }} connectNulls
+          />
+        ))}
+      </LineChart>
+    </ResponsiveContainer>
   );
 }
 

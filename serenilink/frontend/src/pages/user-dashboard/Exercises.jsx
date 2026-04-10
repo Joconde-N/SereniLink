@@ -78,13 +78,15 @@ function ExerciseModal({ ex, onClose, onMarkDone, isDone }) {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", margin: "8px 0 24px" }}>
-          <svg width="110" height="110" style={{ transform: "rotate(-90deg)" }}>
-            <circle cx="55" cy="55" r="44" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
-            <circle cx="55" cy="55" r="44" fill="none" stroke={finished ? "#67d58c" : meta.text} strokeWidth="6" strokeDasharray={circumference} strokeDashoffset={circumference - (circumference * progress) / 100} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.9s linear, stroke 0.4s ease" }} />
-          </svg>
-          <div style={{ marginTop: "-74px", textAlign: "center", zIndex: 1 }}>
-            <div style={{ fontSize: "26px", fontWeight: 700, color: finished ? "#67d58c" : "#f4f4f4", fontVariantNumeric: "tabular-nums" }}>{finished ? "✓" : fmtTime(timeLeft)}</div>
-            <div style={{ fontSize: "11px", color: "#b0b0b0", marginTop: "2px" }}>{finished ? "Complete" : `of ${fmtDuration(ex.durationSec)}`}</div>
+          <div style={{ position: "relative", width: "110px", height: "110px" }}>
+            <svg width="110" height="110" style={{ transform: "rotate(-90deg)" }}>
+              <circle cx="55" cy="55" r="44" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
+              <circle cx="55" cy="55" r="44" fill="none" stroke={finished ? "#67d58c" : meta.text} strokeWidth="6" strokeDasharray={circumference} strokeDashoffset={circumference - (circumference * progress) / 100} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.9s linear, stroke 0.4s ease" }} />
+            </svg>
+            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ fontSize: "26px", fontWeight: 700, color: finished ? "#67d58c" : "#f4f4f4", fontVariantNumeric: "tabular-nums" }}>{finished ? "✓" : fmtTime(timeLeft)}</div>
+              <div style={{ fontSize: "11px", color: "#b0b0b0", marginTop: "2px" }}>{finished ? "Complete" : `of ${fmtDuration(ex.durationSec)}`}</div>
+            </div>
           </div>
           <div style={{ display: "flex", gap: "10px", marginTop: "18px" }}>
             {!finished && (
@@ -155,22 +157,30 @@ function Exercises() {
   const [loading, setLoading]       = useState(true);
   const [activeType, setActiveType] = useState("ALL");
   const [activeEx, setActiveEx]     = useState(null);
-  const [done, setDone] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("exercises_done") || "[]"); } catch { return []; }
-  });
+  const [done, setDone]             = useState([]);
 
   useEffect(() => {
-    api.get("/exercises/", { params: { limit: 100 } })
-      .then((r) => setExercises(r.data))
+    Promise.all([
+      api.get("/exercises/", { params: { limit: 100 } }),
+      api.get("/exercises/completed/today"),
+    ])
+      .then(([exRes, doneRes]) => {
+        setExercises(exRes.data);
+        setDone(doneRes.data.completed_ids);
+      })
       .finally(() => setLoading(false));
   }, []);
 
   const toggleDone = (id, forceAdd = false) => {
-    const updated = forceAdd
-      ? done.includes(id) ? done : [...done, id]
-      : done.includes(id) ? done.filter(x => x !== id) : [...done, id];
-    setDone(updated);
-    localStorage.setItem("exercises_done", JSON.stringify(updated));
+    const alreadyDone = done.includes(id);
+    if (forceAdd && alreadyDone) return;
+    api.post(`/exercises/${id}/complete`)
+      .then((r) => {
+        setDone((prev) =>
+          r.data.completed ? [...prev, id] : prev.filter((x) => x !== id)
+        );
+      })
+      .catch(() => {});
   };
 
   const types    = ["ALL", ...Object.keys(TYPE_META).filter(t => exercises.some(e => e.type === t))];

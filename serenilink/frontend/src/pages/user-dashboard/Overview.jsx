@@ -208,12 +208,15 @@ function Overview() {
       {/* Recommended Content + Wellness Tip */}
       <div className="dashboard-grid dashboard-cards-2" style={{ marginBottom: "20px" }}>
         <div className="dashboard-card">
-          <h3>Recommended Content</h3>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <h3 style={{ margin: 0 }}>Recommended Content</h3>
+            <Link to="/dashboard/resources" style={{ fontSize: 12, color: "var(--accent)", textDecoration: "none" }}>View all</Link>
+          </div>
           {recommended_content?.length > 0 ? (
             <div className="list-stack">
-              {recommended_content.map((c) => (
+              {recommended_content.slice(0, 3).map((c) => (
                 <div key={c.id} className="simple-item">
-                  <p style={{ margin: 0, fontWeight: 600 }}>{c.title}</p>
+                  <p style={{ margin: 0, fontWeight: 500, fontSize:16 }}>{c.title}</p>
                   <p className="small-muted" style={{ margin: "4px 0 0" }}>{c.category}</p>
                 </div>
               ))}
