@@ -45,7 +45,7 @@ function CounselorSidebar({ collapsed, setCollapsed }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => { logout(); navigate("/"); };
+  const handleLogout = () => { logout(); navigate("/login"); };
 
   return (
     <aside className={`dashboard-sidebar ${collapsed ? "collapsed" : ""}`}>

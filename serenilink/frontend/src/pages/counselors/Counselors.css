@@ -49,7 +49,7 @@
 }
 
 .counselors-btn {
-  background: #967364;
+  background: #a86955;
   color: #ffffff;
   padding: 14px 36px;
   border-radius: 999px;
@@ -235,7 +235,7 @@
 .book-btn {
   margin-top: 28px;
   align-self: flex-start;
-  background: #967364;
+  background: #a86955;
   color: #ffffff;
   padding: 12px 20px;
   border-radius: 999px;
@@ -249,9 +249,9 @@
   margin-top: 28px;
   align-self: flex-end;
   background: transparent;
-  color: #967364;
+  color: #a86955;
   padding: 12px 20px;
-  border: 1px solid #967364;
+  border: 1px solid #a86955;
   border-radius: 999px;
   font-weight: 600;
   font-size: 0.95rem;
@@ -296,17 +296,6 @@
   z-index: 999;
 }
 
-.counselors-chat-btn .chat-svg {
-  width: 55px;
-  height: 55px;
-  display: block;
-  color: #967364;
-}
-
-.counselors-chat-btn:hover {
-  opacity: 0.92;
-  transform: scale(1.06);
-}
 
 /* RESPONSIVE */
 @media (max-width: 1100px) {

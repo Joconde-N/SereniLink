@@ -93,7 +93,7 @@
   left: 16px;
   display: flex;
   align-items: center;
-  color: #b89381;
+  color: #a86955;
 }
 
 .resources-search-input {
@@ -123,7 +123,7 @@
 }
 
 .filter-svg {
-  color: #b89381;
+  color: #a86955;
 }
 
 .resources-filter-box select option {
@@ -186,7 +186,7 @@
 }
 
 .resource-tab.active {
-  background: #b89381;
+  background: #a86955;
   color: #ffffff;
 }
 
@@ -286,7 +286,7 @@
 }
 
 .resource-action-btn {
-  background: #b89381;
+  background: #a86955;
   color: #ffffff;
   padding: 14px 28px;
   border-radius: 999px;

@@ -233,6 +233,7 @@ function MyAvailability() {
             <option value="">All Statuses</option>
             <option value="AVAILABLE">Available</option>
             <option value="BOOKED">Booked</option>
+            <option value="EXPIRED">Expired</option>
           </select>
         </div>
 
@@ -278,8 +279,8 @@ function MyAvailability() {
                       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                         <span style={{
                           padding: "4px 12px", borderRadius: "999px", fontSize: "12px", fontWeight: 600,
-                          background: s.status === "AVAILABLE" ? "rgba(103,213,140,0.1)" : "rgba(245,201,95,0.1)",
-                          color: s.status === "AVAILABLE" ? "#67d58c" : "#f5c95f",
+                          background: s.status === "AVAILABLE" ? "rgba(103,213,140,0.1)" : s.status === "BOOKED" ? "rgba(245,201,95,0.1)" : "rgba(156,163,175,0.1)",
+                          color: s.status === "AVAILABLE" ? "#67d58c" : s.status === "BOOKED" ? "#f5c95f" : "#9ca3af",
                         }}>
                           {s.status}
                         </span>

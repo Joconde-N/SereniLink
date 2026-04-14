@@ -67,6 +67,15 @@ def list_my_slots(
 ):
     counselor = _get_my_counselor_profile(db, current_user.id)
 
+    # Auto-expire past AVAILABLE slots
+    now = datetime.utcnow()
+    db.query(AvailabilitySlot).filter(
+        AvailabilitySlot.counselor_id == counselor.id,
+        AvailabilitySlot.status == "AVAILABLE",
+        AvailabilitySlot.end_time < now,
+    ).update({"status": "EXPIRED"}, synchronize_session=False)
+    db.commit()
+
     q = db.query(AvailabilitySlot).filter(AvailabilitySlot.counselor_id == counselor.id)
     if status:
         q = q.filter(AvailabilitySlot.status == status.upper())

@@ -6,6 +6,7 @@ from app.models.booking import Booking
 from app.models.chat import ChatMessage
 from app.schemas.chat import ChatCreate, ChatOut
 from app.models.counselor import Counselor
+from app.models.notification import Notification
 
 router = APIRouter(prefix="/chat", tags=["Chat"])
 
@@ -34,10 +35,21 @@ def send_message(
         sender_id=current_user.id,
         message=payload.message
     )
-
     db.add(msg)
     db.commit()
     db.refresh(msg)
+
+    # Notify the other party
+    recipient_id = counselor.user_id if is_booking_owner else booking.user_id
+    sender_label = current_user.nickname or "Someone"
+    notif = Notification(
+        user_id=recipient_id,
+        title="New Message",
+        message=f"{sender_label} sent you a message in booking #{payload.booking_id}.",
+    )
+    db.add(notif)
+    db.commit()
+
     return msg
 
 @router.get("/booking/{booking_id}", response_model=list[ChatOut])

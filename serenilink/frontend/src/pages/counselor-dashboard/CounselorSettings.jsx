@@ -23,13 +23,33 @@ function SectionHeader({ icon: Icon, title, subtitle }) {
 }
 
 function CounselorSettings() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const { theme, toggle } = useTheme();
+
+  const [email, setEmail] = useState(user?.email || "");
+  const [emailMsg, setEmailMsg] = useState("");
+  const [savingEmail, setSavingEmail] = useState(false);
 
   const [newPw, setNewPw] = useState("");
   const [confirmPw, setConfirmPw] = useState("");
   const [pwMsg, setPwMsg] = useState("");
   const [savingPw, setSavingPw] = useState(false);
+
+  const handleEmailSave = async (e) => {
+    e.preventDefault();
+    setEmailMsg("");
+    setSavingEmail(true);
+    try {
+      const res = await api.patch("/auth/me", { email });
+      updateUser({ email: res.data.email });
+      setEmailMsg("success:Email updated successfully.");
+    } catch (err) {
+      setEmailMsg("error:" + (err.response?.data?.detail || "Failed to update email."));
+    } finally {
+      setSavingEmail(false);
+      setTimeout(() => setEmailMsg(""), 4000);
+    }
+  };
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();
@@ -67,18 +87,38 @@ function CounselorSettings() {
           {/* Account Info */}
           <div className="dashboard-card">
             <SectionHeader icon={LuUser} title="Account Information" subtitle="Your counselor account details" />
-            <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
-              {[
-                { label: "Username", value: user?.nickname },
-                { label: "Email", value: user?.email ?? "Not set" },
-                { label: "Role", value: user?.role },
-              ].map(({ label, value }) => (
-                <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: "1px solid var(--border-faint)" }}>
-                  <span style={{ fontSize: "13px", color: "var(--text-muted)" }}>{label}</span>
-                  <span style={{ fontWeight: 600, fontSize: "14px", textTransform: label === "Role" ? "capitalize" : "none", color: label === "Role" ? "#67d58c" : "var(--text-main)" }}>{value ?? "—"}</span>
-                </div>
-              ))}
+
+            <div style={{ marginBottom: "16px" }}>
+              <label className="form-label">Username</label>
+              <input
+                className="form-input" type="text"
+                value={user?.nickname || ""} readOnly
+                style={{ opacity: 0.5, cursor: "not-allowed" }}
+              />
+              <p style={{ margin: "6px 0 0", fontSize: "11px", color: "var(--text-muted)" }}>
+                Username cannot be changed. Contact support if needed.
+              </p>
             </div>
+
+            <form onSubmit={handleEmailSave}>
+              {emailMsg && <p style={msgStyle(emailMsg)}>{msgText(emailMsg)}</p>}
+              <div style={{ marginBottom: "16px" }}>
+                <label className="form-label">Email Address</label>
+                <input
+                  className="form-input" type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                />
+              </div>
+              <button
+                className="primary-btn" type="submit"
+                disabled={savingEmail || email === user?.email}
+                style={{ height: "40px", padding: "0 20px", fontSize: "14px" }}
+              >
+                {savingEmail ? "Saving..." : "Save Email"}
+              </button>
+            </form>
           </div>
 
           {/* Change Password */}

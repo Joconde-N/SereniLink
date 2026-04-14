@@ -18,6 +18,7 @@ function Login() {
   }, [user, authLoading]);
 
   const [form, setForm] = useState({ username: "", password: "" });
+  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -63,7 +64,7 @@ function Login() {
         headers: { Authorization: `Bearer ${res.data.access_token}` },
       });
 
-      login(res.data.access_token, meRes.data);
+      login(res.data.access_token, meRes.data, rememberMe);
       const role = meRes.data.role;
       navigate(role === "admin" ? "/admin" : role === "counselor" ? "/counselor" : "/dashboard");
     } catch (err) {
@@ -148,7 +149,7 @@ function Login() {
 
             <div className="login-options">
               <label className="login-remember">
-                <input type="checkbox" />
+                <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
                 <span>Remember Me</span>
               </label>
               <button type="button" onClick={() => { setShowForgot(true); setForgotStatus(""); setForgotError(""); }} className="login-forgot">

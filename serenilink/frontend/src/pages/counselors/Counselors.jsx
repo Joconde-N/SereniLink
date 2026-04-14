@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./Counselors.css";
 import api from "../../api/axios";
-import { LuSearch, LuFilter } from "react-icons/lu";
+import { LuSearch, LuFilter, LuArrowRight } from "react-icons/lu";
 
 const FALLBACK_IMAGE = "https://ui-avatars.com/api/?background=a78bfa&color=fff&size=200&name=";
 
@@ -282,24 +282,17 @@ function Counselors() {
         )}
 
         {hasMore && !search && (
-          <div className="view-more-wrap">
+          <div style={{ textAlign: "center", marginTop: 32 }}>
             <button
-              className="view-more-btn"
               onClick={() => fetchCounselors(skip, true)}
               disabled={loading}
+              style={{ background: "transparent", border: "none", color: "#E19A86", padding: "8px 0", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
             >
-              {loading ? "Loading..." : "View More"}
+              {loading ? "Loading..." : <>{"View More"} <LuArrowRight size={14} /></>}
             </button>
           </div>
         )}
       </section>
-
-      <button type="button" className="counselors-chat-btn" title="Chat with SereniLink AI"
-        onClick={() => window.dispatchEvent(new Event("open-guest-chat"))}>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="chat-svg">
-          <path fill="currentColor" d="M3 12c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h8c1.1 0 2 .9 2 2v5c0 1.1-.9 2-2 2H9v3l-3-3zm18 6c1.1 0 2-.9 2-2v-5c0-1.1-.9-2-2-2h-6v1c0 2.2-1.8 4-4 4v2c0 1.1.9 2 2 2h2v3l3-3z" />
-        </svg>
-      </button>
 
       <CounselorModal counselor={selected} onClose={() => setSelected(null)} />
     </div>

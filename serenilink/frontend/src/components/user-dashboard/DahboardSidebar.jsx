@@ -14,7 +14,7 @@ function DashboardSidebar({ collapsed, setCollapsed }) {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate("/login");
   };
 
   const menuItems = [
