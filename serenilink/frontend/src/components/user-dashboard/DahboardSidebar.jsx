@@ -7,40 +7,38 @@ import {
   LuChevronsLeft, LuChevronsRight, LuUser,
 } from "react-icons/lu";
 import { useAuth } from "../../context/AuthContext";
+import MobileSidebarDrawer from "./MobileSidebarDrawer";
 
-function DashboardSidebar({ collapsed, setCollapsed }) {
+function DashboardSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
+  const handleLogout = () => { logout(); navigate("/login"); };
 
   const menuItems = [
     {
       title: "Main",
       items: [
-        { label: "Dashboard", icon: <LuLayoutDashboard />, to: "/dashboard" },
-        { label: "AI Support", icon: <LuBot />, to: "/dashboard/ai-support" },
-        { label: "Find Counselors", icon: <LuSearch />, to: "/dashboard/counselors" },
-        { label: "My Bookings", icon: <LuCalendarCheck />, to: "/dashboard/bookings" },
+        { label: "Dashboard",       icon: <LuLayoutDashboard />, to: "/dashboard",           end: true },
+        { label: "AI Support",      icon: <LuBot />,             to: "/dashboard/ai-support" },
+        { label: "Find Counselors", icon: <LuSearch />,          to: "/dashboard/counselors" },
+        { label: "My Bookings",     icon: <LuCalendarCheck />,   to: "/dashboard/bookings" },
       ],
     },
     {
       title: "Wellness",
       items: [
-        { label: "Resources", icon: <LuLayers />, to: "/dashboard/resources" },
-        { label: "Check-In", icon: <LuSmile />, to: "/dashboard/checkins" },
-        { label: "Progress", icon: <LuChartNoAxesCombined />, to: "/dashboard/progress" },
-        { label: "Exercises", icon: <LuLeaf />, to: "/dashboard/exercises" },
+        { label: "Resources", icon: <LuLayers />,              to: "/dashboard/resources" },
+        { label: "Check-In",  icon: <LuSmile />,               to: "/dashboard/checkins" },
+        { label: "Progress",  icon: <LuChartNoAxesCombined />, to: "/dashboard/progress" },
+        { label: "Exercises", icon: <LuLeaf />,                to: "/dashboard/exercises" },
       ],
     },
     {
       title: "Activity",
       items: [
-        { label: "Notifications", icon: <LuBell />, to: "/dashboard/notifications" },
-        { label: "Messages", icon: <LuMessageSquare />, to: "/dashboard/messages" },
+        { label: "Notifications", icon: <LuBell />,          to: "/dashboard/notifications" },
+        { label: "Messages",      icon: <LuMessageSquare />, to: "/dashboard/messages" },
       ],
     },
     {
@@ -52,7 +50,17 @@ function DashboardSidebar({ collapsed, setCollapsed }) {
   ];
 
   return (
-    <aside className={`dashboard-sidebar ${collapsed ? "collapsed" : ""}`}>
+    <>
+      <MobileSidebarDrawer
+        brand="SereniLink"
+        sections={menuItems}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+        roleLabel={user?.role ?? "User"}
+        roleColor="var(--text-muted)"
+      />
+
+      <aside className={`dashboard-sidebar ${collapsed ? "collapsed" : ""}`}>
       <div className="sidebar-top">
         <div className="sidebar-brand-row">
           {!collapsed && <h2 className="sidebar-brand">SereniLink</h2>}
@@ -115,6 +123,7 @@ function DashboardSidebar({ collapsed, setCollapsed }) {
         </button>
       </div>
     </aside>
+    </>
   );
 }
 

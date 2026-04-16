@@ -1,10 +1,13 @@
 import secrets
+import re
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from app.api.deps import get_db, get_current_user
 from app.core.security import hash_password, verify_password, create_access_token
@@ -14,9 +17,21 @@ from app.schemas.user import UserCreate, UserOut
 from app.schemas.auth import Token
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
+limiter = Limiter(key_func=get_remote_address)
 
-@router.post("/register", response_model= UserOut, status_code=201)
-def register(payload: UserCreate, db: Session = Depends(get_db)):
+@router.post("/register", response_model=UserOut, status_code=201)
+@limiter.limit("5/minute")
+def register(request: Request, payload: UserCreate, db: Session = Depends(get_db)):
+    p = payload.password
+    if len(p) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters.")
+    if not re.search(r"[A-Z]", p):
+        raise HTTPException(status_code=400, detail="Password must contain at least one uppercase letter.")
+    if not re.search(r"[0-9]", p):
+        raise HTTPException(status_code=400, detail="Password must contain at least one number.")
+    if not re.search(r"[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]", p):
+        raise HTTPException(status_code=400, detail="Password must contain at least one special character.")
+
     existing = db.query(User).filter(User.nickname == payload.nickname).first()
     if existing:
         raise HTTPException(status_code=400, detail="Nickname already exist, please choose another one.")
@@ -39,7 +54,9 @@ def register(payload: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=Token)
+@limiter.limit("10/minute")
 def login(
+    request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
@@ -91,7 +108,8 @@ def update_profile(
 
 
 @router.post("/forgot-password")
-def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def forgot_password(request: Request, payload: ForgotPasswordRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == payload.email).first()
     # Always return 200 to avoid email enumeration
     if not user:

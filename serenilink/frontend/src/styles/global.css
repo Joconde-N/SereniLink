@@ -84,7 +84,7 @@ a {
   color: #E19A86;
 }
 
-.login-btn {
+.nav-login-btn {
   background: #a86955;
   color: #FFFFFF;
   padding: 11px 15px;
@@ -199,11 +199,6 @@ a {
 
 /* RESPONSIVE */
 @media (max-width: 1100px) {
-  .navbar {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
   .footer-top {
     grid-template-columns: 1fr;
   }
@@ -215,21 +210,10 @@ a {
 }
 
 @media (max-width: 768px) {
-  .navbar,
   .custom-footer,
   .page-section {
     padding-left: 20px;
     padding-right: 20px;
-  }
-
-  .nav-logo a {
-    font-size: 1.9rem;
-  }
-
-  .nav-links {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 18px;
   }
 
   .footer-left h3,
@@ -237,8 +221,99 @@ a {
     font-size: 1.6rem;
   }
 
-  .footer-bottom h2 {
-    font-size: 2rem;
+  .footer-bottom p {
+    font-size: 1rem;
+  }
+}
+
+/* NAV BURGER — mobile only */
+.nav-burger {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #B0B0B0;
+  cursor: pointer;
+  padding: 4px;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-mobile-drawer {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 14px 20px;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    position: fixed;
+    background: rgba(7,8,8,0.96);
+    backdrop-filter: blur(10px);
+  }
+
+  .nav-logo {
+    flex: 1;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0;
+  }
+
+  .nav-burger {
+    display: flex;
+  }
+
+  .nav-login-btn {
+    display: none;
+  }
+
+  .nav-mobile-drawer {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    background: rgba(7,8,8,0.98);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 16px 24px 24px;
+    gap: 4px;
+    z-index: 999;
+  }
+
+  .nav-mobile-drawer a,
+  .nav-mobile-drawer span {
+    color: #B0B0B0;
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: block;
+  }
+
+  .nav-mobile-drawer a.active {
+    color: #E19A86;
+  }
+
+  .custom-footer,
+  .page-section {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .footer-left h3,
+  .footer-right h3 {
+    font-size: 1.6rem;
   }
 
   .footer-bottom p {
@@ -246,7 +321,7 @@ a {
   }
 }
 
-/* react-datepicker overrides */
+
 .datepicker-full { width: 100%; }
 .datepicker-full .react-datepicker-wrapper { width: 100%; }
 .datepicker-full input.form-input { width: 100%; cursor: pointer; }

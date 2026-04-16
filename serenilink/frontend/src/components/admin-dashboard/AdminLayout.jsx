@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 function AdminLayout() {
   const { user, loading } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   if (loading) {
     return (
@@ -20,7 +21,7 @@ function AdminLayout() {
 
   return (
     <div className="dashboard-shell">
-      <AdminSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+      <AdminSidebar collapsed={collapsed} setCollapsed={setCollapsed} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
       <main className="dashboard-main">
         <Outlet />
       </main>

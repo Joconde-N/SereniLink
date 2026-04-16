@@ -117,7 +117,7 @@ function GuestChatWidget() {
   return (
     <div style={{
       position: "fixed", bottom: "24px", right: "24px", zIndex: 1000,
-      width: "370px", height: "540px", borderRadius: "20px",
+      width: "min(370px, calc(100vw - 32px))", height: "540px", borderRadius: "20px",
       background: "linear-gradient(180deg, #1a1a1d 0%, #171719 100%)",
       border: "1px solid rgba(176,176,176,0.1)",
       boxShadow: "0 20px 70px rgba(0,0,0,0.6)",

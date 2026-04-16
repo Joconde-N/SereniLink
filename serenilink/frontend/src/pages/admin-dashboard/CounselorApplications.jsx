@@ -4,6 +4,13 @@ import { LuEye, LuCheck, LuX, LuDownload, LuFileText } from "react-icons/lu";
 
 const BASE_URL = "http://localhost:8000";
 
+// Use protected /files/ endpoint instead of public /uploads/
+function toProtectedUrl(uploadPath) {
+  // uploadPath is like /uploads/applications/certifications/abc.pdf
+  // convert to /files/applications/certifications/abc.pdf
+  return `${BASE_URL}/files${uploadPath.replace("/uploads", "")}`;
+}
+
 const STATUS_STYLE = {
   PENDING:  { color: "#f5c95f", bg: "rgba(245,201,95,0.1)"  },
   APPROVED: { color: "#67d58c", bg: "rgba(103,213,140,0.1)" },
@@ -59,7 +66,7 @@ function CertFile({ url, index }) {
   const isPdf    = filename.toLowerCase().endsWith(".pdf");
   return (
     <a
-      href={`${BASE_URL}${url}`}
+      href={toProtectedUrl(url)}
       target="_blank"
       rel="noreferrer"
       download

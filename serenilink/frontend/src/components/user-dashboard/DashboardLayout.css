@@ -474,3 +474,125 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 600px) {
+  /* Hide the sidebar entirely — replaced by mobile top bar + drawer */
+  .dashboard-sidebar {
+    display: none;
+  }
+
+  .dashboard-main {
+    padding: 72px 16px 24px;
+    min-height: 100vh;
+  }
+
+  .dashboard-page-title {
+    font-size: 22px;
+  }
+
+  .dashboard-page-subtitle {
+    font-size: 14px;
+    margin-bottom: 18px;
+  }
+
+  .dashboard-cards-4,
+  .dashboard-cards-3,
+  .dashboard-cards-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile top bar shown only on small screens */
+.dash-mobile-topbar {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .dash-mobile-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 58px;
+    padding: 0 18px;
+    background: #1A1D1E;
+    border-bottom: 1px solid var(--border-faint);
+    z-index: 200;
+  }
+
+  .dash-mobile-topbar-brand {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .dash-mobile-burger {
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+  }
+}
+
+/* Mobile drawer overlay */
+.dash-mobile-overlay {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .dash-mobile-overlay {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(0,0,0,0.5);
+  }
+
+  .dash-mobile-drawer {
+    width: 280px;
+    height: 100%;
+    background: #1A1D1E;
+    border-right: 1px solid var(--border-faint);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 16px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(202,163,143,0.35) transparent;
+  }
+
+  .dash-mobile-drawer::-webkit-scrollbar { width: 4px; }
+  .dash-mobile-drawer::-webkit-scrollbar-track { background: transparent; }
+  .dash-mobile-drawer::-webkit-scrollbar-thumb { background: rgba(202,163,143,0.35); border-radius: 999px; }
+
+  .dash-mobile-drawer-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .dash-mobile-drawer-brand {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .dash-mobile-close {
+    background: transparent;
+    border: none;
+    color: var(--text-soft);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+  }
+}

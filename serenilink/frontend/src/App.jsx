@@ -57,6 +57,8 @@ import CounselorProfile from "./pages/counselor-dashboard/CounselorProfile";
 import CounselorSettings from "./pages/counselor-dashboard/CounselorSettings";
 import ChangePassword from "./pages/counselor-dashboard/ChangePassword";
 
+import NotFound from "./pages/NotFound";
+
 function App() {
   return (
     <Routes>
@@ -119,6 +121,8 @@ function App() {
         <Route path="settings" element={<CounselorSettings />} />
         <Route path="change-password" element={<ChangePassword />} />
       </Route>
+
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

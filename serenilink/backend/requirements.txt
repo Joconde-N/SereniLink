@@ -7,3 +7,5 @@ passlib[argon2]
 python-multipart
 psycopg2-binary
 openai
+slowapi
+pydantic-settings

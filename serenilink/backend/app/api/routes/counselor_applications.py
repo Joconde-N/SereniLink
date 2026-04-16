@@ -32,8 +32,12 @@ def _save_file(file: UploadFile, subfolder: str) -> str:
     ext      = Path(file.filename).suffix
     filename = f"{secrets.token_hex(12)}{ext}"
     path     = dest / filename
+    content  = file.file.read()
+    if len(content) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=400, detail=f"File too large. Maximum size is 5MB.")
     with path.open("wb") as f:
-        shutil.copyfileobj(file.file, f)
+        f.write(content)
+    file.file.seek(0)
     return f"/uploads/applications/{subfolder}/{filename}"
 
 

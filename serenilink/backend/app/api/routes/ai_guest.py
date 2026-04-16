@@ -1,10 +1,13 @@
 from datetime import datetime
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from app.core.ai_client import get_ai_client, get_ai_model
 
 router = APIRouter(prefix="/ai", tags=["AI Support"])
+limiter = Limiter(key_func=get_remote_address)
 
 # In-memory guest storage (resets if server restarts)
 GUEST_HISTORY: dict[str, list[dict]] = {}
@@ -38,7 +41,8 @@ def detect_risk_level(text: str) -> str:
 
 
 @router.post("/guest-chat")
-def guest_chat(payload: GuestChatIn):
+@limiter.limit("20/minute")
+def guest_chat(request: Request, payload: GuestChatIn):
     gid = payload.guest_id.strip()
 
     # message limit

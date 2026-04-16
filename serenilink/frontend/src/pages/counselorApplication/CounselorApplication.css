@@ -57,7 +57,6 @@
   font-family: Georgia, "Times New Roman", serif;
   color: #E19A86;
   font-weight: 500;
-  font-style: italic;
 }
 
 .counselor-header p {
@@ -244,5 +243,19 @@
   .card-medium,
   .card-large {
     padding: 24px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .counselor-header h1 {
+    font-size: 28px;
+  }
+
+  .counselor-header p {
+    font-size: 15px;
+  }
+
+  .counselor-wrapper {
+    padding: 24px 14px 48px;
   }
 }

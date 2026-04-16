@@ -220,3 +220,13 @@
     gap: 0;
   }
 }
+
+@media (max-width: 480px) {
+  .register-right {
+    padding: 100px 16px 32px;
+  }
+
+  .register-form-box h2 {
+    font-size: 38px;
+  }
+}

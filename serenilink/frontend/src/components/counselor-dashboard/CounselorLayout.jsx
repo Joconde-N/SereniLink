@@ -7,6 +7,7 @@ import { useAuth } from "../../context/AuthContext";
 function CounselorLayout() {
   const { user, loading } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
   if (loading) {
@@ -20,14 +21,13 @@ function CounselorLayout() {
   if (!user) return <Navigate to="/login" replace />;
   if (user.role !== "counselor") return <Navigate to="/dashboard" replace />;
 
-  // Force password change on first login
   if (user.must_change_password && location.pathname !== "/counselor/change-password") {
     return <Navigate to="/counselor/change-password" replace />;
   }
 
   return (
     <div className="dashboard-shell">
-      <CounselorSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+      <CounselorSidebar collapsed={collapsed} setCollapsed={setCollapsed} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
       <main className="dashboard-main" style={{ position: "relative" }}>
         <div style={{ position: "absolute", top: "28px", right: "28px", zIndex: 10 }}>
           <NotificationBell notifPath="/counselor/notifications" />

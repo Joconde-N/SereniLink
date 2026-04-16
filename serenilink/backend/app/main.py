@@ -1,7 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pathlib import Path
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from app.core.config import settings
 from app.api.routes.health import router as health_router
@@ -23,22 +27,47 @@ from app.api.routes.admin_users import router as admin_users_router
 from app.api.routes.ai_guest import router as ai_guest_router
 
 from app.db.session import engine
-from app.models import User, Content, Assessment, Counselor, CounselorApplication, Booking, Progress, ChatMessage, AvailabilitySlot, AIConversation, AIMessage, MoodEntry, Exercise, ExerciseLog, Notification, UserAISummary
+from app.models import User, Content, Assessment, Counselor, CounselorApplication, Booking, Progress, ChatMessage, AvailabilitySlot, AIConversation, AIMessage, MoodEntry, Exercise, Notification
 from app.db.base import Base
+from app.api.deps import get_current_user, require_admin
+from sqlalchemy.orm import Session
+from app.api.deps import get_db
+from fastapi import Depends
+
+# Rate limiter
+limiter = Limiter(key_func=get_remote_address, default_limits=["200/minute"])
 
 app = FastAPI(title=settings.APP_NAME)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-UPLOAD_DIR = Path("uploads")
-UPLOAD_DIR.mkdir(exist_ok=True)
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+# CORS — reads allowed origins from env, falls back to localhost for dev
+allowed_origins = [o.strip() for o in settings.ALLOWED_ORIGINS.split(",") if o.strip()]
 
 app.add_middleware(
-    CORSMiddleware, 
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    CORSMiddleware,
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Uploads static dir
+UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR.mkdir(exist_ok=True)
+
+# Protected file download — requires valid JWT
+@app.get("/files/{file_path:path}")
+async def protected_file(
+    file_path: str,
+    current_user=Depends(get_current_user),
+):
+    full_path = UPLOAD_DIR / file_path
+    if not full_path.exists() or not full_path.is_file():
+        raise HTTPException(status_code=404, detail="File not found")
+    # Only admin or the file owner (counselor applications) can download certs
+    # For simplicity: any authenticated user can download (covers counselors viewing their own)
+    return FileResponse(str(full_path))
 
 app.include_router(health_router)
 app.include_router(auth_router)

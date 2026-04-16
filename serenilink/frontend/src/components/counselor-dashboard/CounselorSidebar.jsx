@@ -14,6 +14,7 @@ import {
   LuChevronsRight,
 } from "react-icons/lu";
 import { useAuth } from "../../context/AuthContext";
+import MobileSidebarDrawer from "../user-dashboard/MobileSidebarDrawer";
 
 const SECTIONS = [
   {
@@ -41,14 +42,23 @@ const SECTIONS = [
   },
 ];
 
-function CounselorSidebar({ collapsed, setCollapsed }) {
+function CounselorSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => { logout(); navigate("/login"); };
 
   return (
-    <aside className={`dashboard-sidebar ${collapsed ? "collapsed" : ""}`}>
+    <>
+      <MobileSidebarDrawer
+        brand="SereniLink"
+        sections={SECTIONS}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+        roleLabel="Counselor"
+        roleColor="#67d58c"
+      />
+      <aside className={`dashboard-sidebar ${collapsed ? "collapsed" : ""}`}>
       {/* Top */}
       <div className="sidebar-top">
         <div className="sidebar-brand-row">
@@ -114,6 +124,7 @@ function CounselorSidebar({ collapsed, setCollapsed }) {
         </button>
       </div>
     </aside>
+    </>
   );
 }
 

@@ -23,6 +23,9 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Show session expired message if redirected from 401
+  const sessionExpired = new URLSearchParams(window.location.search).get("session") === "expired";
+
   const [showForgot, setShowForgot] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotStatus, setForgotStatus] = useState("");
@@ -110,6 +113,12 @@ function Login() {
           <p className="login-subtext">
             Enter your credentials to access your SereniLink dashboard.
           </p>
+
+          {sessionExpired && (
+            <div style={{ marginBottom: 16, padding: "12px 16px", borderRadius: 12, background: "rgba(245,201,95,0.1)", border: "1px solid rgba(245,201,95,0.25)", color: "#f5c95f", fontSize: 14 }}>
+              Your session expired. Please log in again.
+            </div>
+          )}
 
           {error && <p style={{ color: "red", marginBottom: "12px", fontSize: "14px" }}>{error}</p>}
 
