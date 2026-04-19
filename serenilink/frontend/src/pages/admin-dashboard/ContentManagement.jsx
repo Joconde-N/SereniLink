@@ -120,8 +120,8 @@ function ContentManagement() {
                 <input className="form-input" value={form.summary} onChange={(e) => setForm({ ...form, summary: e.target.value })} />
               </div>
               <div>
-                <label className="form-label">Video URL (YouTube — for Video category only)</label>
-                <input className="form-input" placeholder="https://www.youtube.com/watch?v=..." value={form.video_url} onChange={(e) => setForm({ ...form, video_url: e.target.value })} />
+                <label className="form-label">Audio / Video URL (YouTube, SoundCloud, or direct .mp3 link)</label>
+                <input className="form-input" placeholder="https://www.youtube.com/watch?v=... or https://soundcloud.com/..." value={form.video_url} onChange={(e) => setForm({ ...form, video_url: e.target.value })} />
               </div>
               <div>
                 <label className="form-label">Body *</label>

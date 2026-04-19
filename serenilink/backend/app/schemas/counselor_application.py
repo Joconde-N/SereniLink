@@ -25,6 +25,7 @@ class CounselorApplicationCreate(BaseModel):
     languages_offered: str | None = Field(default=None, max_length=200)
     preferred_session_type: str | None = Field(default=None, max_length=50)
     preferred_duration: str | None = Field(default=None, max_length=20)
+    hourly_rate: float | None = Field(default=None, ge=0)
 
 
 class CounselorApplicationOut(BaseModel):
@@ -46,6 +47,7 @@ class CounselorApplicationOut(BaseModel):
     languages_offered: str | None
     preferred_session_type: str | None
     preferred_duration: str | None
+    hourly_rate: float | None
     profile_image_url: str | None
     certification_urls: Optional[List[str]]
     status: str

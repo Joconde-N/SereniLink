@@ -19,6 +19,12 @@ const CATEGORY_ICONS = {
         d="M3 15.75v-7.5a2 2 0 0 1 2-2h8.5a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2m17.168-8.759l-4 3.563a.5.5 0 0 0-.168.373v1.778a.5.5 0 0 0 .168.373l4 3.563a.5.5 0 0 0 .832-.374V7.365a.5.5 0 0 0-.832-.374" />
     </svg>
   ),
+  audio: (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="resource-svg">
+      <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"
+        d="M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0m12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+    </svg>
+  ),
   default: (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" className="resource-svg">
       <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
@@ -100,28 +106,28 @@ function Home() {
           <div className="resource-list">
             {previewContent.length > 0
               ? previewContent.map((item) => (
-                  <div className="resource-card" key={item.id}>
+                  <Link to={`/resources/${item.id}`} className="resource-card" key={item.id} style={{ textDecoration: "none" }}>
                     <div className="resource-icon">
                       {CATEGORY_ICONS[(item.category || "").toLowerCase()] || CATEGORY_ICONS.default}
                     </div>
                     <div>
                       <h3>{item.title}</h3>
-                      <p>{item.summary ? item.summary.slice(0, 90) + "..." : item.body.slice(0, 90) + "..."}</p>
+                      <p>{item.summary ? item.summary.slice(0, 90) + "..." : (item.body || "").slice(0, 90) + "..."}</p>
                     </div>
-                  </div>
+                  </Link>
                 ))
               : [
                   { id: 1, title: "Understanding Stress: A youth guide", summary: "Learn what stress is, how it affects your body and mind, and simple ways to manage it in your daily..." },
                   { id: 2, title: "Guided Meditation for Anxiety", summary: "A gentle guided meditation designed to help ease anxious thoughts and feelings..." },
                   { id: 3, title: "Building Healthy Sleep Habits", summary: "Sleep is crucial for mental health. Learn how to create a bedtime routine that works for you..." },
                 ].map((item) => (
-                  <div className="resource-card" key={item.id}>
+                  <Link to="/resources" className="resource-card" key={item.id} style={{ textDecoration: "none" }}>
                     <div className="resource-icon">{CATEGORY_ICONS.default}</div>
                     <div>
                       <h3>{item.title}</h3>
                       <p>{item.summary}</p>
                     </div>
-                  </div>
+                  </Link>
                 ))
             }
           </div>

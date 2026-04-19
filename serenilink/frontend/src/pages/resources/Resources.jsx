@@ -39,14 +39,14 @@ function ResourceCard({ item }) {
         <div className="resource-badge">{item.category}</div>
 
         {(cat === "video" || cat === "audio") && (
-          <div className="resource-center-icon">
+          <Link to={`/resources/${item.id}`} className="resource-center-icon" style={{ textDecoration: "none" }}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="play-svg">
               <path
                 fill="currentColor"
                 d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18a1 1 0 0 0 0-1.68L9.54 5.98A1 1 0 0 0 8 6.82"
               />
             </svg>
-          </div>
+          </Link>
         )}
 
         {cat === "article" && (

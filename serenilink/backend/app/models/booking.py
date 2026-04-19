@@ -1,6 +1,7 @@
 from datetime import datetime
-from sqlalchemy import Integer, String, DateTime, ForeignKey
+from sqlalchemy import Integer, String, DateTime, ForeignKey, Numeric
 from sqlalchemy.orm import Mapped, mapped_column
+from decimal import Decimal
 
 from app.db.base import Base
 
@@ -22,6 +23,7 @@ class Booking(Base):
     status: Mapped[str] = mapped_column(String(20), default="PENDING", index=True)
     
     payment_status: Mapped[str] = mapped_column(String(20), default="PENDING", index=True)
+    session_price: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

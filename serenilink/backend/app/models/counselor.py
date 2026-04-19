@@ -1,6 +1,7 @@
 from datetime import datetime
-from sqlalchemy import Integer, String, Boolean, DateTime, ForeignKey, Text
+from sqlalchemy import Integer, String, Boolean, DateTime, ForeignKey, Text, Numeric
 from sqlalchemy.orm import Mapped, mapped_column
+from decimal import Decimal
 
 from app.db.base import Base
 
@@ -38,6 +39,7 @@ class Counselor(Base):
     languages_offered: Mapped[str | None] = mapped_column(String(200), nullable=True)
     preferred_session_type: Mapped[str | None] = mapped_column(String(50), nullable=True)
     preferred_duration: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    hourly_rate: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), nullable=True)
 
     application_status: Mapped[str] = mapped_column(String(20), default="PENDING", index=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=False)

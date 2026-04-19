@@ -25,6 +25,7 @@ class BookingOut(BaseModel):
     reason: str | None
     status: str
     payment_status: str
+    session_price: float | None
     created_at: datetime
     updated_at: datetime
 

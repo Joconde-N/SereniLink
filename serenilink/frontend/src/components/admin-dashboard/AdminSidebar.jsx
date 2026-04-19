@@ -8,7 +8,6 @@ import {
   LuDumbbell,
   LuUsers,
   LuChartBar,
-  LuUser,
   LuSettings,
   LuLogOut,
   LuChevronsLeft,
@@ -38,7 +37,6 @@ const SECTIONS = [
   {
     title: "Account",
     items: [
-      { label: "Profile",  icon: <LuUser />,     to: "/admin/profile" },
       { label: "Settings", icon: <LuSettings />, to: "/admin/settings" },
     ],
   },

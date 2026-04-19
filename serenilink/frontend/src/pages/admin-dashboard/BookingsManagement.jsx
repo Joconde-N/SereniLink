@@ -19,7 +19,7 @@ function tabLabel(t) {
   return t === "ALL" ? "All" : t.charAt(0) + t.slice(1).toLowerCase();
 }
 const BOOKING_STATUSES = ["PENDING", "APPROVED", "DECLINED", "COMPLETED", "CANCELLED"];
-const PAYMENT_STATUSES = ["PENDING", "PAID", "WAIVED"];
+const PAYMENT_STATUSES = ["PENDING", "WAIVED"];
 
 function ActionPopover({ label, options, current, onSelect, accentCurrent }) {
   const [open, setOpen] = useState(false);

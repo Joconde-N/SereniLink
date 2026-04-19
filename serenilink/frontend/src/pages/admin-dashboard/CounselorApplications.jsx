@@ -145,6 +145,7 @@ function DetailsModal({ app, onClose, onAction, acting }) {
               <Field label="In-Person Sessions" value={app.offers_in_person ? "Yes" : "No"} />
               <Field label="Preferred Type"     value={app.preferred_session_type} />
               <Field label="Preferred Duration" value={app.preferred_duration} />
+              <Field label="Hourly Rate"        value={app.hourly_rate != null ? `$${app.hourly_rate}/hr` : null} />
             </ThreeCol>
           </SectionBox>
 
@@ -262,7 +263,7 @@ function CounselorApplications() {
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
             <thead>
               <tr style={{ borderBottom: "1px solid var(--border-faint)" }}>
-                {["Applicant", "Specialization", "Date Applied", "Status", "Actions"].map((h) => (
+                {["Applicant", "Specialization", "Hourly Rate", "Date Applied", "Status", "Actions"].map((h) => (
                   <th key={h} style={{ padding: "10px 14px", textAlign: "left", color: "var(--text-muted)", fontWeight: 600, fontSize: 12, textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>
                     {h}
                   </th>
@@ -284,6 +285,9 @@ function CounselorApplications() {
                       {app.title && <p style={{ margin: "2px 0 0", fontSize: 12, color: "var(--text-muted)" }}>{app.title}</p>}
                     </td>
                     <td style={{ padding: "14px", color: "var(--text-soft)", fontSize: 13 }}>{app.specialization}</td>
+                    <td style={{ padding: "14px", color: "var(--text-soft)", fontSize: 13, whiteSpace: "nowrap" }}>
+                      {app.hourly_rate != null ? `$${app.hourly_rate}/hr` : <span style={{ color: "var(--text-muted)" }}>—</span>}
+                    </td>
                     <td style={{ padding: "14px", color: "var(--text-muted)", fontSize: 13, whiteSpace: "nowrap" }}>
                       {new Date(app.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                     </td>

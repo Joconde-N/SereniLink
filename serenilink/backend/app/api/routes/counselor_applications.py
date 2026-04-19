@@ -75,6 +75,7 @@ async def submit_application(
     languages_offered:      Optional[str] = Form(None),
     preferred_session_type: Optional[str] = Form(None),
     preferred_duration:     Optional[str] = Form(None),
+    hourly_rate:            Optional[float] = Form(None),
     profile_image:          Optional[UploadFile] = File(None),
     certifications:         Optional[List[UploadFile]] = File(None),
     db: Session = Depends(get_db),
@@ -122,6 +123,7 @@ async def submit_application(
         languages_offered=languages_offered or None,
         preferred_session_type=preferred_session_type or None,
         preferred_duration=preferred_duration or None,
+        hourly_rate=hourly_rate,
         profile_image_url=profile_image_url,
         certification_urls=cert_urls if cert_urls else None,
     )
@@ -208,6 +210,7 @@ def approve_application(
         languages_offered=item.languages_offered,
         preferred_session_type=item.preferred_session_type,
         preferred_duration=item.preferred_duration,
+        hourly_rate=item.hourly_rate,
         profile_image_url=item.profile_image_url,
         application_status="APPROVED",
         is_active=True,

@@ -21,6 +21,7 @@ function CounselorApplication() {
     highest_certification: "", issuing_institution: "",
     office_address: "", offers_online: true, offers_in_person: false,
     languages_offered: "", preferred_session_type: "Video Call", preferred_duration: "30 Minutes",
+    hourly_rate: "",
   });
 
   const set = (e) => {
@@ -65,6 +66,7 @@ function CounselorApplication() {
       if (form.languages_offered)      fd.append("languages_offered",      form.languages_offered);
       if (form.preferred_session_type) fd.append("preferred_session_type", form.preferred_session_type);
       if (form.preferred_duration)     fd.append("preferred_duration",     form.preferred_duration);
+      if (form.hourly_rate)            fd.append("hourly_rate",            parseFloat(form.hourly_rate));
       if (profileFile)                 fd.append("profile_image",          profileFile);
       certFiles.forEach((f) =>         fd.append("certifications",         f));
 
@@ -232,6 +234,11 @@ function CounselorApplication() {
                   <option>45 Minutes</option>
                   <option>60 Minutes</option>
                 </select>
+              </div>
+
+              <div className="field no-margin">
+                <label>Hourly Rate (USD)</label>
+                <input type="number" name="hourly_rate" placeholder="e.g. 50" min="0" step="0.01" value={form.hourly_rate} onChange={set} />
               </div>
             </div>
           </section>

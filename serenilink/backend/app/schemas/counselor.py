@@ -15,6 +15,7 @@ class CounselorApplicationSubmit(BaseModel):
     offers_in_person: bool = False
     show_phone_after_booking: bool = True
     show_office_after_booking: bool = True
+    hourly_rate: float | None = Field(default=None, ge=0)
 
 
 # Public info shown BEFORE booking (safe)
@@ -34,6 +35,7 @@ class CounselorPublicOut(BaseModel):
     counseling_approach: str | None
     highest_certification: str | None
     issuing_institution: str | None
+    hourly_rate: float | None
 
     class Config:
         from_attributes = True
@@ -62,6 +64,7 @@ class CounselorAdminOut(BaseModel):
     languages_offered: str | None
     preferred_session_type: str | None
     preferred_duration: str | None
+    hourly_rate: float | None
     application_status: str
     is_active: bool
     created_at: datetime
@@ -91,3 +94,4 @@ class CounselorProfileUpdate(BaseModel):
     languages_offered: str | None = Field(default=None, max_length=200)
     preferred_session_type: str | None = Field(default=None, max_length=50)
     preferred_duration: str | None = Field(default=None, max_length=20)
+    hourly_rate: float | None = Field(default=None, ge=0)

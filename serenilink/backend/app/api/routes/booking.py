@@ -20,7 +20,7 @@ router = APIRouter(prefix="/bookings", tags=["Bookings"])
 
 ALLOWED_STATUSES = {"PENDING", "APPROVED", "DECLINED", "COMPLETED", "CANCELLED"}
 COUNSELOR_ALLOWED = {"APPROVED", "DECLINED", "COMPLETED", "CANCELLED"}
-PAYMENT_ALLOWED = {"PENDING", "PAID", "WAIVED"}
+PAYMENT_ALLOWED = {"PENDING", "WAIVED"}
 
 
 def expire_stale_bookings(db: Session):
@@ -120,6 +120,7 @@ def create_booking(
         reason=payload.reason,
         status="PENDING",
         payment_status="PENDING",
+        session_price=round(float(counselor.hourly_rate) * (slot.end_time - slot.start_time).seconds / 3600, 2) if counselor.hourly_rate else None,
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow(),
     )
@@ -215,7 +216,35 @@ def update_booking_status_admin(
     return item
 
 
-@router.patch("/{booking_id}/payment", response_model=BookingOut)
+@router.post("/{booking_id}/pay", response_model=BookingOut)
+def user_pay_booking(
+    booking_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    item = db.query(Booking).filter(Booking.id == booking_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    if item.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not allowed")
+    if item.status != "APPROVED":
+        raise HTTPException(status_code=409, detail="Payment is only allowed for approved bookings")
+    if item.payment_status == "PAID":
+        raise HTTPException(status_code=409, detail="Booking is already paid")
+
+    item.payment_status = "PAID"
+    item.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(item)
+
+    create_notification(
+        db, item.user_id,
+        "Payment Confirmed",
+        "Your payment has been recorded. Your session is confirmed."
+    )
+    return item
+
+
 def admin_update_payment_status(
     booking_id: int,
     payload: BookingUpdatePayment,

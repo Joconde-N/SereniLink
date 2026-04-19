@@ -226,6 +226,12 @@
   background: #1A1D1E;
   padding: 24px 22px;
   border-radius: 8px;
+  transition: background 0.2s ease;
+  cursor: pointer;
+}
+
+.resource-card:hover {
+  background: #222527;
 }
 
 .resource-icon {

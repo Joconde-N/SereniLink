@@ -18,6 +18,7 @@ function BookingDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [cancelling, setCancelling] = useState(false);
+  const [paying, setPaying] = useState(false);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -41,6 +42,19 @@ function BookingDetails() {
     };
     fetchAll();
   }, [id]);
+
+  const handlePay = async () => {
+    if (!window.confirm("Confirm payment for this session?")) return;
+    setPaying(true);
+    try {
+      const res = await api.post(`/bookings/${id}/pay`);
+      setBooking(res.data);
+    } catch (err) {
+      alert(err.response?.data?.detail || "Payment failed.");
+    } finally {
+      setPaying(false);
+    }
+  };
 
   const handleCancel = async () => {
     if (!window.confirm("Cancel this booking?")) return;
@@ -143,6 +157,21 @@ function BookingDetails() {
               </td>
               <td style={{ padding: "16px 20px" }}>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                  {booking.status === "APPROVED" && booking.payment_status === "PENDING" && (
+                    <button
+                      type="button"
+                      onClick={handlePay}
+                      disabled={paying}
+                      style={{
+                        height: 34, padding: "0 14px", borderRadius: 10, fontSize: 13,
+                        fontWeight: 600, cursor: "pointer",
+                        border: "1px solid rgba(103,213,140,0.35)",
+                        background: "rgba(103,213,140,0.12)", color: "#67d58c",
+                      }}
+                    >
+                      {paying ? "Processing..." : booking.session_price != null ? `Pay $${booking.session_price}` : "Pay Now"}
+                    </button>
+                  )}
                   {booking.status === "APPROVED" && (
                     <Link
                       to={`/dashboard/chat/${booking.id}`}
