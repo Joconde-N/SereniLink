@@ -234,9 +234,9 @@ pip install -r requirements.txt
 Create a `.env` file:
 
 ```env
-DATABASE_URL=postgresql://username:password@localhost/serenilink
-SECRET_KEY=your_secret_key
-OPENAI_API_KEY=your_openai_api_key
+HF_API_KEY=your_api_key_here
+HF_BASE_URL=https://router.huggingface.co/v1
+AI_MODEL=openai/gpt-oss-20b:groq
 ```
 
 ### 6. Run Database Migrations
