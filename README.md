@@ -1,8 +1,8 @@
-# SereniLinkAI - Mental Health Support and Counseling Platform
+# SereniLink - Mental Health Support and Counseling Platform
 
 ## Overview
 
-SereniLinkAI is an AI-powered mental health support and counseling platform designed to improve access to mental health services through digital technology.
+SereniLink is an AI-powered mental health support and counseling platform designed to improve access to mental health services through digital technology.
 
 The platform provides:
 
@@ -110,7 +110,7 @@ The platform provides:
 
 ## AI Configuration
 
-SereniLinkAI uses the Hugging Face Router as the AI gateway. The application communicates with an OpenAI-compatible API endpoint provided through Hugging Face and accesses the GPT-OSS-20B model running on Groq infrastructure.
+SereniLink uses the Hugging Face Router as the AI gateway. The application communicates with an OpenAI-compatible API endpoint provided through Hugging Face and accesses the GPT-OSS-20B model running on Groq infrastructure.
 
 Configuration:
 
