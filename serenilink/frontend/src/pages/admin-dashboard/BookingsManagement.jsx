@@ -8,18 +8,12 @@ const STATUS_STYLE = {
   DECLINED:  { color: "#f08f8f", bg: "rgba(240,143,143,0.12)" },
   CANCELLED: { color: "#9ca3af", bg: "rgba(156,163,175,0.12)" },
 };
-const PAYMENT_STYLE = {
-  PENDING: { color: "#f5c95f" },
-  PAID:    { color: "#67d58c" },
-  WAIVED:  { color: "#caa38f" },
-};
 const STATUS_TABS = ["ALL", "PENDING", "APPROVED", "DECLINED", "COMPLETED", "CANCELLED"];
 
 function tabLabel(t) {
   return t === "ALL" ? "All" : t.charAt(0) + t.slice(1).toLowerCase();
 }
 const BOOKING_STATUSES = ["PENDING", "APPROVED", "DECLINED", "COMPLETED", "CANCELLED"];
-const PAYMENT_STATUSES = ["PENDING", "WAIVED"];
 
 function ActionPopover({ label, options, current, onSelect, accentCurrent }) {
   const [open, setOpen] = useState(false);
@@ -92,12 +86,6 @@ function BookingsManagement() {
 
   const flash = (text) => { setMsg(text); setTimeout(() => setMsg(""), 3000); };
 
-  const handlePayment = (bookingId, ps) => {
-    api.patch(`/bookings/${bookingId}/payment`, { payment_status: ps })
-      .then((r) => { setBookings((prev) => prev.map((b) => b.id === bookingId ? r.data : b)); flash("Payment status updated."); })
-      .catch(() => flash("Update failed."));
-  };
-
   const handleStatus = (bookingId, status) => {
     api.patch(`/bookings/${bookingId}/status`, { status })
       .then((r) => { setBookings((prev) => prev.map((b) => b.id === bookingId ? r.data : b)); flash(`Booking status set to ${status}.`); })
@@ -107,7 +95,7 @@ function BookingsManagement() {
   return (
     <div>
       <h1 className="dashboard-page-title">Bookings Management</h1>
-      <p className="dashboard-page-subtitle">View all bookings, update statuses and payment.</p>
+      <p className="dashboard-page-subtitle">View all bookings and update their statuses.</p>
 
       {msg && (
         <div style={{ marginBottom: "16px", padding: "12px 16px", borderRadius: "12px", background: "rgba(103,213,140,0.1)", color: "#67d58c", border: "1px solid rgba(103,213,140,0.2)" }}>
@@ -142,7 +130,7 @@ function BookingsManagement() {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ borderBottom: "1px solid var(--border-soft)" }}>
-                {["Booking", "Scheduled", "User", "Counselor", "Payment", "Status", "Actions"].map((h) => (
+                {["Booking", "Scheduled", "User", "Counselor", "Status", "Actions"].map((h) => (
                   <th key={h} style={{
                     padding: "13px 18px", textAlign: "left", fontSize: "13px",
                     fontWeight: 600, color: "var(--text-muted)", letterSpacing: "0.04em",
@@ -156,7 +144,6 @@ function BookingsManagement() {
             <tbody>
               {bookings.map((b, i) => {
                 const ss = STATUS_STYLE[b.status] ?? STATUS_STYLE.PENDING;
-                const ps = PAYMENT_STYLE[b.payment_status] ?? PAYMENT_STYLE.PENDING;
                 return (
                   <tr key={b.id} style={{ borderBottom: i < bookings.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
                     <td style={{ padding: "14px 18px", fontWeight: 700, fontSize: "14px", whiteSpace: "nowrap" }}>
@@ -175,11 +162,6 @@ function BookingsManagement() {
                       Counselor #{b.counselor_id}
                     </td>
                     <td style={{ padding: "14px 18px", whiteSpace: "nowrap" }}>
-                      <span style={{ fontSize: "13px", fontWeight: 600, color: ps.color }}>
-                        {b.payment_status}
-                      </span>
-                    </td>
-                    <td style={{ padding: "14px 18px", whiteSpace: "nowrap" }}>
                       <span style={{
                         display: "inline-block", padding: "4px 10px", borderRadius: "999px",
                         fontSize: "12px", fontWeight: 600, color: ss.color, background: ss.bg,
@@ -194,12 +176,6 @@ function BookingsManagement() {
                           options={BOOKING_STATUSES}
                           current={b.status}
                           onSelect={(s) => handleStatus(b.id, s)}
-                        />
-                        <ActionPopover
-                          label="Payment Status"
-                          options={PAYMENT_STATUSES}
-                          current={b.payment_status}
-                          onSelect={(ps) => handlePayment(b.id, ps)}
                         />
                       </div>
                     </td>

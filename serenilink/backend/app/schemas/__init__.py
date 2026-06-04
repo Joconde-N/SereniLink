@@ -12,3 +12,5 @@ from .ai import AIChatIn, AIChatOut, AIConversationOut, AIMessageOut
 from .mood import MoodCreate, MoodOut
 from .exercise import ExerciseCreate, ExerciseOut
 from .notification import NotificationOut, NotificationMarkRead
+from .screening import ScreeningCreate, ScreeningOut
+from .session_note import SessionNoteUpsert, SessionNoteOut

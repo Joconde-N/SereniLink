@@ -14,11 +14,21 @@ function BookingDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [booking, setBooking] = useState(null);
-  const [contact, setContact] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [cancelling, setCancelling] = useState(false);
-  const [paying, setPaying] = useState(false);
+
+  // Session note
+  const [sharedNote, setSharedNote] = useState(null);
+
+  // Book again modal
+  const [showModal, setShowModal] = useState(false);
+  const [slots, setSlots] = useState([]);
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [bookReason, setBookReason] = useState("");
+  const [loadingSlots, setLoadingSlots] = useState(false);
+  const [bookingAgain, setBookingAgain] = useState(false);
+  const [bookError, setBookError] = useState("");
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -27,13 +37,10 @@ function BookingDetails() {
         const found = res.data.find((b) => b.id === parseInt(id));
         if (!found) { setError("Booking not found."); return; }
         setBooking(found);
-
-        if (found.status === "APPROVED") {
-          try {
-            const cRes = await api.get(`/bookings/${id}/contact`);
-            setContact(cRes.data);
-          } catch { /* contact not available */ }
-        }
+        try {
+          const noteRes = await api.get(`/notes/booking/${id}/user`);
+          setSharedNote(noteRes.data);
+        } catch { /* no shared note */ }
       } catch {
         setError("Failed to load booking details.");
       } finally {
@@ -42,19 +49,6 @@ function BookingDetails() {
     };
     fetchAll();
   }, [id]);
-
-  const handlePay = async () => {
-    if (!window.confirm("Confirm payment for this session?")) return;
-    setPaying(true);
-    try {
-      const res = await api.post(`/bookings/${id}/pay`);
-      setBooking(res.data);
-    } catch (err) {
-      alert(err.response?.data?.detail || "Payment failed.");
-    } finally {
-      setPaying(false);
-    }
-  };
 
   const handleCancel = async () => {
     if (!window.confirm("Cancel this booking?")) return;
@@ -68,36 +62,45 @@ function BookingDetails() {
     }
   };
 
+  const openBookAgain = async (counselorId) => {
+    setShowModal(true);
+    setLoadingSlots(true);
+    setBookError("");
+    setSelectedSlot(null);
+    setBookReason("");
+    try {
+      const res = await api.get(`/availability/counselor/${counselorId}`);
+      setSlots(res.data);
+    } catch {
+      setBookError("Failed to load available slots.");
+    } finally {
+      setLoadingSlots(false);
+    }
+  };
+
+  const handleBookAgain = async () => {
+    if (!selectedSlot) return;
+    setBookingAgain(true);
+    setBookError("");
+    try {
+      const res = await api.post("/bookings/", {
+        counselor_id: booking.counselor_id,
+        slot_id: selectedSlot,
+        reason: bookReason || undefined,
+      });
+      setShowModal(false);
+      navigate(`/dashboard/bookings/${res.data.id}`);
+    } catch (err) {
+      setBookError(err.response?.data?.detail || "Booking failed.");
+    } finally {
+      setBookingAgain(false);
+    }
+  };
+
   if (loading) return <div style={{ color: "var(--text-muted)", padding: "40px" }}>Loading...</div>;
   if (error) return <div style={{ color: "#f08f8f", padding: "40px" }}>{error}</div>;
 
   const ss = STATUS_STYLE[booking.status] || STATUS_STYLE.PENDING;
-
-  const rows = [
-    { label: "Booking", value: `#${booking.id}` },
-    { label: "Scheduled For", value: new Date(booking.scheduled_for).toLocaleString() },
-    { label: "Reason", value: booking.reason || "—" },
-    {
-      label: "Payment",
-      value: (
-        <span style={{ color: booking.payment_status === "PAID" ? "#67d58c" : "#f5c95f", fontWeight: 600 }}>
-          {booking.payment_status}
-        </span>
-      ),
-    },
-    {
-      label: "Status",
-      value: (
-        <span style={{
-          display: "inline-block", padding: "5px 12px", borderRadius: 999,
-          fontSize: 12, fontWeight: 600, color: ss.color, background: ss.bg,
-        }}>
-          {booking.status}
-        </span>
-      ),
-    },
-    { label: "Booked On", value: new Date(booking.created_at).toLocaleDateString() },
-  ];
 
   return (
     <div>
@@ -115,7 +118,7 @@ function BookingDetails() {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--border-soft)" }}>
-              {["Booking", "Reason", "Payment", "Status", "Booked On", "Actions"].map((h) => (
+              {["Booking", "Reason", "Status", "Booked On", "Actions"].map((h) => (
                 <th key={h} style={{
                   padding: "14px 20px", textAlign: "left",
                   fontSize: 14, fontWeight: 600,
@@ -140,11 +143,6 @@ function BookingDetails() {
                 </span>
               </td>
               <td style={{ padding: "16px 20px", whiteSpace: "nowrap" }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: booking.payment_status === "PAID" ? "#67d58c" : "#f5c95f" }}>
-                  {booking.payment_status}
-                </span>
-              </td>
-              <td style={{ padding: "16px 20px", whiteSpace: "nowrap" }}>
                 <span style={{
                   display: "inline-block", padding: "5px 12px", borderRadius: 999,
                   fontSize: 12, fontWeight: 600, color: ss.color, background: ss.bg,
@@ -157,21 +155,7 @@ function BookingDetails() {
               </td>
               <td style={{ padding: "16px 20px" }}>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-                  {booking.status === "APPROVED" && booking.payment_status === "PENDING" && (
-                    <button
-                      type="button"
-                      onClick={handlePay}
-                      disabled={paying}
-                      style={{
-                        height: 34, padding: "0 14px", borderRadius: 10, fontSize: 13,
-                        fontWeight: 600, cursor: "pointer",
-                        border: "1px solid rgba(103,213,140,0.35)",
-                        background: "rgba(103,213,140,0.12)", color: "#67d58c",
-                      }}
-                    >
-                      {paying ? "Processing..." : booking.session_price != null ? `Pay $${booking.session_price}` : "Pay Now"}
-                    </button>
-                  )}
+                  {/* Chat — open for APPROVED, view history for COMPLETED */}
                   {booking.status === "APPROVED" && (
                     <Link
                       to={`/dashboard/chat/${booking.id}`}
@@ -186,6 +170,21 @@ function BookingDetails() {
                       Open Chat
                     </Link>
                   )}
+                  {booking.status === "COMPLETED" && (
+                    <Link
+                      to={`/dashboard/chat/${booking.id}`}
+                      style={{
+                        height: 34, padding: "0 14px", borderRadius: 10, fontSize: 13,
+                        fontWeight: 600, textDecoration: "none",
+                        display: "inline-flex", alignItems: "center",
+                        border: "1px solid rgba(126,184,247,0.25)",
+                        background: "rgba(126,184,247,0.08)", color: "#7eb8f7",
+                      }}
+                    >
+                      View Chat
+                    </Link>
+                  )}
+                  {/* Cancel */}
                   {(booking.status === "PENDING" || booking.status === "APPROVED") && (
                     <button
                       type="button"
@@ -201,8 +200,20 @@ function BookingDetails() {
                       {cancelling ? "..." : "Cancel"}
                     </button>
                   )}
-                  {booking.status !== "PENDING" && booking.status !== "APPROVED" && (
-                    <span style={{ fontSize: 13, color: "var(--text-muted)" }}>—</span>
+                  {/* Book Again */}
+                  {(booking.status === "COMPLETED" || booking.status === "DECLINED" || booking.status === "CANCELLED") && (
+                    <button
+                      type="button"
+                      onClick={() => openBookAgain(booking.counselor_id)}
+                      style={{
+                        height: 34, padding: "0 14px", borderRadius: 10, fontSize: 13,
+                        fontWeight: 600, cursor: "pointer",
+                        border: "1px solid rgba(202,163,143,0.3)",
+                        background: "rgba(202,163,143,0.1)", color: "var(--accent)",
+                      }}
+                    >
+                      Book Again
+                    </button>
                   )}
                 </div>
               </td>
@@ -211,49 +222,113 @@ function BookingDetails() {
         </table>
       </div>
 
-      {/* Contact details — separate card below the table */}
-      <div className="dashboard-card">
+      {/* Shared session note */}
+      {sharedNote && (
+        <div className="dashboard-card" style={{ marginBottom: 20 }}>
+          <h3 style={{ marginBottom: "8px" }}>Session Notes from Counselor</h3>
+          <p style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "12px" }}>
+            Last updated: {new Date(sharedNote.updated_at).toLocaleDateString()}
+          </p>
+          <p style={{ fontSize: "14px", color: "var(--text-soft)", lineHeight: 1.7, whiteSpace: "pre-wrap", margin: 0 }}>
+            {sharedNote.note_text}
+          </p>
+        </div>
+      )}
 
-        {booking.status === "APPROVED" && contact ? (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ borderBottom: "1px solid var(--border-soft)" }}>
-                {["Counselor", "Phone", "Location", "Office Address"].map((h) => (
-                  <th key={h} style={{
-                    padding: "10px 16px", textAlign: "left",
-                    fontSize: 13, fontWeight: 600,
-                    color: "var(--text-muted)", letterSpacing: "0.04em",
-                  }}>
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style={{ padding: "14px 16px", fontSize: 14, fontWeight: 600, color: "var(--text-main)" }}>
-                  {contact.counselor_name || "—"}
-                </td>
-                <td style={{ padding: "14px 16px", fontSize: 13, color: "var(--text-soft)" }}>
-                  {contact.phone_number || "—"}
-                </td>
-                <td style={{ padding: "14px 16px", fontSize: 13, color: "var(--text-soft)" }}>
-                  {contact.general_location || "—"}
-                </td>
-                <td style={{ padding: "14px 16px", fontSize: 13, color: "var(--text-soft)" }}>
-                  {contact.office_address || "—"}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        ) : (
-          <div className="empty-state" style={{ minHeight: "100px" }}>
-            {booking.status === "APPROVED"
-              ? "Contact details not available."
-              : "Contact details are revealed after your booking is approved."}
-          </div>
-        )}
+      {/* Contact card */}
+      <div className="dashboard-card">
+        <h3 style={{ marginBottom: 16 }}>Counselor Contact</h3>
+        <div className="empty-state" style={{ minHeight: "80px" }}>
+          Contact details are revealed after your booking is approved.
+        </div>
       </div>
+
+      {/* Book Again Modal */}
+      {showModal && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 200,
+          background: "rgba(0,0,0,0.6)", display: "flex",
+          alignItems: "center", justifyContent: "center", padding: "20px",
+        }}>
+          <div style={{
+            background: "#1a1a1d", border: "1px solid var(--border-soft)",
+            borderRadius: "20px", padding: "28px", width: "100%", maxWidth: "480px",
+            maxHeight: "80vh", overflowY: "auto",
+          }}>
+            <h3 style={{ margin: "0 0 6px" }}>Book Again</h3>
+            <p style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "20px" }}>
+              Select an available slot with the same counselor.
+            </p>
+
+            {loadingSlots ? (
+              <p style={{ color: "var(--text-muted)", fontSize: "13px" }}>Loading slots...</p>
+            ) : slots.length === 0 ? (
+              <p style={{ color: "var(--text-muted)", fontSize: "13px" }}>No available slots at the moment.</p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
+                {slots.map((s) => (
+                  <button
+                    key={s.id} type="button"
+                    onClick={() => setSelectedSlot(s.id)}
+                    style={{
+                      padding: "12px 16px", borderRadius: "12px", textAlign: "left",
+                      cursor: "pointer", fontSize: "13px",
+                      border: selectedSlot === s.id ? "1px solid var(--accent)" : "1px solid var(--border-soft)",
+                      background: selectedSlot === s.id ? "rgba(202,163,143,0.12)" : "rgba(255,255,255,0.03)",
+                      color: selectedSlot === s.id ? "var(--accent)" : "var(--text-soft)",
+                    }}
+                  >
+                    {new Date(s.start_time).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                    {" — "}
+                    {new Date(s.end_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <textarea
+              placeholder="Reason for booking (optional)"
+              value={bookReason}
+              onChange={(e) => setBookReason(e.target.value)}
+              rows={3}
+              style={{
+                width: "100%", background: "var(--bg-input)", border: "1px solid var(--border-soft)",
+                borderRadius: "10px", padding: "10px 12px", color: "var(--text-main)",
+                fontSize: "13px", resize: "none", outline: "none", boxSizing: "border-box",
+                marginBottom: "16px",
+              }}
+            />
+
+            {bookError && <p style={{ color: "#f08f8f", fontSize: "13px", marginBottom: "12px" }}>{bookError}</p>}
+
+            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+              <button
+                type="button" onClick={() => setShowModal(false)}
+                style={{
+                  height: 38, padding: "0 18px", borderRadius: 10, fontSize: 13,
+                  fontWeight: 600, cursor: "pointer",
+                  border: "1px solid var(--border-soft)", background: "transparent", color: "var(--text-soft)",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button" onClick={handleBookAgain}
+                disabled={!selectedSlot || bookingAgain}
+                style={{
+                  height: 38, padding: "0 20px", borderRadius: 10, fontSize: 13,
+                  fontWeight: 600, cursor: selectedSlot ? "pointer" : "not-allowed",
+                  border: "none",
+                  background: selectedSlot ? "var(--accent)" : "rgba(255,255,255,0.06)",
+                  color: selectedSlot ? "#111" : "var(--text-muted)",
+                }}
+              >
+                {bookingAgain ? "Booking..." : "Confirm Booking"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

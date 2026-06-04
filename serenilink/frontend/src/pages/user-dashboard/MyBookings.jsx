@@ -89,7 +89,7 @@ function MyBookings() {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ borderBottom: "1px solid var(--border-soft)" }}>
-                {["Booking", "Reason", "Payment", "Status", "Actions"].map((h) => (
+                {["Booking", "Reason", "Status", "Actions"].map((h) => (
                   <th key={h} style={{
                     padding: "14px 20px", textAlign: "left",
                     fontSize: 14, fontWeight: 600,
@@ -122,16 +122,6 @@ function MyBookings() {
                     <td style={{ padding: "16px 20px", maxWidth: 200 }}>
                       <span style={{ fontSize: 13, color: "var(--text-soft)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
                         {b.reason || <span style={{ color: "var(--text-muted)" }}>—</span>}
-                      </span>
-                    </td>
-
-                    {/* Payment */}
-                    <td style={{ padding: "16px 20px", whiteSpace: "nowrap" }}>
-                      <span style={{
-                        fontSize: 13, fontWeight: 600,
-                        color: b.payment_status === "PAID" ? "#67d58c" : "#f5c95f",
-                      }}>
-                        {b.payment_status}
                       </span>
                     </td>
 

@@ -29,6 +29,7 @@ import AiSupport from "./pages/user-dashboard/AiSupport";
 import FindCounselors from "./pages/user-dashboard/FindCounselors";
 import DashboardResources from "./pages/user-dashboard/DashboardResources";
 import Messages from "./pages/user-dashboard/Messages";
+import Screenings from "./pages/user-dashboard/Screenings";
 
 // Admin dashboard
 import AdminLayout from "./components/admin-dashboard/AdminLayout";
@@ -91,6 +92,7 @@ function App() {
         <Route path="counselors" element={<FindCounselors />} />
         <Route path="resources" element={<DashboardResources />} />
         <Route path="messages" element={<Messages />} />
+        <Route path="screenings" element={<Screenings />} />
       </Route>
 
       {/* Admin Dashboard */}

@@ -12,10 +12,6 @@ class BookingUpdateStatus(BaseModel):
     status: str = Field(min_length=3, max_length=20)
 
 
-class BookingUpdatePayment(BaseModel):
-    payment_status: str = Field(min_length=3, max_length=20)  # PENDING/PAID/WAIVED
-
-
 class BookingOut(BaseModel):
     id: int
     user_id: int
@@ -24,8 +20,6 @@ class BookingOut(BaseModel):
     scheduled_for: datetime
     reason: str | None
     status: str
-    payment_status: str
-    session_price: float | None
     created_at: datetime
     updated_at: datetime
 

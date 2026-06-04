@@ -12,7 +12,6 @@ from app.models.notification import Notification
 from app.schemas.booking import (
     BookingCreate,
     BookingUpdateStatus,
-    BookingUpdatePayment,
     BookingOut,
 )
 
@@ -20,7 +19,6 @@ router = APIRouter(prefix="/bookings", tags=["Bookings"])
 
 ALLOWED_STATUSES = {"PENDING", "APPROVED", "DECLINED", "COMPLETED", "CANCELLED"}
 COUNSELOR_ALLOWED = {"APPROVED", "DECLINED", "COMPLETED", "CANCELLED"}
-PAYMENT_ALLOWED = {"PENDING", "WAIVED"}
 
 
 def expire_stale_bookings(db: Session):
@@ -119,8 +117,6 @@ def create_booking(
         scheduled_for=slot.start_time,
         reason=payload.reason,
         status="PENDING",
-        payment_status="PENDING",
-        session_price=round(float(counselor.hourly_rate) * (slot.end_time - slot.start_time).seconds / 3600, 2) if counselor.hourly_rate else None,
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow(),
     )
@@ -216,63 +212,6 @@ def update_booking_status_admin(
     return item
 
 
-@router.post("/{booking_id}/pay", response_model=BookingOut)
-def user_pay_booking(
-    booking_id: int,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
-):
-    item = db.query(Booking).filter(Booking.id == booking_id).first()
-    if not item:
-        raise HTTPException(status_code=404, detail="Booking not found")
-    if item.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not allowed")
-    if item.status != "APPROVED":
-        raise HTTPException(status_code=409, detail="Payment is only allowed for approved bookings")
-    if item.payment_status == "PAID":
-        raise HTTPException(status_code=409, detail="Booking is already paid")
-
-    item.payment_status = "PAID"
-    item.updated_at = datetime.utcnow()
-    db.commit()
-    db.refresh(item)
-
-    create_notification(
-        db, item.user_id,
-        "Payment Confirmed",
-        "Your payment has been recorded. Your session is confirmed."
-    )
-    return item
-
-
-def admin_update_payment_status(
-    booking_id: int,
-    payload: BookingUpdatePayment,
-    db: Session = Depends(get_db),
-    _admin=Depends(require_admin),
-):
-    item = db.query(Booking).filter(Booking.id == booking_id).first()
-    if not item:
-        raise HTTPException(status_code=404, detail="Booking not found")
-
-    new_ps = payload.payment_status.upper()
-    if new_ps not in PAYMENT_ALLOWED:
-        raise HTTPException(status_code=409, detail=f"Invalid payment_status. Allowed: {sorted(list(PAYMENT_ALLOWED))}")
-
-    item.payment_status = new_ps
-    item.updated_at = datetime.utcnow()
-
-    db.commit()
-    db.refresh(item)
-
-    create_notification(
-        db,
-        item.user_id,
-        "Payment Status Updated",
-        f"Your booking payment status is now: {new_ps}"
-    )
-
-    return item
 
 
 @router.delete("/{booking_id}", status_code=204)
@@ -324,7 +263,7 @@ def counselor_my_bookings(
     current_user=Depends(get_current_user),
     status: str | None = None,
     skip: int = 0,
-    limit: int = Query(default=20, le=100),
+    limit: int = Query(default=20, le=200),
 ):
     counselor = _get_counselor_profile_for_user(db, current_user.id)
     expire_stale_bookings(db)

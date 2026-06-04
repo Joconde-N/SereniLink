@@ -4,7 +4,7 @@ import {
   LuLayoutDashboard, LuBot, LuSearch, LuCalendarCheck,
   LuLayers, LuSmile, LuChartNoAxesCombined, LuLeaf,
   LuBell, LuMessageSquare, LuSettings, LuLogOut,
-  LuChevronsLeft, LuChevronsRight, LuUser,
+  LuChevronsLeft, LuChevronsRight, LuUser, LuClipboardList,
 } from "react-icons/lu";
 import { useAuth } from "../../context/AuthContext";
 import MobileSidebarDrawer from "./MobileSidebarDrawer";
@@ -29,8 +29,9 @@ function DashboardSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }
       title: "Wellness",
       items: [
         { label: "Resources", icon: <LuLayers />,              to: "/dashboard/resources" },
-        { label: "Check-In",  icon: <LuSmile />,               to: "/dashboard/checkins" },
-        { label: "Progress",  icon: <LuChartNoAxesCombined />, to: "/dashboard/progress" },
+        { label: "Check-In",    icon: <LuSmile />,               to: "/dashboard/checkins" },
+        { label: "Screenings",   icon: <LuClipboardList />,       to: "/dashboard/screenings" },
+        { label: "Progress",     icon: <LuChartNoAxesCombined />, to: "/dashboard/progress" },
         { label: "Exercises", icon: <LuLeaf />,                to: "/dashboard/exercises" },
       ],
     },

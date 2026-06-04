@@ -20,7 +20,7 @@ function CounselorApplication() {
     bio: "", counseling_approach: "",
     highest_certification: "", issuing_institution: "",
     office_address: "", offers_online: true, offers_in_person: false,
-    languages_offered: "", preferred_session_type: "Video Call", preferred_duration: "30 Minutes",
+    languages_offered: "", preferred_session_type: "Chat", preferred_duration: "30 Minutes",
     hourly_rate: "",
   });
 
@@ -221,9 +221,9 @@ function CounselorApplication() {
               <div className="field no-margin">
                 <label>Preferred Session Type</label>
                 <select name="preferred_session_type" value={form.preferred_session_type} onChange={set}>
-                  <option>Video Call</option>
-                  <option>Audio Call</option>
                   <option>Chat</option>
+                  <option>Audio Call</option>
+                  <option>Video Call</option>
                 </select>
               </div>
 
@@ -236,10 +236,7 @@ function CounselorApplication() {
                 </select>
               </div>
 
-              <div className="field no-margin">
-                <label>Hourly Rate (USD)</label>
-                <input type="number" name="hourly_rate" placeholder="e.g. 50" min="0" step="0.01" value={form.hourly_rate} onChange={set} />
-              </div>
+              
             </div>
           </section>
 

@@ -9,9 +9,10 @@ function CounselorMessages() {
 
   useEffect(() => {
     // Load approved bookings — these are the ones with active chats
-    api.get("/bookings/counselor/me", { params: { status: "APPROVED", limit: 50 } })
+    api.get("/bookings/counselor/me", { params: { limit: 50 } })
       .then(async (res) => {
-        setBookings(res.data);
+        const active = res.data.filter((b) => b.status === "APPROVED" || b.status === "COMPLETED");
+        setBookings(active);
         // Fetch last message preview for each booking
         const previewMap = {};
         await Promise.all(
@@ -33,7 +34,7 @@ function CounselorMessages() {
   return (
     <div>
       <h1 className="dashboard-page-title">Messages</h1>
-      <p className="dashboard-page-subtitle">Chat threads from your approved booking sessions.</p>
+      <p className="dashboard-page-subtitle">Chat threads from your approved and completed sessions.</p>
 
       {bookings.length === 0 ? (
         <div className="dashboard-card">

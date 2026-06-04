@@ -94,7 +94,6 @@ def my_dashboard(
                 "id": next_booking.id,
                 "scheduled_for": next_booking.scheduled_for,
                 "status": next_booking.status,
-                "payment_status": next_booking.payment_status,
             }
         },
         "progress": {
@@ -126,12 +125,11 @@ def admin_insights(db: Session = Depends(get_db), _admin=Depends(require_admin))
     }
 
     statuses = ["PENDING", "APPROVED", "DECLINED", "CANCELLED", "COMPLETED"]
-    bookings_by_status = {s: db.query(Booking).filter(Booking.status == s).count() for s in statuses}
+    bookings_by_status = {
+        s: db.query(Booking).filter(Booking.status == s).count()
+        for s in statuses
+    }
 
-    payments = ["PENDING", "PAID", "WAIVED"]
-    bookings_by_payment = {p: db.query(Booking).filter(Booking.payment_status == p).count() for p in payments}
-
-    # Trends: last 30 days, grouped by day
     now = datetime.utcnow()
     days = [(now - timedelta(days=i)).date() for i in range(29, -1, -1)]
 
@@ -146,24 +144,26 @@ def admin_insights(db: Session = Depends(get_db), _admin=Depends(require_admin))
         return [{"date": str(d), "count": counts.get(str(d), 0)} for d in days]
 
     trends = {
-        "new_users":    daily_counts(User, User.created_at),
+        "new_users": daily_counts(User, User.created_at),
         "new_bookings": daily_counts(Booking, Booking.created_at),
         "mood_checkins": daily_counts(MoodEntry, MoodEntry.created_at),
     }
 
-    # Content by category
     cat_rows = (
         db.query(Content.category, func.count())
         .filter(Content.is_published == True)
         .group_by(Content.category)
         .all()
     )
-    content_by_category = [{ "category": r[0] or "Unknown", "count": r[1] } for r in cat_rows]
+
+    content_by_category = [
+        {"category": r[0] or "Unknown", "count": r[1]}
+        for r in cat_rows
+    ]
 
     return {
         "totals": totals,
         "bookings_by_status": bookings_by_status,
-        "bookings_by_payment_status": bookings_by_payment,
         "trends": trends,
         "content_by_category": content_by_category,
     }

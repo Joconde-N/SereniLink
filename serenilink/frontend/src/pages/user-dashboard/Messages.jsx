@@ -10,7 +10,7 @@ function Messages() {
   useEffect(() => {
     api.get("/bookings/me", { params: { limit: 50 } })
       .then(async (res) => {
-        const approved = res.data.filter((b) => b.status === "APPROVED");
+        const approved = res.data.filter((b) => b.status === "APPROVED" || b.status === "COMPLETED");
         setBookings(approved);
         const previewMap = {};
         await Promise.all(
@@ -32,7 +32,7 @@ function Messages() {
   return (
     <div>
       <h1 className="dashboard-page-title">Messages</h1>
-      <p className="dashboard-page-subtitle">Chat threads from your active counseling sessions.</p>
+      <p className="dashboard-page-subtitle">Chat threads from your active and completed counseling sessions.</p>
 
       {bookings.length === 0 ? (
         <div className="dashboard-card">

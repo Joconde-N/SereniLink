@@ -27,6 +27,12 @@ function CounselorBookingDetails() {
   const [error, setError]     = useState("");
   const [acting, setActing]   = useState(null);
 
+  // Session note state
+  const [noteText, setNoteText] = useState("");
+  const [noteShared, setNoteShared] = useState(false);
+  const [noteSaving, setNoteSaving] = useState(false);
+  const [noteMsg, setNoteMsg] = useState("");
+
   const load = async () => {
     try {
       // fetch from counselor bookings list and find by id
@@ -42,6 +48,28 @@ function CounselorBookingDetails() {
   };
 
   useEffect(() => { load(); }, [id]);
+
+  // Load existing note
+  useEffect(() => {
+    if (!id) return;
+    api.get(`/notes/booking/${id}`)
+      .then((res) => { setNoteText(res.data.note_text); setNoteShared(res.data.is_shared_with_user); })
+      .catch(() => {});
+  }, [id]);
+
+  const handleSaveNote = async () => {
+    setNoteSaving(true);
+    setNoteMsg("");
+    try {
+      await api.put(`/notes/booking/${id}`, { note_text: noteText, is_shared_with_user: noteShared });
+      setNoteMsg("Note saved.");
+      setTimeout(() => setNoteMsg(""), 3000);
+    } catch {
+      setNoteMsg("Failed to save note.");
+    } finally {
+      setNoteSaving(false);
+    }
+  };
 
   const handleAction = async (newStatus) => {
     const cfg = ACTION_LABELS[newStatus];
@@ -89,12 +117,6 @@ function CounselorBookingDetails() {
             <div className="simple-item">
               <span className="small-muted">Client Note / Reason</span>
               <p style={{ margin: "4px 0 0" }}>{booking.reason || "No reason provided."}</p>
-            </div>
-            <div className="simple-item" style={{ display: "flex", justifyContent: "space-between" }}>
-              <span>Payment Status</span>
-              <span style={{ color: booking.payment_status === "PAID" ? "#67d58c" : "#f5c95f", fontWeight: 600 }}>
-                {booking.payment_status}
-              </span>
             </div>
             <div className="simple-item">
               <span className="small-muted">Booked On</span>
@@ -169,6 +191,54 @@ function CounselorBookingDetails() {
                 <span>Slot ID</span>
                 <span style={{ color: "var(--text-soft)" }}>#{booking.slot_id}</span>
               </div>
+            </div>
+          </div>
+        </div>
+        {/* Session Note */}
+        <div className="dashboard-card">
+          <h3 style={{ marginBottom: "16px" }}>Session Notes</h3>
+          <p style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "12px" }}>
+            Private notes about this session. Toggle sharing to let the client read them.
+          </p>
+          <textarea
+            value={noteText}
+            onChange={(e) => setNoteText(e.target.value)}
+            placeholder="Write your session notes here..."
+            rows={6}
+            style={{
+              width: "100%", background: "var(--bg-input)", border: "1px solid var(--border-soft)",
+              borderRadius: "12px", padding: "12px", color: "var(--text-main)",
+              fontSize: "14px", lineHeight: 1.6, resize: "vertical", outline: "none",
+              boxSizing: "border-box",
+            }}
+          />
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "12px", flexWrap: "wrap", gap: "10px" }}>
+            <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "13px", color: "var(--text-soft)" }}>
+              <input
+                type="checkbox"
+                checked={noteShared}
+                onChange={(e) => setNoteShared(e.target.checked)}
+                style={{ width: "16px", height: "16px", accentColor: "var(--accent)", cursor: "pointer" }}
+              />
+              Share with client
+            </label>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              {noteMsg && (
+                <span style={{ fontSize: "13px", color: noteMsg === "Note saved." ? "#67d58c" : "#f08f8f" }}>
+                  {noteMsg}
+                </span>
+              )}
+              <button
+                type="button" onClick={handleSaveNote}
+                disabled={noteSaving || !noteText.trim()}
+                style={{
+                  height: "38px", padding: "0 20px", borderRadius: "10px", fontSize: "13px",
+                  fontWeight: 600, cursor: noteText.trim() ? "pointer" : "not-allowed",
+                  border: "none", background: "var(--accent)", color: "#111",
+                }}
+              >
+                {noteSaving ? "Saving..." : "Save Note"}
+              </button>
             </div>
           </div>
         </div>

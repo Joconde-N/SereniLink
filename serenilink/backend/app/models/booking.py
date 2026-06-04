@@ -1,7 +1,6 @@
 from datetime import datetime
-from sqlalchemy import Integer, String, DateTime, ForeignKey, Numeric
+from sqlalchemy import Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
-from decimal import Decimal
 
 from app.db.base import Base
 
@@ -16,14 +15,10 @@ class Booking(Base):
 
     slot_id: Mapped[int] = mapped_column(Integer, ForeignKey("availability_slots.id"), index=True, nullable=False)
 
-    scheduled_for: Mapped[datetime] = mapped_column(DateTime, nullable=False)  # requested session time
+    scheduled_for: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     reason: Mapped[str | None] = mapped_column(String(300), nullable=True)
 
-    # workflow status
     status: Mapped[str] = mapped_column(String(20), default="PENDING", index=True)
-    
-    payment_status: Mapped[str] = mapped_column(String(20), default="PENDING", index=True)
-    session_price: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
