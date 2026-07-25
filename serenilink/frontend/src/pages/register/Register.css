@@ -121,7 +121,7 @@
 }
 
 .register-subtext {
-  margin: 0 0 34px;
+  margin: 0 0 25px;
   font-size: 16px;
   color: #98a1b3;
 }
@@ -184,6 +184,7 @@
 .register-btn {
   width: 100%;
   height: 56px;
+  margin-bottom: 30px;
   border: none;
   border-radius: 10px;
   background: #a86955;
@@ -229,4 +230,64 @@
   .register-form-box h2 {
     font-size: 38px;
   }
+}
+
+/* ============================================
+   LIGHT MODE — warm beige, easy on the eyes
+   ============================================ */
+body.light .register-page {
+  background: #e8e1d6;
+  color: #2b2521;
+}
+
+body.light .register-topbar {
+  border-bottom-color: rgba(70, 52, 42, 0.12);
+}
+
+body.light .register-brand {
+  color: #6b6259;
+}
+
+body.light .register-back {
+  color: #57504a;
+}
+
+body.light .register-right {
+  background: #e8e1d6;
+}
+
+body.light .register-form-box h2 {
+  color: #2b2521;
+}
+
+body.light .register-subtext {
+  color: #6b6259;
+}
+
+body.light .register-field label,
+body.light .register-terms {
+  color: #57504a;
+}
+
+body.light .register-field input {
+  background: #f4eee5;
+  color: #2b2521;
+  border: 1px solid rgba(70, 52, 42, 0.14);
+}
+
+body.light .register-field input::placeholder {
+  color: #7a7168;
+}
+
+body.light .register-subtext a {
+  color: #a86955;
+}
+
+body.light .register-left-content h1 {
+  color: #ffffff;
+}
+
+body.light .register-tag {
+  background: rgba(168, 105, 85, 0.2);
+  color: #c99d87;
 }

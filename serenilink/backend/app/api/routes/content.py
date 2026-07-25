@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db, require_admin
 from app.models.content import Content
 from app.schemas.content import ContentCreate, ContentUpdate, ContentOut
+from app.core.audit import log_action
 
 router = APIRouter(prefix="/content", tags=["Content"])
 
@@ -66,6 +67,7 @@ def create_content(
     db.add(item)
     db.commit()
     db.refresh(item)
+    log_action(db, "CONTENT_CREATED", user=_admin, resource="content", resource_id=item.id, detail=f"Created content: {item.title}")
     return item
 
 
@@ -86,6 +88,7 @@ def update_content(
 
     db.commit()
     db.refresh(item)
+    log_action(db, "CONTENT_UPDATED", user=_admin, resource="content", resource_id=item.id, detail=f"Updated content: {item.title}")
     return item
 
 
@@ -99,6 +102,8 @@ def delete_content(
     if not item:
         raise HTTPException(status_code=404, detail="Content not found")
 
+    title = item.title
     db.delete(item)
     db.commit()
+    log_action(db, "CONTENT_DELETED", user=_admin, resource="content", resource_id=content_id, detail=f"Deleted content: {title}")
     return None

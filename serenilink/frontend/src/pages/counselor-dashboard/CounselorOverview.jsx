@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import {
+  LuCalendarDays,
+  LuUsers,
+  LuClock,
+  LuInbox,
+} from "react-icons/lu";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
-
-const STATUS_CLASS = {
-  PENDING: "pending", APPROVED: "approved",
-  DECLINED: "declined", CANCELLED: "cancelled", COMPLETED: "approved",
-};
 
 function StatCard({ title, value, label, color }) {
   return (
@@ -17,6 +18,13 @@ function StatCard({ title, value, label, color }) {
     </div>
   );
 }
+
+const QUICK_ACTIONS = [
+  { label: "View Appointments", to: "/counselor/requests", icon: LuInbox, iconBg: "rgba(202,163,143,0.18)", iconColor: "var(--accent)" },
+  { label: "My Clients", to: "/counselor/clients", icon: LuUsers, iconBg: "rgba(96,165,250,0.15)", iconColor: "#60a5fa" },
+  { label: "My Sessions", to: "/counselor/sessions", icon: LuCalendarDays, iconBg: "rgba(167,139,250,0.15)", iconColor: "#a78bfa" },
+  { label: "Update Availability", to: "/counselor/availability", icon: LuClock, iconBg: "rgba(103,213,140,0.15)", iconColor: "#67d58c" },
+];
 
 function CounselorOverview() {
   const { user } = useAuth();
@@ -50,15 +58,33 @@ function CounselorOverview() {
 
   return (
     <div>
-      {/* Welcome */}
-      <div style={{ marginBottom: "28px" }}>
-        <h1 className="dashboard-page-title">
-          Welcome, <span style={{ color: "var(--accent)" }}>{user?.nickname}</span> 
+      <div style={{ marginBottom: "20px" }}>
+        <h1 className="dashboard-page-title" style={{ marginBottom: 8 }}>
+          Welcome, <span style={{ color: "var(--accent)" }}>{user?.nickname}</span>
         </h1>
-        <p className="dashboard-page-subtitle">Here is an overview of your counseling activity.</p>
+        <p className="dashboard-page-subtitle" style={{ marginBottom: 0 }}>
+          Here is an overview of your counseling activity.
+        </p>
       </div>
 
-      {/* Stats */}
+      <section className="dashboard-section" aria-labelledby="counselor-quick-actions">
+        <div className="quick-actions-panel">
+          <div className="dashboard-section-header dashboard-section-header--compact">
+            <h2 id="counselor-quick-actions" className="dashboard-section-title">Quick Actions</h2>
+          </div>
+          <div className="quick-actions-grid">
+            {QUICK_ACTIONS.map(({ label, to, icon: Icon, iconBg, iconColor }) => (
+              <Link key={label} to={to} className="quick-action-btn">
+                <span className="quick-action-icon" style={{ background: iconBg, color: iconColor }}>
+                  <Icon aria-hidden />
+                </span>
+                <p className="quick-action-label">{label}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <div className="dashboard-grid dashboard-cards-4" style={{ marginBottom: "20px" }}>
         <StatCard title="Total Bookings"   value={stats?.total_bookings}    label="All time" />
         <StatCard title="Pending Requests" value={stats?.pending_requests}  label="Awaiting action" color="#f5c95f" />
@@ -79,7 +105,7 @@ function CounselorOverview() {
               {pending.map((b) => (
                 <div key={b.id} className="simple-item">
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontWeight: 600 }}>Booking #{b.id}</span>
+                    <span style={{ fontWeight: 600 }}>{b.user_nickname || `User #${b.user_id}`}</span>
                     <span className="status-pill pending">PENDING</span>
                   </div>
                   <p className="small-muted" style={{ margin: "4px 0 0" }}>
@@ -128,7 +154,7 @@ function CounselorOverview() {
               {upcoming.map((b) => (
                 <div key={b.id} className="simple-item">
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontWeight: 600, fontSize: "14px" }}>Booking #{b.id}</span>
+                    <span style={{ fontWeight: 600, fontSize: "14px" }}>{b.user_nickname || `User #${b.user_id}`}</span>
                     <span className="status-pill approved">APPROVED</span>
                   </div>
                   <p className="small-muted" style={{ margin: "4px 0 0" }}>

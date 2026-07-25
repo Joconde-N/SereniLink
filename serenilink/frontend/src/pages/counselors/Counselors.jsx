@@ -142,6 +142,7 @@ function CounselorModal({ counselor, onClose }) {
 
 function Counselors() {
   const [counselors, setCounselors] = useState([]);
+  const [specializations, setSpecializations] = useState([]);
   const [search, setSearch] = useState("");
   const [specialization, setSpecialization] = useState("");
   const [loading, setLoading] = useState(true);
@@ -150,6 +151,12 @@ function Counselors() {
   const [hasMore, setHasMore] = useState(true);
   const [selected, setSelected] = useState(null);
   const LIMIT = 9;
+
+  useEffect(() => {
+    api.get("/counselors/specializations")
+      .then((r) => setSpecializations(r.data))
+      .catch(() => {});
+  }, []);
 
   const fetchCounselors = async (newSkip = 0, append = false) => {
     setLoading(true);
@@ -228,11 +235,9 @@ function Counselors() {
               }}
             >
               <option value="">Filter by Profession</option>
-              <option value="Anxiety">Anxiety</option>
-              <option value="Depression">Depression</option>
-              <option value="Trauma">Trauma</option>
-              <option value="Youth Counseling">Youth Counseling</option>
-              <option value="Relationship Counseling">Relationship Counseling</option>
+              {specializations.map((spec) => (
+                <option key={spec} value={spec}>{spec}</option>
+              ))}
             </select>
             <span>{specialization || "Filter by Profession"}</span>
             <LuFilter className="counselors-filter-icon" />

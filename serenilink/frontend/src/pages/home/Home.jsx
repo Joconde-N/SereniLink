@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { RiRobot2Line } from "react-icons/ri";
-import { GiStethoscope } from "react-icons/gi";
+import { LuHandshake } from "react-icons/lu";
 import { MdSelfImprovement } from "react-icons/md";
 import { Wind, Eye } from "lucide-react";
 import "./Home.css";
@@ -57,7 +57,7 @@ function Home() {
               <br />
               Your <span>Healing</span> Starts Here.
             </h1>
-            <p>Safe, anonymous mental health support for Youth.</p>
+            <p>Accessible, confidential mental health support for youth</p>
             <div className="hero-buttons">
               <Link to="/register" className="home-btn">Get Started</Link>
               <button type="button" className="home-btn" onClick={openChat}>
@@ -84,7 +84,7 @@ function Home() {
           </div>
           <div className="info-card">
             <div className="card-icon">
-              <GiStethoscope className="feature-svg" />
+              <LuHandshake className="feature-svg" />
             </div>
             <h3>Professional Support Access</h3>
             <p>Connect privately with licensed mental health professionals through secure conversations designed for comfort and confidentiality.</p>
@@ -143,15 +143,15 @@ function Home() {
         <div className="steps">
           <div className="step-box">
             <div className="step-number">1</div>
-            <p>Browse Educational Contents and try some of the calming tools.</p>
+            <p>Explore mental health resources and try calming tools at your own pace.</p>
           </div>
           <div className="step-box">
             <div className="step-number">2</div>
-            <p>Create an anonymous account to save progress and book appointments.</p>
+            <p>Create an account to save your progress and book sessions with a counselor.</p>
           </div>
           <div className="step-box">
             <div className="step-number">3</div>
-            <p>Use AI assistance, take assessments and connect with counselors.</p>
+            <p>Use AI support, complete wellness check-ins, and connect with a counselor when ready.</p>
           </div>
         </div>
       </section>
@@ -160,20 +160,20 @@ function Home() {
         <h2>Quick <span>Calm</span> Tools</h2>
         <div className="rings"></div>
         <div className="tools-grid">
-          <div className="tool-card">
+          <Link to="/login?next=/dashboard/exercises" className="tool-card" style={{ textDecoration: "none", color: "inherit" }}>
             <div className="tool-icon">
               <Wind className="tool-svg" />
             </div>
             <h3>Breathing Bubble</h3>
             <p>Follow the animated bubble to calm your breathing</p>
-          </div>
-          <div className="tool-card">
+          </Link>
+          <Link to="/login?next=/dashboard/exercises" className="tool-card" style={{ textDecoration: "none", color: "inherit" }}>
             <div className="tool-icon">
               <Eye className="tool-svg" />
             </div>
             <h3>5-4-3-2-1 Grounding</h3>
             <p>Ground yourself in the present moment.</p>
-          </div>
+          </Link>
         </div>
       </section>
 

@@ -5,9 +5,10 @@
 }
 
 body {
-  background-color: #070808;
-  color: #FFFFFF;
+  background-color: var(--site-bg, #070808);
+  color: var(--site-text, #FFFFFF);
   font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 a {
@@ -16,7 +17,8 @@ a {
 
 .site-wrapper {
   min-height: 100vh;
-  background: #070808;
+  background: var(--site-bg, #070808);
+  transition: background-color 0.25s ease;
 }
 
 .navbar {
@@ -34,7 +36,7 @@ a {
 }
 
 .nav-logo a {
-  color: #B0B0B0;
+  color: var(--site-muted, #B0B0B0);
   font-size: 1.9rem;
   font-weight: 700;
 }
@@ -46,7 +48,7 @@ a {
 }
 
 .nav-links a {
-  color: #B0B0B0;
+  color: var(--site-muted, #B0B0B0);
   font-size: 0.95rem;
   font-weight: 600;
   transition: 0.3s ease;
@@ -75,7 +77,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #B0B0B0;
+  color: var(--site-muted, #B0B0B0);
   transition: background 0.2s ease, color 0.2s ease;
 }
 
@@ -341,3 +343,86 @@ a {
 .react-datepicker__time-list-item { color: #1a1a1a !important; }
 .react-datepicker__time-list-item:hover { background: rgba(225,154,134,0.3) !important; color: #1a1a1a !important; }
 .react-datepicker__time-list-item--selected { background: #E19A86 !important; color: #fff !important; }
+
+/* ============================================
+   LIGHT MODE — public chrome (navbar + footer)
+   Warm beige palette, matches the dashboard.
+   ============================================ */
+
+body.light .nav-links a,
+body.light .nav-logo a,
+body.light .theme-icon-btn,
+body.light .nav-burger {
+  color: #57504a;
+}
+
+body.light .nav-links a:hover,
+body.light .nav-links .active {
+  color: #a86955;
+}
+
+body.light .theme-icon-btn:hover {
+  background: rgba(168, 105, 85, 0.12);
+  color: #a86955;
+}
+
+body.light .custom-footer {
+  background: #ddd3c4;
+  color: #2b2521;
+}
+
+body.light .footer-description {
+  color: #57504a;
+}
+
+body.light .footer-left h2 {
+  color: #6b6259;
+}
+
+body.light .footer-left h3,
+body.light .footer-right h3 {
+  color: #2b2521;
+}
+
+body.light .footer-links-grid a,
+body.light .footer-bottom p {
+  color: #6b6259;
+}
+
+body.light .footer-links-grid a:hover {
+  color: #a86955;
+}
+
+body.light .social-icons a {
+  color: #57504a;
+}
+
+body.light .footer-bottom {
+  border-top-color: rgba(70, 52, 42, 0.25);
+}
+
+body.light .page-section {
+  background: #e8e1d6;
+  color: #2b2521;
+}
+
+@media (max-width: 768px) {
+  body.light .navbar {
+    background: rgba(232, 225, 214, 0.96);
+  }
+
+  body.light .nav-mobile-drawer {
+    background: rgba(238, 231, 220, 0.98);
+    border-bottom-color: rgba(70, 52, 42, 0.12);
+  }
+
+  body.light .nav-mobile-drawer a,
+  body.light .nav-mobile-drawer span {
+    color: #57504a;
+    border-bottom-color: rgba(70, 52, 42, 0.08);
+  }
+
+  body.light .nav-mobile-drawer a.active {
+    color: #a86955;
+  }
+}

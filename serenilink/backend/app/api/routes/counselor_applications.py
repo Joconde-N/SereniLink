@@ -15,6 +15,7 @@ from app.models.counselor_application import CounselorApplication
 from app.models.counselor import Counselor
 from app.models.user import User
 from app.schemas.counselor_application import CounselorApplicationOut
+from app.core.audit import log_action
 
 router = APIRouter(prefix="/counselor-applications", tags=["Counselor Applications"])
 
@@ -222,6 +223,8 @@ def approve_application(
     db.commit()
     db.refresh(item)
 
+    log_action(db, "COUNSELOR_APPROVED", user=_admin, resource="counselor_application", resource_id=application_id, detail=f"Approved application for {item.full_name}")
+
     send_counselor_credentials(
         to_email=item.email,
         full_name=item.full_name,
@@ -248,4 +251,5 @@ def reject_application(
     item.reviewed_at = datetime.utcnow()
     db.commit()
     db.refresh(item)
+    log_action(db, "COUNSELOR_REJECTED", user=_admin, resource="counselor_application", resource_id=application_id, detail=f"Rejected application for {item.full_name}")
     return item

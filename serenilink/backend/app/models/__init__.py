@@ -16,3 +16,4 @@ from .notification import Notification
 from .user_ai_summary import UserAISummary
 from .screening import Screening
 from .session_note import SessionNote
+from .audit_log import AuditLog

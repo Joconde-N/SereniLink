@@ -408,3 +408,99 @@
     font-size: 0.9rem;
   }
 }
+
+/* ============================================
+   LIGHT MODE — warm beige, easy on the eyes
+   ============================================ */
+body.light .resources-page {
+  background: #e8e1d6;
+  color: #2b2521;
+}
+
+body.light .resources-hero-section {
+  background: #ded5c8;
+}
+
+body.light .resources-hero-content h1 {
+  color: #2b2521;
+}
+
+body.light .resources-hero-content p {
+  color: #57504a;
+}
+
+body.light .resources-shape {
+  background: #d3c7b6;
+}
+
+body.light .resources-main-section {
+  background: #e8e1d6;
+}
+
+body.light .section-heading-row h2 {
+  color: #2b2521;
+}
+
+body.light .section-heading-row h2 span {
+  color: #a86955;
+}
+
+body.light .section-line {
+  background: rgba(150, 115, 100, 0.45);
+}
+
+body.light .resources-search-box,
+body.light .resources-filter-box {
+  background: #f4eee5;
+  border: 1px solid rgba(70, 52, 42, 0.14);
+}
+
+body.light .resources-search-input {
+  color: #2b2521;
+}
+
+body.light .resources-search-input::placeholder {
+  color: #7a7168;
+}
+
+body.light .resources-filter-box {
+  color: #45403a;
+}
+
+body.light .resources-filter-box select option {
+  background: #f4eee5;
+  color: #2b2521;
+}
+
+body.light .resource-tab {
+  background: #ece5d9;
+  color: #45403a;
+}
+
+body.light .resource-tab.active {
+  background: #a86955;
+  color: #ffffff;
+}
+
+body.light .resource-item-card {
+  background: linear-gradient(180deg, #f4eee5, #ece5d9);
+  border: 1px solid rgba(70, 52, 42, 0.1);
+}
+
+body.light .resource-item-body h3 {
+  color: #2b2521;
+}
+
+body.light .resource-meta {
+  color: #6b6259;
+}
+
+body.light .resource-badge {
+  background: rgba(238, 231, 220, 0.9);
+  color: #45403a;
+}
+
+body.light .view-more-btn {
+  color: #2b2521;
+  border-color: rgba(70, 52, 42, 0.35);
+}

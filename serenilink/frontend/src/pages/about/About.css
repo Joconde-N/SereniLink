@@ -42,7 +42,7 @@
 .about-hero-text p {
   font-family: Georgia, "Times New Roman", serif;
   font-style: italic;
-  font-size: 1.45rem;
+  font-size: 1.35rem;
   color: #e8e3df;
   margin-bottom: 34px;
 }
@@ -346,6 +346,46 @@
   margin: 0 auto;
 }
 
+.about-cta-section {
+  padding: 80px 70px 100px;
+  text-align: center;
+  background: linear-gradient(180deg, #0c0d0e 0%, #151718 100%);
+  border-top: 1px solid rgba(225, 154, 134, 0.12);
+}
+
+.about-cta-section h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.6rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin-bottom: 14px;
+}
+
+.about-cta-section p {
+  color: #b8bfcc;
+  font-size: 1.05rem;
+  margin: 0 auto 28px;
+  max-width: 520px;
+  line-height: 1.6;
+}
+
+.about-cta-buttons {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.about-btn-secondary {
+  background: transparent !important;
+  border: 1px solid rgba(225, 154, 134, 0.45);
+  color: #E19A86 !important;
+}
+
+.about-btn-secondary:hover {
+  background: rgba(225, 154, 134, 0.1) !important;
+}
+
 /* FLOATING CHAT */
 .about-chat-btn {
   position: fixed;
@@ -401,7 +441,8 @@
   .who-section,
   .mission-section,
   .vision-section,
-  .values-section {
+  .values-section,
+  .about-cta-section {
     padding-left: 20px;
     padding-right: 20px;
   }
@@ -473,4 +514,102 @@
   .mission-image-wrap {
     margin-left: 0;
   }
+}
+
+/* ============================================
+   LIGHT MODE — warm beige, easy on the eyes
+   ============================================ */
+body.light .about-page {
+  background: #e8e1d6;
+  color: #2b2521;
+}
+
+body.light .about-hero-section {
+  background: #ded5c8;
+}
+
+body.light .about-hero-text h1 {
+  color: #2b2521;
+}
+
+body.light .about-hero-text h1 span {
+  color: #a86955;
+}
+
+body.light .about-hero-text p {
+  color: #57504a;
+}
+
+body.light .about-shape {
+  background: #d3c7b6;
+}
+
+body.light .who-section,
+body.light .mission-section,
+body.light .vision-section,
+body.light .values-section {
+  background: #e8e1d6;
+}
+
+body.light .who-section h2,
+body.light .mission-text h2,
+body.light .vision-box h2,
+body.light .values-section h2 {
+  color: #2b2521;
+}
+
+body.light .who-section h2 span,
+body.light .mission-text h2 span,
+body.light .vision-box h2 span,
+body.light .values-section h2 span {
+  color: #a86955;
+}
+
+body.light .who-box,
+body.light .vision-box,
+body.light .value-card {
+  background: #f4eee5;
+  border: 1px solid rgba(70, 52, 42, 0.1);
+}
+
+body.light .who-box p,
+body.light .mission-text p,
+body.light .vision-box p,
+body.light .value-card p {
+  color: #45403a;
+}
+
+body.light .value-card h3 {
+  color: #2b2521;
+}
+
+body.light .value-icon {
+  color: #967364;
+}
+
+body.light .values-rings,
+body.light .values-rings::before,
+body.light .values-rings::after {
+  border-color: rgba(150, 115, 100, 0.25);
+}
+
+body.light .about-cta-section {
+  background: linear-gradient(180deg, #ded5c8 0%, #d5cabb 100%);
+}
+
+body.light .about-cta-section h2 {
+  color: #2b2521;
+}
+
+body.light .about-cta-section p {
+  color: #57504a;
+}
+
+body.light .about-btn-secondary {
+  color: #a86955 !important;
+  border-color: #a86955 !important;
+}
+
+body.light .about-btn-secondary:hover {
+  background: rgba(168, 105, 85, 0.12) !important;
 }

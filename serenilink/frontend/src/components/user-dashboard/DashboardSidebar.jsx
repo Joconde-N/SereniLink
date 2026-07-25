@@ -8,10 +8,12 @@ import {
 } from "react-icons/lu";
 import { useAuth } from "../../context/AuthContext";
 import MobileSidebarDrawer from "./MobileSidebarDrawer";
+import { useUnreadCount } from "../../hooks/useUnreadCount";
 
 function DashboardSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const unread = useUnreadCount();
 
   const handleLogout = () => { logout(); navigate("/login"); };
 
@@ -38,7 +40,7 @@ function DashboardSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }
     {
       title: "Activity",
       items: [
-        { label: "Notifications", icon: <LuBell />,          to: "/dashboard/notifications" },
+        { label: "Notifications", icon: <LuBell />,          to: "/dashboard/notifications", badge: unread },
         { label: "Messages",      icon: <LuMessageSquare />, to: "/dashboard/messages" },
       ],
     },
@@ -107,8 +109,16 @@ function DashboardSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }
                   end={item.to === "/dashboard"}
                   className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}
                 >
-                  <span className="sidebar-icon">{item.icon}</span>
+                  <span className="sidebar-icon" style={{ position: "relative" }}>
+                    {item.icon}
+                    {collapsed && item.badge > 0 && (
+                      <span className="sidebar-badge-dot" />
+                    )}
+                  </span>
                   {!collapsed && <span>{item.label}</span>}
+                  {!collapsed && item.badge > 0 && (
+                    <span className="sidebar-badge-count">{item.badge > 99 ? "99+" : item.badge}</span>
+                  )}
                 </NavLink>
               ))}
             </div>

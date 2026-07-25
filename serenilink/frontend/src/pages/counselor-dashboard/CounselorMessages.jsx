@@ -8,15 +8,13 @@ function CounselorMessages() {
   const [previews, setPreviews] = useState({});
 
   useEffect(() => {
-    // Load approved bookings — these are the ones with active chats
     api.get("/bookings/counselor/me", { params: { limit: 50 } })
       .then(async (res) => {
         const active = res.data.filter((b) => b.status === "APPROVED" || b.status === "COMPLETED");
         setBookings(active);
-        // Fetch last message preview for each booking
         const previewMap = {};
         await Promise.all(
-          res.data.map(async (b) => {
+          active.map(async (b) => {
             try {
               const msgRes = await api.get(`/chat/booking/${b.id}`, { params: { limit: 1 } });
               if (msgRes.data.length > 0) previewMap[b.id] = msgRes.data[msgRes.data.length - 1];
@@ -45,6 +43,7 @@ function CounselorMessages() {
           <div className="list-stack">
             {bookings.map((b) => {
               const last = previews[b.id];
+              const name = b.user_nickname || `User #${b.user_id}`;
               return (
                 <Link
                   key={b.id}
@@ -61,18 +60,20 @@ function CounselorMessages() {
                     onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.03)"}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-                      {/* Avatar */}
                       <div style={{
                         width: "44px", height: "44px", borderRadius: "50%",
                         background: "rgba(202,163,143,0.2)", display: "flex",
                         alignItems: "center", justifyContent: "center",
                         color: "var(--accent)", fontWeight: 700, fontSize: "16px", flexShrink: 0,
                       }}>
-                        #{b.user_id}
+                        {name[0]?.toUpperCase()}
                       </div>
                       <div>
                         <p style={{ margin: 0, fontWeight: 600, color: "var(--text-main)" }}>
-                          Booking #{b.id}
+                          {name}
+                        </p>
+                        <p className="small-muted" style={{ margin: "3px 0 0", fontSize: "12px" }}>
+                          Session · {new Date(b.scheduled_for).toLocaleDateString()}
                         </p>
                         <p className="small-muted" style={{ margin: "3px 0 0" }}>
                           {last

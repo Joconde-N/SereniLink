@@ -38,6 +38,36 @@ def update_my_profile(
     return counselor
 
 
+def _split_specializations(raw: str | None) -> list[str]:
+    """Split a comma-separated specialization string into unique trimmed tags."""
+    if not raw:
+        return []
+    return [part.strip() for part in raw.split(",") if part.strip()]
+
+
+@router.get("/specializations", response_model=list[str])
+def list_specializations(db: Session = Depends(get_db)):
+    """Return unique individual specialization tags (not full comma-joined strings)."""
+    rows = (
+        db.query(Counselor.specialization)
+        .filter(
+            Counselor.is_active == True,
+            Counselor.application_status == "APPROVED",
+        )
+        .all()
+    )
+
+    # Keep first-seen casing; dedupe case-insensitively
+    seen: dict[str, str] = {}
+    for (value,) in rows:
+        for tag in _split_specializations(value):
+            key = tag.lower()
+            if key not in seen:
+                seen[key] = tag
+
+    return sorted(seen.values(), key=str.lower)
+
+
 @router.get("/", response_model=list[CounselorPublicOut])
 def list_counselors(
     db: Session = Depends(get_db),
@@ -49,6 +79,8 @@ def list_counselors(
         Counselor.is_active == True,
         Counselor.application_status == "APPROVED"
     )
+    # Match if the chosen tag appears anywhere in the comma-separated field
+    # e.g. filter "Anxiety" matches "Anxiety, Stress"
     if specialization:
         q = q.filter(Counselor.specialization.ilike(f"%{specialization}%"))
     return q.offset(skip).limit(limit).all()

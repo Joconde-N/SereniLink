@@ -1,24 +1,17 @@
 import React, { useState } from "react";
-import { Outlet, Navigate } from "react-router-dom";
-import DashboardSidebar from "./DahboardSidebar";
+import { Outlet } from "react-router-dom";
+import DashboardSidebar from "./DashboardSidebar";
 import NotificationBell from "./NotificationBell";
+import PageLoader from "../shared/PageLoader";
 import { useAuth } from "../../context/AuthContext";
 import "./DashboardLayout.css";
 
 function DashboardLayout() {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  if (loading) {
-    return (
-      <div style={{ minHeight: "100vh", background: "#050505", display: "flex", alignItems: "center", justifyContent: "center", color: "#caa38f" }}>
-        Loading...
-      </div>
-    );
-  }
-
-  if (!user) return <Navigate to="/login" replace />;
+  if (loading) return <PageLoader message="Loading dashboard..." />;
 
   return (
     <div className="dashboard-shell">

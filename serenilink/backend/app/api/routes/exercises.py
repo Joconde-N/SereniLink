@@ -7,6 +7,7 @@ from app.models.exercise import Exercise
 from app.models.exercise_log import ExerciseLog
 from app.models.user import User
 from app.schemas.exercise import ExerciseCreate, ExerciseUpdate, ExerciseOut
+from app.core.audit import log_action
 
 router = APIRouter(prefix="/exercises", tags=["Exercises"])
 
@@ -56,10 +57,8 @@ def create_exercise(payload: ExerciseCreate, db: Session = Depends(get_db), _adm
     db.add(item)
     db.commit()
     db.refresh(item)
+    log_action(db, "EXERCISE_CREATED", user=_admin, resource="exercise", resource_id=item.id, detail=f"Created exercise: {item.title}")
     return item
-
-
-@router.patch("/{exercise_id}", response_model=ExerciseOut)
 def update_exercise(exercise_id: int, payload: ExerciseUpdate, db: Session = Depends(get_db), _admin=Depends(require_admin)):
     item = db.query(Exercise).filter(Exercise.id == exercise_id).first()
     if not item:
@@ -68,10 +67,8 @@ def update_exercise(exercise_id: int, payload: ExerciseUpdate, db: Session = Dep
         setattr(item, field, value)
     db.commit()
     db.refresh(item)
+    log_action(db, "EXERCISE_UPDATED", user=_admin, resource="exercise", resource_id=item.id, detail=f"Updated exercise: {item.title}")
     return item
-
-
-@router.patch("/{exercise_id}/toggle-active", response_model=ExerciseOut)
 def toggle_exercise(exercise_id: int, db: Session = Depends(get_db), _admin=Depends(require_admin)):
     item = db.query(Exercise).filter(Exercise.id == exercise_id).first()
     if not item:
@@ -79,10 +76,8 @@ def toggle_exercise(exercise_id: int, db: Session = Depends(get_db), _admin=Depe
     item.is_active = not item.is_active
     db.commit()
     db.refresh(item)
+    log_action(db, "EXERCISE_TOGGLED", user=_admin, resource="exercise", resource_id=item.id, detail=f"Set exercise '{item.title}' active={item.is_active}")
     return item
-
-
-@router.post("/{exercise_id}/complete")
 def complete_exercise(
     exercise_id: int,
     db: Session = Depends(get_db),

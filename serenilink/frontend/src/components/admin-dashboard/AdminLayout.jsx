@@ -1,23 +1,16 @@
 import React, { useState } from "react";
-import { Outlet, Navigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import AdminSidebar from "./AdminSidebar";
+import PageLoader from "../shared/PageLoader";
 import { useAuth } from "../../context/AuthContext";
+import "../user-dashboard/DashboardLayout.css";
 
 function AdminLayout() {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  if (loading) {
-    return (
-      <div style={{ minHeight: "100vh", background: "#050505", display: "flex", alignItems: "center", justifyContent: "center", color: "#caa38f" }}>
-        Loading...
-      </div>
-    );
-  }
-
-  if (!user) return <Navigate to="/login" replace />;
-  if (user.role !== "admin") return <Navigate to="/dashboard" replace />;
+  if (loading) return <PageLoader message="Loading admin dashboard..." />;
 
   return (
     <div className="dashboard-shell">

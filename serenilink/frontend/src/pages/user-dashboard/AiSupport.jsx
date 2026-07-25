@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import { LuSendHorizontal, LuPlus, LuBot, LuChevronsLeft, LuChevronsRight } from "react-icons/lu";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
@@ -87,6 +88,10 @@ function AiSupport() {
     setIsNewChat(true);
   };
 
+  const showHighRiskCta = messages.some(
+    (m) => String(m.risk_level || "").toUpperCase() === "HIGH"
+  );
+
   return (
     <div>
       <h1 className="dashboard-page-title">AI Support</h1>
@@ -100,6 +105,34 @@ function AiSupport() {
       }}>
         <strong>In crisis or emergency?</strong> Call <strong>112</strong> or <strong>114</strong> for health services.
       </div>
+
+      {showHighRiskCta && (
+        <div style={{
+          marginBottom: 20, padding: "16px 18px", borderRadius: 14,
+          background: "rgba(240,143,143,0.12)", border: "1px solid rgba(240,143,143,0.35)",
+          display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap",
+        }}>
+          <div>
+            <p style={{ margin: "0 0 4px", color: "#f08f8f", fontSize: 15, fontWeight: 700 }}>
+              Extra support may help right now
+            </p>
+            <p style={{ margin: 0, color: "var(--text-soft)", fontSize: 13, lineHeight: 1.5 }}>
+              Based on this conversation, consider booking a counselor. This is not a medical diagnosis.
+            </p>
+          </div>
+          <Link
+            to="/dashboard/counselors"
+            className="primary-btn"
+            style={{
+              textDecoration: "none", height: 42, padding: "0 18px",
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              whiteSpace: "nowrap", background: "#c45c5c",
+            }}
+          >
+            Book a Counselor
+          </Link>
+        </div>
+      )}
 
       <div style={{ display: "flex", gap: "16px", height: "580px" }}>
 

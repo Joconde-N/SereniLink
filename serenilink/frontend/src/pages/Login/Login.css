@@ -394,3 +394,94 @@
   font-size: 14px;
   margin: 0 0 14px;
 }
+
+/* ============================================
+   LIGHT MODE — warm beige, easy on the eyes
+   ============================================ */
+body.light .login-page {
+  background: #e8e1d6;
+  color: #2b2521;
+}
+
+body.light .login-topbar {
+  border-bottom-color: rgba(70, 52, 42, 0.12);
+}
+
+body.light .login-brand {
+  color: #6b6259;
+}
+
+body.light .login-back {
+  color: #57504a;
+}
+
+body.light .login-right {
+  background: #e8e1d6;
+}
+
+body.light .login-right::before {
+  background: radial-gradient(circle at center, rgba(168, 105, 85, 0.1), transparent 40%);
+}
+
+body.light .login-form-box h2 {
+  color: #2b2521;
+}
+
+body.light .login-subtext {
+  color: #6b6259;
+}
+
+body.light .login-field label,
+body.light .login-remember {
+  color: #57504a;
+}
+
+body.light .login-field input {
+  background: #f4eee5;
+  color: #2b2521;
+  border: 1px solid rgba(70, 52, 42, 0.14);
+}
+
+body.light .login-field input::placeholder {
+  color: #7a7168;
+}
+
+body.light .login-eye {
+  color: #7a7168;
+}
+
+body.light .login-bottom-links p {
+  color: #6b6259;
+}
+
+body.light .forgot-overlay {
+  background: rgba(70, 52, 42, 0.45);
+}
+
+body.light .forgot-modal {
+  background: #f4eee5;
+  border-color: rgba(70, 52, 42, 0.14);
+}
+
+body.light .forgot-modal h3 {
+  color: #2b2521;
+}
+
+body.light .forgot-modal p {
+  color: #6b6259;
+}
+
+body.light .forgot-close {
+  background: rgba(70, 52, 42, 0.08);
+  color: #2b2521;
+}
+
+body.light .forgot-input {
+  background: #ece5d9;
+  color: #2b2521;
+  border: 1px solid rgba(70, 52, 42, 0.14);
+}
+
+body.light .forgot-input::placeholder {
+  color: #7a7168;
+}

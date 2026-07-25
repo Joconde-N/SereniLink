@@ -1,352 +1,155 @@
-# SereniLink - Mental Health Support and Counseling Platform
+# SereniLink — Mental Health Support & Counseling Platform
 
-## Overview
+SereniLink is an AI-powered mental health support and counseling platform that helps people access wellness tools, screenings, and professional counselors through a single web app.
 
-SereniLink is an AI-powered mental health support and counseling platform designed to improve access to mental health services through digital technology.
+## What You Can Do
 
-The platform provides:
-
-- AI-assisted mental health support
-- PHQ-9 and GAD-7 mental health screenings
-- Counselor appointment booking
-- Mood tracking and progress monitoring
-- Educational mental health resources
-- Session notes and counseling support
-- Administrative reporting and analytics
-
----
-
-## Features
-
-### User Management
-
-- User registration and authentication
-- Role-based access control
-- Password strength validation
-- Password reset functionality
-- Profile management
-- Counselor application workflow
-
-### AI Mental Health Support
-
-- Authenticated AI chat
-- Guest AI support
-- Risk detection (Low, Moderate, High)
-- Personalized responses
-- Conversation history
-
-### Mental Health Assessments
-
-- PHQ-9 Depression Screening
-- GAD-7 Anxiety Screening
-- Automatic scoring
-- Severity classification
-- Assessment history
-
-### Mood Tracking
-
-- Daily mood check-ins
-- Mood trends
-- Mood history
-
-### Counseling Services
-
-- Counselor directory
-- Availability management
-- Appointment booking
-- Appointment approval workflow
-- Session management
-
-### Session Notes
-
-- Counselor session notes
-- Session history tracking
-
-### Progress Tracking
-
-- Personal milestones
-- Progress analytics
-- Improvement trends
-
-### Resources
-
-- Mental health articles
-- Wellness exercises
-- Self-help resources
-
-### Reports & Analytics
-
-- Administrative reports
-- Booking analytics
-- User engagement insights
-- Assessment statistics
+- **AI-assisted support** — chat with an AI companion (guest or logged-in), with risk awareness and counselor referral CTAs
+- **Screenings** — PHQ-9 and GAD-7 assessments with scoring and history
+- **Mood & progress** — daily check-ins, wellness tips, and progress tracking
+- **Counseling** — browse counselors, filter by specialization, book sessions, chat in real time (WebSocket)
+- **Exercises & resources** — calm tools, articles, and self-help content
+- **Risk monitoring** — support level (Low / Moderate / High) for users and their assigned counselors; admins only see anonymous aggregates
+- **Audit logging** — admin search, filter, and CSV export of important system actions
+- **Light / dark theme** — one toggle that persists across the whole app
 
 ---
 
 ## Technology Stack
 
-### Frontend
-
-- React
-- Vite
-- React Router
-- Axios
-- Context API
-
-### Backend
-
-- FastAPI
-- SQLAlchemy
-- PostgreSQL
-- Alembic
-- JWT Authentication
-- Argon2 Password Hashing
-
-### AI
-
-- Hugging Face Inference Router
-- GPT-OSS-20B (served through Groq)
-- OpenAI-Compatible API Interface
-
-## AI Configuration
-
-SereniLink uses the Hugging Face Router as the AI gateway. The application communicates with an OpenAI-compatible API endpoint provided through Hugging Face and accesses the GPT-OSS-20B model running on Groq infrastructure.
-
-Configuration:
-
-```python
-HF_API_KEY: str
-HF_BASE_URL: str = "https://router.huggingface.co/v1"
-AI_MODEL: str = "openai/gpt-oss-20b:groq"
-```
-
-### AI Capabilities
-
-- Mental health support conversations
-- PHQ-9 and GAD-7 assessment guidance
-- Emotional support and wellbeing recommendations
-- Risk detection (Low, Moderate, High)
-- Context-aware responses
-- Personalized support suggestions
-
-### Safety Features
-
-- Detection of high-risk messages
-- Emergency guidance using Rwanda emergency numbers:
-  - 112 (National Emergency)
-  - 114 (Medical Emergency / Ambulance)
-- Safe-response mechanism for crisis situations
-- Counselor referral recommendations
-
-### Additional Libraries
-
-- SlowAPI
-- Pydantic
-- Python-Jose
-- Passlib
+| Layer | Stack |
+|-------|--------|
+| Frontend | React, Vite, React Router, Axios, Context API, Recharts, Lucide icons |
+| Backend | FastAPI, SQLAlchemy, PostgreSQL, Alembic, JWT, Argon2 |
+| Realtime | WebSockets (booking chat) |
+| AI | Hugging Face Router → GPT-OSS-20B (Groq), OpenAI-compatible API |
 
 ---
 
-## Project Structure
-
-### Backend
+## Repository Layout
 
 ```text
-backend/
-│
-├── app/
-│   ├── api/
-│   │   ├── routes/
-│   │   └── deps.py
-│   │
-│   ├── core/
-│   │   ├── ai_client.py
-│   │   ├── email.py
-│   |   ├── config.py
-│   │   └── security.py
-│   │
-│   ├── db/
-│   ├── models/
-│   ├── schemas/
-│   └── main.py
-│
-├── alembic/
-├── requirements.txt
-└── .env
+SereniLinkApp/
+├── README.md                 ← you are here
+├── PROJECT_STRUCTURE.md      ← detailed file-by-file guide
+├── .gitignore
+└── serenilink/
+    ├── backend/              ← FastAPI API + database models
+    └── frontend/             ← React (Vite) SPA
 ```
 
-### Frontend
-
-```text
-frontend/
-│
-├── src/
-│   ├── api/
-│   ├── assets/
-│   ├── components/
-│   ├── context/
-│   ├── pages/
-│   ├── styles/
-│   ├── App.jsx
-│   └── main.jsx
-│
-├── package-lock.json
-└── package.json
-```
+For a full walkthrough of every folder and file, see **[PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md)**.
 
 ---
 
-## Backend Setup
+## Quick Start
 
-### 1. Navigate to Backend
-
-```bash
-cd backend
-```
-
-### 2. Create Virtual Environment
+### Backend
 
 ```bash
+cd serenilink/backend
 python -m venv venv
-```
 
-### 3. Activate Virtual Environment
+# Windows
+.\venv\Scripts\activate
+# macOS / Linux
+source venv/bin/activate
 
-Windows:
-
-```bash
-.\venv\Scripts\activate.ps1
-```
-or
-
-```bash
-venv\Scripts\activate
-```
-
-### 4. Install Dependencies
-
-```bash
 pip install -r requirements.txt
 ```
 
-### 5. Configure Environment Variables
-
-Create a `.env` file:
+Create `serenilink/backend/.env`:
 
 ```env
-HF_API_KEY=your_api_key_here
+DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/serenilink
+SECRET_KEY=your-secret-key
+HF_API_KEY=your_huggingface_key
 HF_BASE_URL=https://router.huggingface.co/v1
 AI_MODEL=openai/gpt-oss-20b:groq
 ```
 
-### 6. Run Database Migrations
-
 ```bash
 alembic upgrade head
-```
-
-### 7. Start Backend
-
-```bash
 uvicorn app.main:app --reload
 ```
 
-Backend URL:
+- API: http://127.0.0.1:8000  
+- Swagger: http://127.0.0.1:8000/docs  
 
-```text
-http://127.0.0.1:8000
-```
-
-Swagger Documentation:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
----
-
-## Frontend Setup
-
-### 1. Navigate to Frontend
+### Frontend
 
 ```bash
-cd frontend
-```
-
-### 2. Install Dependencies
-
-```bash
+cd serenilink/frontend
 npm install
 ```
 
-### 3. Configure Environment Variables
-
-Create a `.env` file:
+Create `serenilink/frontend/.env`:
 
 ```env
 VITE_API_URL=http://127.0.0.1:8000
 ```
 
-### 4. Start Frontend
-
 ```bash
 npm run dev
 ```
 
-Frontend URL:
-
-```text
-http://localhost:5173
-```
+- App: http://localhost:5173  
 
 ---
 
 ## User Roles
 
-### Patient/User
-
-- Complete screenings
-- Track moods
-- Book counseling sessions
-- Use AI support
-- View resources
-- Practice excercises
-- Monitor progress
-
-### Counselor
-
-- Manage availability
-- Review appointments
-- Create session notes
-- Support patients/users
-
-### Administrator
-
-- Manage users
-- Manage content and excercises
-- Approve counselors
-- Generate reports
-- View analytics
+| Role | Main areas |
+|------|------------|
+| **User** | Dashboard, screenings, mood, AI chat, find/book counselors, messages, exercises, resources, settings |
+| **Counselor** | Availability, booking requests, sessions, client assessments, messages, profile, settings |
+| **Admin** | Users, counselor applications, content/exercises, bookings, insights, audit logs, settings |
 
 ---
 
-## Security Features
+## Key Features (Recent)
 
-- JWT Authentication
-- Argon2 Password Hashing
-- Role-Based Access Control
-- Rate Limiting
-- Protected API Routes
-- Secure Password Reset
+- **Support Level recommendations** — based on latest PHQ-9 / GAD-7 and recent moods (not a medical diagnosis)
+- **Specialization filters** — comma-separated tags like `Anxiety, Stress` are split into unique filter options; filtering by `Anxiety` matches any counselor who lists that tag
+- **Protected routes** — role-gated dashboards
+- **Shared settings** — one `SettingsPage` component for all roles
+- **Notification badges** — unread counts on sidebar + bell
+- **Audit logs** — admin filtering by action/resource, pagination, CSV export
 
 ---
 
-## Future Enhancements
+## Security
 
-- Video Counseling Sessions
-- Multi-Factor Authentication
-- Anonymous Registration
-- High-Risk Alert Dashboard
-- Mobile Application
-- Advanced Analytics
+- JWT authentication  
+- Argon2 password hashing  
+- Role-based access control  
+- Rate limiting (SlowAPI)  
+- Protected API routes  
+- Secure password reset  
 
+---
+
+## AI Safety Notes
+
+- Risk levels: Low / Moderate / High  
+- High-risk AI chats show a **Book a Counselor** CTA  
+- Emergency numbers (Rwanda): **112** (national), **114** (medical / ambulance)  
+- The app does **not** make clinical diagnoses  
+
+---
+
+## Future Ideas
+
+- Video counseling sessions  
+- Multi-factor authentication  
+- Mobile application  
+- Advanced analytics dashboards  
+
+---
+
+## Docs
+
+| File | Purpose |
+|------|---------|
+| [README.md](./README.md) | Setup, stack, overview |
+| [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md) | How the codebase is organized and how to navigate it |

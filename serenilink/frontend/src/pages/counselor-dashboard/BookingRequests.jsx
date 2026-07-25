@@ -100,7 +100,7 @@ export default function BookingRequests() {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ borderBottom: "1px solid var(--border-soft)" }}>
-                {["Bookings", "Reason", "Payment", "Status", "Actions"].map((h) => (
+                {["Bookings", "Reason", "Status", "Actions"].map((h) => (
                   <th key={h} style={{
                     padding: "14px 20px", textAlign: "left",
                     fontSize: 14, fontWeight: 600,
@@ -139,15 +139,6 @@ export default function BookingRequests() {
                       </span>
                     </td>
 
-                    {/* Payment */}
-                    <td style={{ padding: "16px 20px", whiteSpace: "nowrap" }}>
-                      <span style={{
-                        fontSize: 13, fontWeight: 600,
-                        color: b.payment_status === "PAID" ? "#67d58c" : "#f5c95f",
-                      }}>
-                        {b.payment_status}
-                      </span>
-                    </td>
 
                     {/* Status */}
                     <td style={{ padding: "16px 20px", whiteSpace: "nowrap" }}>

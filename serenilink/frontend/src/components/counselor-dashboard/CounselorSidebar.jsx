@@ -5,6 +5,7 @@ import {
   LuCalendarPlus,
   LuInbox,
   LuCalendarCheck,
+  LuUsers,
   LuMessageSquare,
   LuBell,
   LuUser,
@@ -15,51 +16,53 @@ import {
 } from "react-icons/lu";
 import { useAuth } from "../../context/AuthContext";
 import MobileSidebarDrawer from "../user-dashboard/MobileSidebarDrawer";
-
-const SECTIONS = [
-  {
-    title: "Main",
-    items: [
-      { label: "Dashboard",        icon: <LuLayoutDashboard />, to: "/counselor" },
-      { label: "My Availability",  icon: <LuCalendarPlus />,   to: "/counselor/availability" },
-      { label: "Booking Requests", icon: <LuInbox />,          to: "/counselor/requests" },
-      { label: "My Sessions",      icon: <LuCalendarCheck />,  to: "/counselor/sessions" },
-    ],
-  },
-  {
-    title: "Communication",
-    items: [
-      { label: "Messages",      icon: <LuMessageSquare />, to: "/counselor/messages" },
-      { label: "Notifications", icon: <LuBell />,          to: "/counselor/notifications" },
-    ],
-  },
-  {
-    title: "Account",
-    items: [
-      { label: "Profile",   icon: <LuUser />,     to: "/counselor/profile" },
-      { label: "Settings",  icon: <LuSettings />, to: "/counselor/settings" },
-    ],
-  },
-];
+import { useUnreadCount } from "../../hooks/useUnreadCount";
 
 function CounselorSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const unread = useUnreadCount();
 
   const handleLogout = () => { logout(); navigate("/login"); };
+
+  const sections = [
+    {
+      title: "Main",
+      items: [
+        { label: "Dashboard",        icon: <LuLayoutDashboard />, to: "/counselor" },
+        { label: "My Availability",  icon: <LuCalendarPlus />,   to: "/counselor/availability" },
+        { label: "Booking Requests", icon: <LuInbox />,          to: "/counselor/requests" },
+        { label: "My Sessions",      icon: <LuCalendarCheck />,  to: "/counselor/sessions" },
+        { label: "My Clients",       icon: <LuUsers />,          to: "/counselor/clients" },
+      ],
+    },
+    {
+      title: "Communication",
+      items: [
+        { label: "Messages",      icon: <LuMessageSquare />, to: "/counselor/messages" },
+        { label: "Notifications", icon: <LuBell />,          to: "/counselor/notifications", badge: unread },
+      ],
+    },
+    {
+      title: "Account",
+      items: [
+        { label: "Profile",   icon: <LuUser />,     to: "/counselor/profile" },
+        { label: "Settings",  icon: <LuSettings />, to: "/counselor/settings" },
+      ],
+    },
+  ];
 
   return (
     <>
       <MobileSidebarDrawer
         brand="SereniLink"
-        sections={SECTIONS}
+        sections={sections}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
         roleLabel="Counselor"
         roleColor="#67d58c"
       />
       <aside className={`dashboard-sidebar ${collapsed ? "collapsed" : ""}`}>
-      {/* Top */}
       <div className="sidebar-top">
         <div className="sidebar-brand-row">
           {!collapsed && <h2 className="sidebar-brand">SereniLink</h2>}
@@ -70,7 +73,6 @@ function CounselorSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }
         {!collapsed && <div className="sidebar-divider" />}
       </div>
 
-      {/* User badge */}
       {!collapsed && user && (
         <div style={{
           display: "flex", alignItems: "center", gap: "10px",
@@ -93,9 +95,8 @@ function CounselorSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }
         </div>
       )}
 
-      {/* Nav */}
       <div className="sidebar-content">
-        {SECTIONS.map((section) => (
+        {sections.map((section) => (
           <div className="sidebar-section" key={section.title}>
             {!collapsed && <p className="sidebar-section-title">{section.title}</p>}
             <div className="sidebar-links">
@@ -106,8 +107,16 @@ function CounselorSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }
                   end={item.to === "/counselor"}
                   className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}
                 >
-                  <span className="sidebar-icon">{item.icon}</span>
+                  <span className="sidebar-icon" style={{ position: "relative" }}>
+                    {item.icon}
+                    {collapsed && item.badge > 0 && (
+                      <span className="sidebar-badge-dot" />
+                    )}
+                  </span>
                   {!collapsed && <span>{item.label}</span>}
+                  {!collapsed && item.badge > 0 && (
+                    <span className="sidebar-badge-count">{item.badge > 99 ? "99+" : item.badge}</span>
+                  )}
                 </NavLink>
               ))}
             </div>
@@ -115,7 +124,6 @@ function CounselorSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }
         ))}
       </div>
 
-      {/* Logout */}
       <div className="sidebar-bottom">
         <div className="sidebar-divider" />
         <button className="logout-btn" type="button" onClick={handleLogout}>

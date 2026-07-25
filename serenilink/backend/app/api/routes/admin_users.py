@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, require_admin
 from app.models.user import User
+from app.core.audit import log_action
 
 router = APIRouter(prefix="/admin/users", tags=["Admin Users"])
 
@@ -32,6 +33,7 @@ def promote_user(user_id: int, db: Session = Depends(get_db), admin=Depends(requ
         raise HTTPException(status_code=400, detail="Cannot change your own role.")
     user.role = "admin"
     db.commit()
+    log_action(db, "USER_PROMOTED", user=admin, resource="user", resource_id=user_id, detail=f"Promoted {user.nickname} to admin")
     return {"message": "User promoted to admin", "role": user.role}
 
 
@@ -44,6 +46,7 @@ def demote_user(user_id: int, db: Session = Depends(get_db), admin=Depends(requi
         raise HTTPException(status_code=400, detail="Cannot change your own role.")
     user.role = "user"
     db.commit()
+    log_action(db, "USER_DEMOTED", user=admin, resource="user", resource_id=user_id, detail=f"Demoted {user.nickname} to user")
     return {"message": "User demoted to user", "role": user.role}
 
 
@@ -56,4 +59,5 @@ def toggle_active(user_id: int, db: Session = Depends(get_db), admin=Depends(req
         raise HTTPException(status_code=400, detail="Cannot deactivate your own account.")
     user.is_active = not user.is_active
     db.commit()
+    log_action(db, "USER_TOGGLE_ACTIVE", user=admin, resource="user", resource_id=user_id, detail=f"Set {user.nickname} active={user.is_active}")
     return {"message": "Status updated", "is_active": user.is_active}

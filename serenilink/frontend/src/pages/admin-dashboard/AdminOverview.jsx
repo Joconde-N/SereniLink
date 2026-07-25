@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import {
+  LuUserCheck,
+  LuUsers,
+  LuChartBar,
+  LuScrollText,
+} from "react-icons/lu";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 
@@ -8,7 +14,12 @@ const STATUS_CLASS = {
   CANCELLED: "cancelled", COMPLETED: "approved",
 };
 
-const PAYMENT_COLOR = { PENDING: "#f5c95f", PAID: "#67d58c", WAIVED: "#caa38f" };
+const QUICK_ACTIONS = [
+  { label: "Approve Counselors", to: "/admin/applications", icon: LuUserCheck, iconBg: "rgba(103,213,140,0.15)", iconColor: "#67d58c" },
+  { label: "Manage Users", to: "/admin/users", icon: LuUsers, iconBg: "rgba(96,165,250,0.15)", iconColor: "#60a5fa" },
+  { label: "Platform Insights", to: "/admin/insights", icon: LuChartBar, iconBg: "rgba(202,163,143,0.18)", iconColor: "var(--accent)" },
+  { label: "Audit Logs", to: "/admin/audit-logs", icon: LuScrollText, iconBg: "rgba(245,201,95,0.15)", iconColor: "#f5c95f" },
+];
 
 function StatCard({ title, value, color }) {
   return (
@@ -24,7 +35,6 @@ function AdminOverview() {
   const [insights, setInsights]     = useState(null);
   const [pending, setPending]       = useState([]);
   const [bookings, setBookings]     = useState([]);
-  const [content, setContent]       = useState([]);
   const [exercises, setExercises]   = useState([]);
   const [loading, setLoading]       = useState(true);
   const [actionMsg, setActionMsg]   = useState("");
@@ -34,14 +44,12 @@ function AdminOverview() {
       api.get("/dashboard/admin/insights"),
       api.get("/counselor-applications/", { params: { status: "PENDING" } }),
       api.get("/bookings/", { params: { limit: 5 } }),
-      api.get("/content/",  { params: { limit: 5 } }),
       api.get("/exercises/",{ params: { limit: 5 } }),
     ])
-      .then(([iRes, pRes, bRes, cRes, eRes]) => {
+      .then(([iRes, pRes, bRes, eRes]) => {
         setInsights(iRes.data);
         setPending(pRes.data);
         setBookings(bRes.data);
-        setContent(cRes.data);
         setExercises(eRes.data);
       })
       .catch(() => {})
@@ -54,37 +62,43 @@ function AdminOverview() {
         setPending((prev) => prev.filter((a) => a.id !== id));
         setActionMsg(`Application ${action}d successfully.`);
         setTimeout(() => setActionMsg(""), 3000);
-        // refresh insights
         api.get("/dashboard/admin/insights").then((r) => setInsights(r.data)).catch(() => {});
       })
       .catch(() => setActionMsg("Action failed. Try again."));
   };
 
-  const handlePayment = (bookingId, status) => {
-    api.patch(`/bookings/${bookingId}/payment`, { payment_status: status })
-      .then((r) => {
-        setBookings((prev) => prev.map((b) => b.id === bookingId ? r.data : b));
-        setActionMsg("Payment status updated.");
-        setTimeout(() => setActionMsg(""), 3000);
-      })
-      .catch(() => setActionMsg("Update failed."));
-  };
-
   if (loading) return <div style={{ color: "var(--text-muted)", padding: "40px" }}>Loading dashboard...</div>;
 
   const t = insights?.totals ?? {};
-  const byStatus  = insights?.bookings_by_status ?? {};
-  const byPayment = insights?.bookings_by_payment_status ?? {};
 
   return (
     <div>
-      {/* Welcome */}
-      <div style={{ marginBottom: "28px" }}>
-        <h1 className="dashboard-page-title">
-          Welcome, <span style={{ color: "var(--accent)" }}>{user?.nickname}</span> 
+      <div style={{ marginBottom: "20px" }}>
+        <h1 className="dashboard-page-title" style={{ marginBottom: 8 }}>
+          Welcome, <span style={{ color: "var(--accent)" }}>{user?.nickname}</span>
         </h1>
-        <p className="dashboard-page-subtitle">System overview — manage the entire SereniLink platform.</p>
+        <p className="dashboard-page-subtitle" style={{ marginBottom: 0 }}>
+          System overview — manage the entire SereniLink platform.
+        </p>
       </div>
+
+      <section className="dashboard-section" aria-labelledby="admin-quick-actions">
+        <div className="quick-actions-panel">
+          <div className="dashboard-section-header dashboard-section-header--compact">
+            <h2 id="admin-quick-actions" className="dashboard-section-title">Quick Actions</h2>
+          </div>
+          <div className="quick-actions-grid">
+            {QUICK_ACTIONS.map(({ label, to, icon: Icon, iconBg, iconColor }) => (
+              <Link key={label} to={to} className="quick-action-btn">
+                <span className="quick-action-icon" style={{ background: iconBg, color: iconColor }}>
+                  <Icon aria-hidden />
+                </span>
+                <p className="quick-action-label">{label}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {actionMsg && (
         <div style={{ marginBottom: "16px", padding: "12px 16px", borderRadius: "12px", background: "rgba(103,213,140,0.1)", color: "#67d58c", border: "1px solid rgba(103,213,140,0.2)" }}>
@@ -92,7 +106,6 @@ function AdminOverview() {
         </div>
       )}
 
-      {/* Summary Cards Row 1 */}
       <div className="dashboard-grid dashboard-cards-4" style={{ marginBottom: "20px" }}>
         <StatCard title="Total Users"          value={t.users} />
         <StatCard title="Approved Counselors"  value={t.counselors}        color="#67d58c" />
@@ -100,18 +113,14 @@ function AdminOverview() {
         <StatCard title="Total Bookings"       value={t.bookings} />
       </div>
 
-
-      {/* Pending Applications + Payment Update — 2 col grid */}
       <div className="dashboard-grid dashboard-cards-2" style={{ marginBottom: "20px" }}>
-
-        {/* Pending Applications Preview */}
         <div className="dashboard-card">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
             <h3 style={{ margin: 0 }}>Pending Counselor Applications</h3>
             <Link to="/admin/applications" style={{ color: "var(--accent)", fontSize: "13px", textDecoration: "none" }}>View all →</Link>
           </div>
           {pending.length === 0 ? (
-            <div className="empty-state">No pending applications.</div>
+            <div className="empty-state" style={{ minHeight: "100px" }}>No pending applications.</div>
           ) : (
             <div className="list-stack">
               {pending.slice(0, 3).map((a) => (
@@ -133,38 +142,24 @@ function AdminOverview() {
           )}
         </div>
 
-        {/* Payment Update Preview */}
         <div className="dashboard-card">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
-            <h3 style={{ margin: 0 }}>Update Payment Status</h3>
+            <h3 style={{ margin: 0 }}>Recent Bookings</h3>
             <Link to="/admin/bookings" style={{ color: "var(--accent)", fontSize: "13px", textDecoration: "none" }}>All bookings →</Link>
           </div>
           {bookings.length === 0 ? (
-            <div className="empty-state" style={{ minHeight: "100px" }}>No bookings.</div>
+            <div className="empty-state" style={{ minHeight: "100px" }}>No bookings yet.</div>
           ) : (
             <div className="list-stack">
-              {bookings.slice(0, 3).map((b) => (
+              {bookings.slice(0, 4).map((b) => (
                 <div key={b.id} className="simple-item">
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
                     <div>
                       <span style={{ fontWeight: 600, fontSize: "14px" }}>Booking #{b.id}</span>
                       <span className={`status-pill ${STATUS_CLASS[b.status] ?? "pending"}`} style={{ marginLeft: "8px" }}>{b.status}</span>
-                    </div>
-                    <div style={{ display: "flex", gap: "6px" }}>
-                      {["PENDING", "PAID", "WAIVED"].map((ps) => (
-                        <button
-                          key={ps}
-                          onClick={() => handlePayment(b.id, ps)}
-                          style={{
-                            padding: "4px 10px", borderRadius: "8px", fontSize: "11px", fontWeight: 600, cursor: "pointer",
-                            border: b.payment_status === ps ? "none" : "1px solid var(--border-soft)",
-                            background: b.payment_status === ps ? "var(--accent)" : "transparent",
-                            color: b.payment_status === ps ? "#111" : "var(--text-soft)",
-                          }}
-                        >
-                          {ps}
-                        </button>
-                      ))}
+                      <p className="small-muted" style={{ margin: "4px 0 0" }}>
+                        {new Date(b.scheduled_for).toLocaleString()}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -172,14 +167,10 @@ function AdminOverview() {
             </div>
           )}
         </div>
-
       </div>
 
-      
-
-      {/* Platform Insights */}
       <div className="dashboard-card">
-        <h3>Platform Insights</h3>
+        <h3>Platform Snapshot</h3>
         <div className="dashboard-grid dashboard-cards-4">
           {[
             { label: "Total Exercises",    value: t.exercises ?? exercises.length, color: "var(--accent)" },

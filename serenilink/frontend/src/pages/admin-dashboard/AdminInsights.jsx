@@ -13,11 +13,7 @@ const STATUS_COLOR = {
   DECLINED:  "#f08f8f",
 };
 
-const PAYMENT_COLOR = {
-  PENDING: "#f5c95f",
-  PAID:    "#67d58c",
-  WAIVED:  "#caa38f",
-};
+const SUPPORT_COLOR = { Low: "#67d58c", Moderate: "#f5c95f", High: "#f08f8f" };
 
 function toTitleCase(str) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -64,12 +60,19 @@ function tickFormatter(val, index) {
 
 function AdminInsights() {
   const [data, setData]         = useState(null);
+  const [riskStats, setRiskStats] = useState(null);
   const [loading, setLoading]   = useState(true);
   const [trendKey, setTrendKey] = useState("new_users");
 
   useEffect(() => {
-    api.get("/dashboard/admin/insights")
-      .then((r) => setData(r.data))
+    Promise.all([
+      api.get("/dashboard/admin/insights"),
+      api.get("/risk-monitoring/admin/anonymous-stats"),
+    ])
+      .then(([insightsRes, riskRes]) => {
+        setData(insightsRes.data);
+        setRiskStats(riskRes.data);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -79,14 +82,15 @@ function AdminInsights() {
 
   const t  = data.totals ?? {};
   const bs = data.bookings_by_status ?? {};
-  const bp = data.bookings_by_payment_status ?? {};
   const tr = data.trends ?? {};
   const cc = data.content_by_category ?? [];
 
   const bookingStatusData = Object.entries(bs).map(([name, value]) => ({ name: toTitleCase(name), value, raw: name }));
-  const paymentStatusData = Object.entries(bp).map(([name, value]) => ({ name: toTitleCase(name), value, raw: name }));
   const trendData         = tr[trendKey] ?? [];
   const publishRate       = t.content > 0 ? Math.round((t.published_content / t.content) * 100) : 0;
+  const supportDist       = riskStats?.support_level_distribution ?? {};
+  const screeningStats    = riskStats?.screening_completion ?? {};
+  const supportChartData  = Object.entries(supportDist).map(([name, value]) => ({ name, value }));
 
   const generateCSV = () => {
     const rows = [];
@@ -98,23 +102,29 @@ function AdminInsights() {
     rows.push(["--- SUMMARY TOTALS ---"]);
     rows.push(["Metric", "Value"]);
     rows.push(["Total Users", t.users ?? 0]);
-    rows.push(["Total Counselors", t.counselors ?? 0]);
     rows.push(["Total Bookings", t.bookings ?? 0]);
     rows.push(["Total Assessments", t.assessments ?? 0]);
-    rows.push(["Total Content", t.content ?? 0]);
-    rows.push(["Published Content", t.published_content ?? 0]);
     rows.push(["Content Publish Rate", `${publishRate}%`]);
-    rows.push(["Mood Entries", t.mood_entries ?? 0]);
+    rows.push(["Users With Screening Data", riskStats?.total_users_with_data ?? 0]);
     rows.push([]);
+
+    if (riskStats) {
+      rows.push(["--- ANONYMOUS SUPPORT LEVEL DISTRIBUTION ---"]);
+      rows.push(["Level", "Count"]);
+      Object.entries(supportDist).forEach(([k, v]) => rows.push([k, v]));
+      rows.push([]);
+      rows.push(["--- SCREENING COMPLETION RATES ---"]);
+      rows.push(["Metric", "Value"]);
+      rows.push(["PHQ-9 Completed", screeningStats.phq9_completed ?? 0]);
+      rows.push(["PHQ-9 Rate", `${screeningStats.phq9_rate ?? 0}%`]);
+      rows.push(["GAD-7 Completed", screeningStats.gad7_completed ?? 0]);
+      rows.push(["GAD-7 Rate", `${screeningStats.gad7_rate ?? 0}%`]);
+      rows.push([]);
+    }
 
     rows.push(["--- BOOKINGS BY STATUS ---"]);
     rows.push(["Status", "Count"]);
     Object.entries(bs).forEach(([k, v]) => rows.push([toTitleCase(k), v]));
-    rows.push([]);
-
-    rows.push(["--- BOOKINGS BY PAYMENT STATUS ---"]);
-    rows.push(["Payment Status", "Count"]);
-    Object.entries(bp).forEach(([k, v]) => rows.push([toTitleCase(k), v]));
     rows.push([]);
 
     rows.push(["--- PUBLISHED CONTENT BY TYPE ---"]);
@@ -163,20 +173,29 @@ function AdminInsights() {
           Export CSV
         </button>
       </div>
-      <p className="dashboard-page-subtitle">Real-time metrics and reporting across the entire platform.</p>
+      <p className="dashboard-page-subtitle">
+        Anonymous platform metrics only — individual mental health data is never shown.
+      </p>
 
-      {/* Summary Cards */}
-      <div className="dashboard-grid dashboard-cards-4" style={{ marginBottom: 28 }}>
-        <SummaryCard title="Total Users"          value={t.users} />
-        <SummaryCard title="Total Counselors"     value={t.counselors}        color="#60a5fa" />
-        <SummaryCard title="Total Bookings"       value={t.bookings} />
-        <SummaryCard title="Published Content"    value={t.published_content} color="#67d58c" />
-        <SummaryCard title="Total Assessments"    value={t.assessments}       color="var(--accent)" />
-        <SummaryCard title="Mood Entries"         value={t.mood_entries}      color="var(--accent)" />
-        <SummaryCard title="Content Publish Rate" value={`${publishRate}%`}   color={publishRate >= 70 ? "#67d58c" : "#f5c95f"} />
+      <div className="dashboard-grid dashboard-cards-3" style={{ marginBottom: 20 }}>
+        <SummaryCard title="Total Users" value={t.users} />
+        <SummaryCard title="Total Bookings" value={t.bookings} />
+        <SummaryCard title="Total Assessments" value={t.assessments} color="var(--accent)" />
       </div>
 
-      {/* Row 1: Booking Status + Payment Status */}
+      <div className="dashboard-grid dashboard-cards-2" style={{ marginBottom: 28 }}>
+        <SummaryCard
+          title="Content Publish Rate"
+          value={`${publishRate}%`}
+          color={publishRate >= 70 ? "#67d58c" : "#f5c95f"}
+        />
+        <SummaryCard
+          title="Users With Screening Data"
+          value={riskStats?.total_users_with_data ?? 0}
+          color="#60a5fa"
+        />
+      </div>
+
       <div className="dashboard-grid dashboard-cards-2" style={{ marginBottom: 24 }}>
         <ChartCard title="Bookings by Status">
           <ResponsiveContainer width="100%" height={220}>
@@ -202,32 +221,26 @@ function AdminInsights() {
           </div>
         </ChartCard>
 
-        <ChartCard title="Bookings by Payment Status">
+        <ChartCard title="Support Level Distribution">
           <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={paymentStatusData} barSize={48} style={CHART_STYLE}>
+            <BarChart data={supportChartData} barSize={48} style={CHART_STYLE}>
               <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.04)" />
               <XAxis dataKey="name" tick={{ fill: "#b8bfcc", fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: "#b8bfcc", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip {...tooltipStyle} />
               <Bar dataKey="value" radius={[6, 6, 0, 0]} isAnimationActive>
-                {paymentStatusData.map((entry) => (
-                  <Cell key={entry.raw} fill={PAYMENT_COLOR[entry.raw] ?? "#b8bfcc"} />
+                {supportChartData.map((entry) => (
+                  <Cell key={entry.name} fill={SUPPORT_COLOR[entry.name] ?? "#b8bfcc"} />
                 ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 12 }}>
-            {paymentStatusData.map((e) => (
-              <span key={e.raw} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-soft)" }}>
-                <span style={{ width: 10, height: 10, borderRadius: 2, background: PAYMENT_COLOR[e.raw] ?? "#b8bfcc", display: "inline-block" }} />
-                {e.name}
-              </span>
-            ))}
-          </div>
+          <p style={{ margin: "12px 0 0", fontSize: 12, color: "var(--text-muted)", fontStyle: "italic" }}>
+            Aggregate wellness indicators only — no individual user data.
+          </p>
         </ChartCard>
       </div>
 
-      {/* Row 2: Trends + Content by Type */}
       <div className="dashboard-grid dashboard-cards-2" style={{ marginBottom: 24 }}>
         <ChartCard title="30-Day Trends">
           <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>

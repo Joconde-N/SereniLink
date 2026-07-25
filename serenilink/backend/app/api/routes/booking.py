@@ -9,6 +9,8 @@ from app.models.booking import Booking
 from app.models.counselor import Counselor
 from app.models.availability import AvailabilitySlot
 from app.models.notification import Notification
+from app.models.user import User
+from app.core.audit import log_action
 from app.schemas.booking import (
     BookingCreate,
     BookingUpdateStatus,
@@ -73,6 +75,31 @@ def _get_counselor_profile_for_user(db: Session, user_id: int) -> Counselor:
     return counselor
 
 
+def _enrich_bookings(db: Session, bookings: list[Booking]) -> list[dict]:
+    if not bookings:
+        return []
+
+    counselor_ids = {b.counselor_id for b in bookings}
+    user_ids = {b.user_id for b in bookings}
+
+    counselors = {
+        c.id: c.full_name
+        for c in db.query(Counselor).filter(Counselor.id.in_(counselor_ids)).all()
+    }
+    users = {
+        u.id: u.nickname
+        for u in db.query(User).filter(User.id.in_(user_ids)).all()
+    }
+
+    result = []
+    for b in bookings:
+        data = BookingOut.model_validate(b).model_dump()
+        data["counselor_name"] = counselors.get(b.counselor_id)
+        data["user_nickname"] = users.get(b.user_id)
+        result.append(data)
+    return result
+
+
 def _booking_access_check(db: Session, booking: Booking, current_user) -> tuple[bool, bool, bool]:
     is_owner = booking.user_id == current_user.id
 
@@ -128,6 +155,8 @@ def create_booking(
     db.commit()
     db.refresh(item)
 
+    log_action(db, "BOOKING_CREATED", user=current_user, resource="booking", resource_id=item.id, detail=f"Booked counselor #{counselor.id} for {slot.start_time}")
+
     # Notify counselor of new request
     create_notification(
         db,
@@ -147,7 +176,7 @@ def my_bookings(
     limit: int = Query(default=10, le=50),
 ):
     expire_stale_bookings(db)
-    return (
+    bookings = (
         db.query(Booking)
         .filter(Booking.user_id == current_user.id)
         .order_by(Booking.created_at.desc())
@@ -155,6 +184,7 @@ def my_bookings(
         .limit(limit)
         .all()
     )
+    return _enrich_bookings(db, bookings)
 
 
 @router.get("/", response_model=list[BookingOut])
@@ -202,6 +232,8 @@ def update_booking_status_admin(
     db.commit()
     db.refresh(item)
 
+    log_action(db, "BOOKING_STATUS_UPDATED", user=_admin, resource="booking", resource_id=booking_id, detail=f"Admin set booking #{booking_id} to {new_status}")
+
     create_notification(
         db,
         item.user_id,
@@ -240,6 +272,8 @@ def cancel_my_booking(
 
     db.commit()
 
+    log_action(db, "BOOKING_CANCELLED", user=current_user, resource="booking", resource_id=booking_id, detail=f"User cancelled booking #{booking_id}")
+
     # notify counselor
     counselor = db.query(Counselor).filter(Counselor.id == item.counselor_id).first()
     if counselor:
@@ -272,7 +306,8 @@ def counselor_my_bookings(
     if status:
         q = q.filter(Booking.status == status.upper())
 
-    return q.order_by(Booking.scheduled_for.asc()).offset(skip).limit(limit).all()
+    bookings = q.order_by(Booking.scheduled_for.asc()).offset(skip).limit(limit).all()
+    return _enrich_bookings(db, bookings)
 
 
 @router.get("/counselor/me/stats")
@@ -306,6 +341,44 @@ def counselor_my_stats(
         "today_sessions": today,
         "upcoming_approved": upcoming,
     }
+
+
+@router.get("/counselor/me/assigned-users")
+def counselor_assigned_users(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    from app.api.routes.risk_monitoring import _build_risk_data
+
+    counselor = _get_counselor_profile_for_user(db, current_user.id)
+    bookings = (
+        db.query(Booking)
+        .filter(
+            Booking.counselor_id == counselor.id,
+            Booking.status.in_(["APPROVED", "COMPLETED"]),
+        )
+        .order_by(Booking.scheduled_for.desc())
+        .all()
+    )
+
+    seen = {}
+    for b in bookings:
+        if b.user_id not in seen:
+            user = db.query(User).filter(User.id == b.user_id).first()
+            risk = _build_risk_data(db, b.user_id)
+            seen[b.user_id] = {
+                "user_id": b.user_id,
+                "user_nickname": user.nickname if user else f"User #{b.user_id}",
+                "total_sessions": 0,
+                "last_session": None,
+                "latest_booking_id": b.id,
+                "support_level": risk["support_level"],
+            }
+        seen[b.user_id]["total_sessions"] += 1
+        if not seen[b.user_id]["last_session"]:
+            seen[b.user_id]["last_session"] = b.scheduled_for.isoformat()
+
+    return list(seen.values())
 
 
 @router.patch("/{booking_id}/counselor-status", response_model=BookingOut)
@@ -351,6 +424,8 @@ def counselor_update_booking_status(
 
     db.commit()
     db.refresh(item)
+
+    log_action(db, "BOOKING_STATUS_UPDATED", user=current_user, resource="booking", resource_id=booking_id, detail=f"Counselor set booking #{booking_id} to {new_status}")
 
     # notify user
     if new_status == "APPROVED":

@@ -27,9 +27,11 @@ from app.api.routes.admin_users import router as admin_users_router
 from app.api.routes.ai_guest import router as ai_guest_router
 from app.api.routes.screenings import router as screenings_router
 from app.api.routes.session_notes import router as session_notes_router
+from app.api.routes.audit_logs import router as audit_logs_router
+from app.api.routes.risk_monitoring import router as risk_monitoring_router
 
 from app.db.session import engine
-from app.models import User, Content, Assessment, Counselor, CounselorApplication, Booking, Progress, ChatMessage, AvailabilitySlot, AIConversation, AIMessage, MoodEntry, Exercise, Notification, Screening, SessionNote
+from app.models import User, Content, Assessment, Counselor, CounselorApplication, Booking, Progress, ChatMessage, AvailabilitySlot, AIConversation, AIMessage, MoodEntry, Exercise, Notification, Screening, SessionNote, AuditLog
 from app.db.base import Base
 from app.api.deps import get_current_user, require_admin
 from sqlalchemy.orm import Session
@@ -90,5 +92,7 @@ app.include_router(admin_users_router)
 app.include_router(ai_guest_router)
 app.include_router(screenings_router)
 app.include_router(session_notes_router)
+app.include_router(audit_logs_router)
+app.include_router(risk_monitoring_router)
 
 Base.metadata.create_all(bind=engine)

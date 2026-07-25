@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./About.css";
-import { HandFist, HatGlasses, LockKeyholeOpen } from "lucide-react";
+import { HandFist, HatGlasses, LockKeyholeOpen, DoorOpen, ShieldCheck } from "lucide-react";
 
 import aboutHeroImage from "../../assets/about-hero-woman.png";
 import missionImage from "../../assets/mental-health-laptop.png";
@@ -20,7 +20,7 @@ function About() {
             <h1>
               About <span>SereniLink</span>
             </h1>
-            <p>A digital youth mental health support platform.</p>
+            <p>Mental health support that meets you where you are.</p>
 
             <Link to="/register" className="about-btn">
               Get Started
@@ -106,7 +106,7 @@ function About() {
         <div className="values-grid">
           <div className="value-card value-top">
             <div className="value-icon">
-              <HatGlasses className="value-svg" />
+              <ShieldCheck className="value-svg" />
             </div>
             <h3>Confidentiality</h3>
             <p>We protect user privacy and ensure secure communication.</p>
@@ -114,7 +114,7 @@ function About() {
 
           <div className="value-card value-left">
             <div className="value-icon">
-              <LockKeyholeOpen className="value-svg" />
+              <DoorOpen className="value-svg" />
             </div>
             <h3>Accessibility</h3>
             <p>Support should be available to every young person.</p>
@@ -132,6 +132,14 @@ function About() {
         </div>
       </section>
 
+      <section className="about-cta-section">
+        <h2>Ready to take the next step?</h2>
+        <p>Join SereniLink today or connect with a counselor who can support you.</p>
+        <div className="about-cta-buttons">
+          <Link to="/register" className="about-btn">Register</Link>
+          <Link to="/counselors" className="about-btn about-btn-secondary">Find Counselor</Link>
+        </div>
+      </section>
 
     </div>
   );

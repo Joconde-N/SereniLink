@@ -8,6 +8,7 @@ import {
   LuDumbbell,
   LuUsers,
   LuChartBar,
+  LuScrollText,
   LuSettings,
   LuLogOut,
   LuChevronsLeft,
@@ -32,6 +33,7 @@ const SECTIONS = [
     items: [
       { label: "Users",    icon: <LuUsers />,    to: "/admin/users" },
       { label: "Insights",  icon: <LuChartBar />, to: "/admin/insights" },
+      { label: "Audit Logs", icon: <LuScrollText />, to: "/admin/audit-logs" },
     ],
   },
   {

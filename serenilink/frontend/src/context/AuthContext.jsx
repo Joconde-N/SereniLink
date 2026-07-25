@@ -25,12 +25,15 @@ export function AuthProvider({ children }) {
     } else {
       sessionStorage.setItem("token", token);
     }
+    // New random seed each login — used to shuffle things like recommended content.
+    sessionStorage.setItem("sl_login_seed", String(Date.now()));
     setUser(userData);
   };
 
   const logout = () => {
     localStorage.removeItem("token");
     sessionStorage.removeItem("token");
+    sessionStorage.removeItem("sl_login_seed");
     setUser(null);
   };
 

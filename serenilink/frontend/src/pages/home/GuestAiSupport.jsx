@@ -61,6 +61,10 @@ function GuestAiSupport() {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
   };
 
+  const showHighRiskCta = messages.some(
+    (m) => String(m.risk_level || "").toUpperCase() === "HIGH"
+  );
+
   return (
     <div style={{ minHeight: "100vh", background: "#070808", display: "flex", flexDirection: "column" }}>
 
@@ -91,6 +95,32 @@ function GuestAiSupport() {
       }}>
         <strong>Crisis or emergency?</strong> Call <strong>112</strong> or <strong>114</strong> immediately.
       </div>
+
+      {showHighRiskCta && (
+        <div style={{
+          maxWidth: 760, width: "100%", margin: "16px auto 0", padding: "0 20px", boxSizing: "border-box",
+        }}>
+          <div style={{
+            padding: "14px 16px", borderRadius: 14,
+            background: "rgba(240,143,143,0.12)", border: "1px solid rgba(240,143,143,0.35)",
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap",
+          }}>
+            <p style={{ margin: 0, color: "#f08f8f", fontSize: 14, lineHeight: 1.5 }}>
+              Extra support may help. Log in to book a counselor session. This is not a medical diagnosis.
+            </p>
+            <Link
+              to="/login?next=/dashboard/counselors"
+              style={{
+                textDecoration: "none", height: 40, padding: "0 16px", borderRadius: 10,
+                background: "#c45c5c", color: "#fff", fontWeight: 700, fontSize: 13,
+                display: "inline-flex", alignItems: "center", whiteSpace: "nowrap",
+              }}
+            >
+              Book a Counselor
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Chat panel */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", maxWidth: "760px", width: "100%", margin: "0 auto", padding: "0 20px 24px" }}>

@@ -363,6 +363,19 @@
   color: #FFFFFF;
 }
 
+.tool-cta {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #E19A86;
+}
+
+.tool-card:hover {
+  transform: translateY(-3px);
+  transition: transform 0.2s ease;
+}
+
 /* Decorative rings */
 .rings {
   position: absolute;
@@ -416,6 +429,90 @@
 .home-chat-btn:hover {
   opacity: 0.92;
   transform: scale(1.06);
+}
+
+/* ============================================
+   LIGHT MODE — warm beige, easy on the eyes
+   ============================================ */
+body.light .home-page {
+  background: #e8e1d6;
+  color: #2b2521;
+}
+
+body.light .hero-section {
+  background: #ded5c8;
+}
+
+body.light .hero-text h1 {
+  color: #2b2521;
+}
+
+body.light .hero-text h1 span {
+  color: #a86955;
+}
+
+body.light .hero-text p {
+  color: #57504a;
+}
+
+body.light .hero-shape {
+  background: #d3c7b6;
+}
+
+body.light .why-section,
+body.light .resources-section,
+body.light .works-section,
+body.light .tools-section {
+  background: #e8e1d6;
+}
+
+body.light .why-section h2,
+body.light .resources-section h2,
+body.light .works-section h2,
+body.light .tools-section h2 {
+  color: #2b2521;
+}
+
+body.light .why-section h2 span,
+body.light .resources-section h2 span,
+body.light .works-section h2 span,
+body.light .tools-section h2 span {
+  color: #a86955;
+}
+
+body.light .info-card,
+body.light .resource-card,
+body.light .tool-card {
+  background: #f4eee5;
+  border: 1px solid rgba(70, 52, 42, 0.1);
+}
+
+body.light .resource-card:hover {
+  background: #ece5d9;
+}
+
+body.light .info-card p,
+body.light .resource-card p,
+body.light .tool-card p,
+body.light .step-box p {
+  color: #45403a;
+}
+
+body.light .resources-subtitle {
+  color: #57504a;
+}
+
+body.light .tool-cta {
+  color: #a86955;
+}
+
+body.light .rings {
+  border-color: rgba(150, 115, 100, 0.3);
+}
+
+body.light .rings::before,
+body.light .rings::after {
+  border-color: rgba(150, 115, 100, 0.22);
 }
 
 /* RESPONSIVE */

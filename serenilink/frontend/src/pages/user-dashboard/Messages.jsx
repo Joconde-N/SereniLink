@@ -71,7 +71,10 @@ function Messages() {
                       </div>
                       <div>
                         <p style={{ margin: 0, fontWeight: 600, fontSize: "14px", color: "var(--text-main)" }}>
-                          {b.counselor_name ?? `Booking #${b.id}`}
+                          {b.counselor_name || `Counselor #${b.counselor_id}`}
+                        </p>
+                        <p className="small-muted" style={{ margin: "3px 0 0", fontSize: "12px" }}>
+                          Session · {new Date(b.scheduled_for).toLocaleDateString()}
                         </p>
                         <p className="small-muted" style={{ margin: "3px 0 0", fontSize: "13px" }}>
                           {last

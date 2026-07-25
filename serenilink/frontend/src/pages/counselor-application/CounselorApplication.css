@@ -259,3 +259,80 @@
     padding: 24px 14px 48px;
   }
 }
+
+/* ============================================
+   LIGHT MODE — warm beige, easy on the eyes
+   ============================================ */
+body.light .counselor-page {
+  background: #e8e1d6;
+  color: #2b2521;
+}
+
+body.light .counselor-page .register-topbar {
+  background: #e8e1d6;
+  border-bottom-color: rgba(70, 52, 42, 0.12);
+}
+
+body.light .counselor-page .register-brand {
+  color: #6b6259;
+}
+
+body.light .counselor-page .register-back {
+  color: #57504a;
+}
+
+body.light .counselor-header h1 {
+  color: #2b2521;
+}
+
+body.light .counselor-header h1 span {
+  color: #a86955;
+}
+
+body.light .counselor-header p {
+  color: #6b6259;
+}
+
+body.light .counselor-card {
+  background: linear-gradient(180deg, #f4eee5 0%, #ece5d9 100%);
+  border-color: rgba(70, 52, 42, 0.12);
+  box-shadow: 0 4px 16px rgba(70, 52, 42, 0.08);
+}
+
+body.light .counselor-card h2 {
+  color: #2b2521;
+}
+
+body.light .field label {
+  color: #57504a;
+}
+
+body.light .field input,
+body.light .field select,
+body.light .field textarea {
+  background: #faf6f0;
+  border-color: rgba(70, 52, 42, 0.16);
+  color: #2b2521;
+}
+
+body.light .field input::placeholder,
+body.light .field textarea::placeholder {
+  color: #7a7168;
+}
+
+body.light .upload-box {
+  background: #faf6f0;
+  border-color: rgba(168, 105, 85, 0.35);
+}
+
+body.light .upload-box p {
+  color: #2b2521;
+}
+
+body.light .upload-box span {
+  color: #6b6259;
+}
+
+body.light .counselor-check {
+  color: #57504a;
+}

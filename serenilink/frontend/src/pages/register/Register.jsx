@@ -33,7 +33,7 @@ function PasswordStrength({ password }) {
             key={i}
             style={{
               flex: 1, height: 4, borderRadius: 999,
-              background: strength && i <= strength.level ? strength.color : "rgba(255,255,255,0.08)",
+              background: strength && i <= strength.level ? strength.color : "var(--border-soft)",
               transition: "background 0.25s ease",
             }}
           />
@@ -56,14 +56,14 @@ function PasswordStrength({ password }) {
               <span style={{
                 width: 14, height: 14, borderRadius: "50%", flexShrink: 0,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                background: passed ? "rgba(103,213,140,0.15)" : "rgba(255,255,255,0.05)",
-                border: `1px solid ${passed ? "#67d58c" : "rgba(255,255,255,0.1)"}`,
+                background: passed ? "rgba(103,213,140,0.15)" : "var(--bg-input)",
+                border: `1px solid ${passed ? "#67d58c" : "var(--border-soft)"}`,
                 fontSize: 9, color: passed ? "#67d58c" : "transparent",
                 transition: "all 0.2s ease",
               }}>
                 ✓
               </span>
-              <span style={{ color: passed ? "#b8bfcc" : "#566680", transition: "color 0.2s ease" }}>
+              <span style={{ color: passed ? "var(--text-soft)" : "var(--text-muted)", transition: "color 0.2s ease" }}>
                 {rule.label}
               </span>
             </div>
@@ -151,8 +151,8 @@ function Register() {
       <div className="register-right">
         <div className="register-form-box">
           <h2>Join Us</h2>
-          <p className="register-subtext">
-            Already have an account? <Link to="/login">Log in</Link>
+          <p className="register-subtext"> <em>You choose your username.No real name needed.</em>
+            
           </p>
 
           {error && (
@@ -168,7 +168,7 @@ function Register() {
               <span style={{ fontSize: 18 }}>✓</span>
               <div>
                 <p style={{ margin: 0, fontWeight: 700, fontSize: 14, color: "#67d58c" }}>Account created successfully!</p>
-                <p style={{ margin: "2px 0 0", fontSize: 12, color: "#b8bfcc" }}>Redirecting you to login...</p>
+                <p style={{ margin: "2px 0 0", fontSize: 12, color: "var(--text-soft)" }}>Redirecting you to login...</p>
               </div>
             </div>
           )}
@@ -187,7 +187,7 @@ function Register() {
             </div>
 
             <div className="register-field">
-              <label>Email Address (optional)</label>
+              <label>Email Address (Optional — used only for password recovery)</label>
               <input
                 type="email"
                 name="email"
@@ -233,9 +233,14 @@ function Register() {
               <span>I agree to the terms and conditions &amp; privacy policy</span>
             </label>
 
+        
+
             <button type="submit" className="register-btn" disabled={loading || success}>
               {loading ? "Creating Account..." : "Create Account"}
             </button>
+            <p className="register-subtext" style={{ textAlign: "center" }}>
+              Already have an account? <Link to="/login">Log in</Link>
+            </p>
           </form>
         </div>
       </div>

@@ -12,6 +12,7 @@ from slowapi.util import get_remote_address
 from app.api.deps import get_db, get_current_user
 from app.core.security import hash_password, verify_password, create_access_token
 from app.core.email import send_password_reset_email
+from app.core.audit import log_action
 from app.models.user import User
 from app.schemas.user import UserCreate, UserOut
 from app.schemas.auth import Token
@@ -50,6 +51,7 @@ def register(request: Request, payload: UserCreate, db: Session = Depends(get_db
     db.add(user)
     db.commit()
     db.refresh(user)
+    log_action(db, "USER_REGISTERED", user=user, resource="user", resource_id=user.id, detail=f"New user registered: {user.nickname}", ip_address=request.client.host if request.client else None)
     return user
 
 
@@ -67,6 +69,7 @@ def login(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
     token = create_access_token(subject=str(user.id))
+    log_action(db, "USER_LOGIN", user=user, resource="auth", detail=f"User logged in: {user.nickname}", ip_address=request.client.host if request.client else None)
     return {"access_token": token, "token_type": "bearer"}
 
 @router.get("/me", response_model=UserOut)
@@ -93,6 +96,7 @@ class UpdateProfileRequest(BaseModel):
 
 @router.patch("/me", response_model=UserOut)
 def update_profile(
+    request: Request,
     payload: UpdateProfileRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -104,10 +108,8 @@ def update_profile(
         current_user.email = payload.email
     db.commit()
     db.refresh(current_user)
+    log_action(db, "PROFILE_UPDATED", user=current_user, resource="user", resource_id=current_user.id, detail="Email updated", ip_address=request.client.host if request.client else None)
     return current_user
-
-
-@router.post("/forgot-password")
 @limiter.limit("5/minute")
 def forgot_password(request: Request, payload: ForgotPasswordRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == payload.email).first()

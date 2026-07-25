@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import "./login.css";
-import { Link, useNavigate } from "react-router-dom";
+import "./Login.css";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import loginImage from "../../assets/login.png";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
@@ -8,12 +8,22 @@ import { LuEye, LuEyeOff } from "react-icons/lu";
 
 function Login() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const nextPath = searchParams.get("next");
   const { login, user, loading: authLoading } = useAuth();
+
+  const goAfterLogin = (role) => {
+    // Only allow safe in-app redirects
+    if (nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//") && role === "user") {
+      navigate(nextPath, { replace: true });
+      return;
+    }
+    navigate(role === "admin" ? "/admin" : role === "counselor" ? "/counselor" : "/dashboard", { replace: true });
+  };
 
   useEffect(() => {
     if (!authLoading && user) {
-      const role = user.role;
-      navigate(role === "admin" ? "/admin" : role === "counselor" ? "/counselor" : "/dashboard", { replace: true });
+      goAfterLogin(user.role);
     }
   }, [user, authLoading]);
 
@@ -68,8 +78,7 @@ function Login() {
       });
 
       login(res.data.access_token, meRes.data, rememberMe);
-      const role = meRes.data.role;
-      navigate(role === "admin" ? "/admin" : role === "counselor" ? "/counselor" : "/dashboard");
+      goAfterLogin(meRes.data.role);
     } catch (err) {
       setError(err.response?.data?.detail || "Invalid credentials. Please try again.");
     } finally {

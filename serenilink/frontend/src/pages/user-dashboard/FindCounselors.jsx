@@ -109,15 +109,22 @@ function BookingModal({ counselor, onClose, onBooked }) {
 
 function FindCounselors() {
   const [counselors, setCounselors]   = useState([]);
+  const [specializations, setSpecializations] = useState([]);
   const [search, setSearch]           = useState("");
   const [specialization, setSpecialization] = useState("");
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState("");
   const [skip, setSkip]               = useState(0);
   const [hasMore, setHasMore]         = useState(true);
-  const [booking, setBooking]         = useState(null); // counselor being booked
+  const [booking, setBooking]         = useState(null);
   const [successMsg, setSuccessMsg]   = useState("");
   const LIMIT = 9;
+
+  useEffect(() => {
+    api.get("/counselors/specializations")
+      .then((r) => setSpecializations(r.data))
+      .catch(() => {});
+  }, []);
 
   const fetchCounselors = async (newSkip = 0, append = false) => {
     setLoading(true);
@@ -174,14 +181,12 @@ function FindCounselors() {
           className="form-select"
           value={specialization}
           onChange={(e) => { setSpecialization(e.target.value); setSkip(0); }}
-          style={{ width: "220px" }}
+          style={{ width: "240px" }}
         >
           <option value="">All Specializations</option>
-          <option value="Anxiety">Anxiety</option>
-          <option value="Depression">Depression</option>
-          <option value="Trauma">Trauma</option>
-          <option value="Youth Counseling">Youth Counseling</option>
-          <option value="Relationship Counseling">Relationship Counseling</option>
+          {specializations.map((spec) => (
+            <option key={spec} value={spec}>{spec}</option>
+          ))}
         </select>
       </div>
 
@@ -258,7 +263,7 @@ function FindCounselors() {
         </div>
       )}
 
-      {hasMore && !search && (
+      {hasMore && !search && !specialization && (
         <div style={{ textAlign: "center", marginTop: "24px" }}>
           <button
             type="button"

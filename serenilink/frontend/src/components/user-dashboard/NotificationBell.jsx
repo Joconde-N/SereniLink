@@ -1,52 +1,50 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LuBell } from "react-icons/lu";
-import api from "../../api/axios";
+import { useUnreadCount } from "../../hooks/useUnreadCount";
 
 function NotificationBell({ notifPath }) {
-  const [unread, setUnread] = useState(0);
+  const unread = useUnreadCount();
   const navigate = useNavigate();
+  const [pulse, setPulse] = useState(false);
 
   useEffect(() => {
-    const poll = () => {
-      api.get("/notifications/me", { params: { unread_only: true, limit: 100 } })
-        .then((res) => setUnread(Array.isArray(res.data) ? res.data.length : 0))
-        .catch(() => {});
-    };
-    poll();
-    const id = setInterval(poll, 30000);
-    return () => clearInterval(id);
-  }, []);
+    if (unread > 0) {
+      setPulse(true);
+      const t = setTimeout(() => setPulse(false), 600);
+      return () => clearTimeout(t);
+    }
+  }, [unread]);
 
   return (
     <button
       type="button"
       onClick={() => navigate(notifPath)}
-      title="Notifications"
+      title={unread > 0 ? `${unread} unread notifications` : "Notifications"}
+      className="notif-bell-btn"
       style={{
-        position: "relative", background: "rgba(255,255,255,0.04)",
-        border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px",
+        position: "relative", background: "var(--notif-bell-bg)",
+        border: "1px solid var(--notif-bell-border)", borderRadius: "10px",
         width: "38px", height: "38px", display: "flex",
         alignItems: "center", justifyContent: "center",
         cursor: "pointer", color: "var(--text-soft)", flexShrink: 0,
         transition: "background 0.2s ease, border-color 0.2s ease",
       }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.background = "rgba(202,163,143,0.1)";
-        e.currentTarget.style.borderColor = "rgba(202,163,143,0.3)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background = "rgba(255,255,255,0.04)";
-        e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
-      }}
     >
       <LuBell size={18} />
       {unread > 0 && (
-        <span style={{
-          position: "absolute", top: "5px", right: "5px",
-          width: "8px", height: "8px", borderRadius: "50%",
-          background: "#E19A86", border: "1.5px solid #050505",
-        }} />
+        <span
+          className={pulse ? "notif-badge notif-badge-pulse" : "notif-badge"}
+          style={{
+            position: "absolute", top: "-4px", right: "-4px",
+            minWidth: "18px", height: "18px", borderRadius: "999px",
+            background: "#E19A86", color: "#111", fontSize: "10px", fontWeight: 700,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: "0 5px", border: "2px solid var(--bg-main)",
+          }}
+        >
+          {unread > 99 ? "99+" : unread}
+        </span>
       )}
     </button>
   );

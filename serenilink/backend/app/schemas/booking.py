@@ -22,6 +22,8 @@ class BookingOut(BaseModel):
     status: str
     created_at: datetime
     updated_at: datetime
+    counselor_name: str | None = None
+    user_nickname: str | None = None
 
     class Config:
         from_attributes = True

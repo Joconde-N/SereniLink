@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
+import PatientRiskCard from "../../components/counselor-dashboard/PatientRiskCard";
 
 const STATUS_CLASS = {
   PENDING: "pending", APPROVED: "approved",
@@ -194,6 +195,13 @@ function CounselorBookingDetails() {
             </div>
           </div>
         </div>
+        {/* Client Support Level */}
+        {["APPROVED", "COMPLETED"].includes(booking.status) && (
+          <div className="dashboard-card">
+            <PatientRiskCard userId={booking.user_id} />
+          </div>
+        )}
+
         {/* Session Note */}
         <div className="dashboard-card">
           <h3 style={{ marginBottom: "16px" }}>Session Notes</h3>
