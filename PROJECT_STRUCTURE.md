@@ -294,7 +294,7 @@ Creates the FastAPI app, CORS, rate limiting, and **includes all routers**.
 | `session_notes.py` | Counselor session notes |
 | `dashboard.py` | Dashboard summary payloads |
 | `audit_logs.py` | Admin audit log query / export |
-| `health.py` | Health check |
+
 
 ### `app/core/`
 
