@@ -8,17 +8,17 @@ import api from "../api/axios";
 export function useUnreadCount() {
   const [unread, setUnread] = useState(0);
 
-  useEffect(() => {
-    const poll = () => {
-      api.get("/notifications/me", { params: { unread_only: true, limit: 100 } })
-        .then((res) => setUnread(Array.isArray(res.data) ? res.data.length : 0))
-        .catch(() => {});
-    };
+  const refresh = () => {
+    api.get("/notifications/me", { params: { unread_only: true, limit: 100 } })
+      .then((res) => setUnread(Array.isArray(res.data) ? res.data.length : 0))
+      .catch(() => {});
+  };
 
-    poll();
-    const id = setInterval(poll, 30000);
+  useEffect(() => {
+    refresh();
+    const id = setInterval(refresh, 30000);
     return () => clearInterval(id);
   }, []);
 
-  return unread;
+  return { unread, refresh };
 }

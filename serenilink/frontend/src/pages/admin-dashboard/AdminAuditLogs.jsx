@@ -1,5 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
 import api from "../../api/axios";
+import { useAuth } from "../../context/AuthContext";
+import ExportMenu from "../../components/shared/ExportMenu";
+import { buildReportPdf } from "../../utils/reportPdf";
 
 const ROLE_COLOR = { admin: "#f5c95f", counselor: "#60a5fa", user: "#67d58c" };
 
@@ -42,10 +45,12 @@ function Badge({ label, color }) {
 }
 
 function AdminAuditLogs() {
-  const [logs, setLogs]       = useState([]);
-  const [total, setTotal]     = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage]       = useState(0);
+  const { user }               = useAuth();
+  const [logs, setLogs]        = useState([]);
+  const [total, setTotal]      = useState(0);
+  const [loading, setLoading]  = useState(true);
+  const [page, setPage]        = useState(0);
+  const [exportingPdf, setExportingPdf] = useState(false);
 
   const [filters, setFilters] = useState({
     action: "", user_nickname: "", user_role: "", resource: "",
@@ -77,14 +82,30 @@ function AdminAuditLogs() {
     setFilters(empty); setApplied(empty); setPage(0);
   };
 
-  const handleExport = () => {
+  const buildFilterParams = (f) => {
     const params = new URLSearchParams();
-    if (applied.action)        params.set("action",        applied.action);
-    if (applied.user_nickname) params.set("user_nickname", applied.user_nickname);
-    if (applied.user_role)     params.set("user_role",     applied.user_role);
-    if (applied.resource)      params.set("resource",      applied.resource);
-    if (applied.date_from)     params.set("date_from",     applied.date_from);
-    if (applied.date_to)       params.set("date_to",       applied.date_to);
+    if (f.action)        params.set("action",        f.action);
+    if (f.user_nickname) params.set("user_nickname", f.user_nickname);
+    if (f.user_role)     params.set("user_role",     f.user_role);
+    if (f.resource)      params.set("resource",      f.resource);
+    if (f.date_from)     params.set("date_from",     f.date_from);
+    if (f.date_to)       params.set("date_to",       f.date_to);
+    return params;
+  };
+
+  const describeFilters = (f) => {
+    const parts = [];
+    if (f.action)        parts.push(`Action: ${f.action}`);
+    if (f.resource)      parts.push(`Resource: ${f.resource}`);
+    if (f.user_role)     parts.push(`Role: ${f.user_role}`);
+    if (f.user_nickname) parts.push(`Nickname contains "${f.user_nickname}"`);
+    if (f.date_from)     parts.push(`From: ${f.date_from}`);
+    if (f.date_to)       parts.push(`To: ${f.date_to}`);
+    return parts.length ? parts : ["None (all entries)"];
+  };
+
+  const handleExportCsv = () => {
+    const params = buildFilterParams(applied);
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
     const baseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
     const url = `${baseUrl}/audit-logs/export-csv?${params}`;
@@ -101,6 +122,46 @@ function AdminAuditLogs() {
       });
   };
 
+  const handleExportPdf = () => {
+    setExportingPdf(true);
+    const params = Object.fromEntries(buildFilterParams(applied));
+    api.get("/audit-logs/export-json", { params })
+      .then(({ data }) => {
+        const rows = data.logs.map((l) => [
+          new Date(l.created_at).toLocaleString(),
+          l.user_nickname ?? "—",
+          l.user_role ?? "—",
+          l.action,
+          l.resource ? `${l.resource}${l.resource_id ? ` #${l.resource_id}` : ""}` : "—",
+          l.detail ?? "—",
+          l.ip_address ?? "—",
+        ]);
+
+        const doc = buildReportPdf({
+          title: "Audit Log Report",
+          subtitle: "System activity across the SereniLink platform.",
+          generatedBy: user?.nickname || user?.email,
+          filters: describeFilters(applied),
+          sections: [
+            {
+              title: `Log Entries (${data.returned.toLocaleString()} of ${data.total.toLocaleString()} matching)`,
+              note: data.capped
+                ? `Showing the most recent ${data.returned.toLocaleString()} entries — use CSV export for the complete matching set.`
+                : undefined,
+              columns: ["Timestamp", "User", "Role", "Action", "Resource", "Detail", "IP Address"],
+              rows,
+              columnStyles: { 5: { cellWidth: 50 }, 6: { cellWidth: 24 } },
+            },
+          ],
+          footerNote: "SereniLink — confidential audit log report",
+        });
+
+        doc.save(`audit-logs-${new Date().toISOString().slice(0, 10)}.pdf`);
+      })
+      .catch(() => {})
+      .finally(() => setExportingPdf(false));
+  };
+
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const inputStyle = {
     background: "var(--bg-input, rgba(255,255,255,0.04))", border: "1px solid var(--border-soft)",
@@ -112,14 +173,12 @@ function AdminAuditLogs() {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
         <h1 className="dashboard-page-title" style={{ margin: 0 }}>Audit Logs</h1>
-        <button
-          onClick={handleExport}
-          style={{
-            padding: "10px 20px", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer",
-            border: "1px solid rgba(225,154,134,0.3)", background: "rgba(225,154,134,0.08)",
-            color: "var(--accent)", whiteSpace: "nowrap",
-          }}
-        >Export CSV</button>
+        <ExportMenu
+          onCsv={handleExportCsv}
+          onPdf={handleExportPdf}
+          pdfLabel={exportingPdf ? "Preparing PDF…" : "Export as PDF (Report)"}
+          disabled={exportingPdf}
+        />
       </div>
       <p className="dashboard-page-subtitle">Track all important system activities across the platform.</p>
 

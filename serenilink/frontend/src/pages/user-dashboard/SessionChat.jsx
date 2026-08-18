@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { LuSendHorizontal, LuUserCheck } from "react-icons/lu";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
@@ -8,6 +8,7 @@ import { useBookingChat } from "../../hooks/useBookingChat";
 function SessionChat() {
   const { bookingId } = useParams();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [booking, setBooking] = useState(null);
   const [text, setText] = useState("");
   const bottomRef = useRef(null);
@@ -40,9 +41,12 @@ function SessionChat() {
   return (
     <div>
       <div style={{ marginBottom: "20px" }}>
-        <Link to={`/dashboard/bookings/${bookingId}`} style={{ color: "var(--accent)", textDecoration: "none", fontSize: "14px" }}>
-          ← Back to Booking
-        </Link>
+        <button
+          onClick={() => navigate(-1)}
+          style={{ background: "none", border: "none", color: "var(--accent)", fontSize: "14px", cursor: "pointer", padding: 0 }}
+        >
+          ← Back
+        </button>
       </div>
 
       <h1 className="dashboard-page-title">Session Chat</h1>

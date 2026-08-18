@@ -100,6 +100,7 @@ frontend/
 | File | Role |
 |------|------|
 | `chatWs.js` | Builds the WebSocket URL for booking chat (includes token) |
+| `reportPdf.js` | Shared `buildReportPdf()` helper — branded A4 PDF with header, footer, striped tables, totals row support |
 
 ### `src/styles/`
 
@@ -126,6 +127,7 @@ Grouped by **where they are used**.
 | `PageLoader.jsx` | Full-page loading spinner |
 | `SettingsPage.jsx` | Shared settings UI (profile email, password, theme) with small role differences |
 | `ChangePasswordModal.jsx` | Forced password-change overlay for newly approved counselors |
+| `ExportMenu.jsx` | Dropdown button with CSV and PDF export options; used across admin pages |
 
 #### `components/layout/` — public site chrome
 
@@ -225,8 +227,8 @@ Page folders use **kebab-case** names.
 | `AdminUsers.jsx` / `AdminCounselors.jsx` | User & counselor management |
 | `BookingsManagement.jsx` | All bookings |
 | `ContentManagement.jsx` / `ExercisesManagement.jsx` | Content & exercises CRUD |
-| `AdminInsights.jsx` | Charts & anonymous support-level distribution |
-| `AdminAuditLogs.jsx` | Searchable audit log table + CSV export |
+| `AdminInsights.jsx` | Charts, anonymous support-level distribution, 30-day trends; CSV + PDF export |
+| `AdminAuditLogs.jsx` | Searchable/filterable audit log table; CSV + PDF export |
 | `AdminProfile.jsx` / `AdminSettings.jsx` | Profile / shared settings |
 
 ---
@@ -287,14 +289,13 @@ Creates the FastAPI app, CORS, rate limiting, and **includes all routers**.
 | `screenings.py` | PHQ-9 / GAD-7 |
 | `moods.py` | Mood check-ins |
 | `assessment.py` | Assessment-related endpoints |
-| `risk_monitoring.py` | Support level calculation & recommendations |
+| `risk_monitoring.py` | Support level calculation & recommendations (user self, counselor view, admin anonymous stats) |
 | `content.py` / `exercises.py` | Educational content & exercises |
 | `notifications.py` | User notifications |
 | `progress.py` | Progress data |
 | `session_notes.py` | Counselor session notes |
-| `dashboard.py` | Dashboard summary payloads |
-| `audit_logs.py` | Admin audit log query / export |
-
+| `dashboard.py` | Dashboard summary payloads (user `/me`, admin `/insights` with 30-day trends) |
+| `audit_logs.py` | Admin audit log list, JSON export (for PDF), CSV export with context header |
 
 ### `app/core/`
 
@@ -304,7 +305,7 @@ Creates the FastAPI app, CORS, rate limiting, and **includes all routers**.
 | `security.py` | JWT create/verify, password hashing |
 | `ai_client.py` | Calls Hugging Face / Groq model |
 | `email.py` | Outbound email helpers (e.g. reset) |
-| `audit.py` | Helper to write audit log rows |
+| `audit.py` | `log_action()` helper — writes AuditLog rows; accepts ip_address from routes |
 
 ### `app/db/`
 

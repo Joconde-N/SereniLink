@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, require_admin
@@ -60,6 +60,7 @@ def get_content(content_id: int, db: Session = Depends(get_db)):
 @router.post("/", response_model=ContentOut, status_code=201)
 def create_content(
     payload: ContentCreate,
+    request: Request,
     db: Session = Depends(get_db),
     _admin=Depends(require_admin),
 ):
@@ -67,7 +68,7 @@ def create_content(
     db.add(item)
     db.commit()
     db.refresh(item)
-    log_action(db, "CONTENT_CREATED", user=_admin, resource="content", resource_id=item.id, detail=f"Created content: {item.title}")
+    log_action(db, "CONTENT_CREATED", user=_admin, resource="content", resource_id=item.id, detail=f"Created content: {item.title}", ip_address=request.client.host if request.client else None)
     return item
 
 
@@ -75,6 +76,7 @@ def create_content(
 def update_content(
     content_id: int,
     payload: ContentUpdate,
+    request: Request,
     db: Session = Depends(get_db),
     _admin=Depends(require_admin),
 ):
@@ -88,13 +90,14 @@ def update_content(
 
     db.commit()
     db.refresh(item)
-    log_action(db, "CONTENT_UPDATED", user=_admin, resource="content", resource_id=item.id, detail=f"Updated content: {item.title}")
+    log_action(db, "CONTENT_UPDATED", user=_admin, resource="content", resource_id=item.id, detail=f"Updated content: {item.title}", ip_address=request.client.host if request.client else None)
     return item
 
 
 @router.delete("/{content_id}", status_code=204)
 def delete_content(
     content_id: int,
+    request: Request,
     db: Session = Depends(get_db),
     _admin=Depends(require_admin),
 ):
@@ -105,5 +108,5 @@ def delete_content(
     title = item.title
     db.delete(item)
     db.commit()
-    log_action(db, "CONTENT_DELETED", user=_admin, resource="content", resource_id=content_id, detail=f"Deleted content: {title}")
+    log_action(db, "CONTENT_DELETED", user=_admin, resource="content", resource_id=content_id, detail=f"Deleted content: {title}", ip_address=request.client.host if request.client else None)
     return None

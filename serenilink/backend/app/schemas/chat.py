@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 
 class ChatCreate(BaseModel):
     booking_id: int
-    message: str =Field(min_length=5, max_length=1000)
+    message: str = Field(min_length=1, max_length=1000)
 
 class ChatOut(BaseModel):
     id: int

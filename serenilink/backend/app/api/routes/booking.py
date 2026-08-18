@@ -1,6 +1,6 @@
 from datetime import datetime, date, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
@@ -113,6 +113,7 @@ def _booking_access_check(db: Session, booking: Booking, current_user) -> tuple[
 @router.post("/", response_model=BookingOut, status_code=201)
 def create_booking(
     payload: BookingCreate,
+    request: Request,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
@@ -155,7 +156,7 @@ def create_booking(
     db.commit()
     db.refresh(item)
 
-    log_action(db, "BOOKING_CREATED", user=current_user, resource="booking", resource_id=item.id, detail=f"Booked counselor #{counselor.id} for {slot.start_time}")
+    log_action(db, "BOOKING_CREATED", user=current_user, resource="booking", resource_id=item.id, detail=f"Booked counselor #{counselor.id} for {slot.start_time}", ip_address=request.client.host if request.client else None)
 
     # Notify counselor of new request
     create_notification(
@@ -205,6 +206,7 @@ def list_all_bookings(
 def update_booking_status_admin(
     booking_id: int,
     payload: BookingUpdateStatus,
+    request: Request,
     db: Session = Depends(get_db),
     _admin=Depends(require_admin),
 ):
@@ -232,7 +234,7 @@ def update_booking_status_admin(
     db.commit()
     db.refresh(item)
 
-    log_action(db, "BOOKING_STATUS_UPDATED", user=_admin, resource="booking", resource_id=booking_id, detail=f"Admin set booking #{booking_id} to {new_status}")
+    log_action(db, "BOOKING_STATUS_UPDATED", user=_admin, resource="booking", resource_id=booking_id, detail=f"Admin set booking #{booking_id} to {new_status}", ip_address=request.client.host if request.client else None)
 
     create_notification(
         db,
@@ -249,6 +251,7 @@ def update_booking_status_admin(
 @router.delete("/{booking_id}", status_code=204)
 def cancel_my_booking(
     booking_id: int,
+    request: Request,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
@@ -272,7 +275,7 @@ def cancel_my_booking(
 
     db.commit()
 
-    log_action(db, "BOOKING_CANCELLED", user=current_user, resource="booking", resource_id=booking_id, detail=f"User cancelled booking #{booking_id}")
+    log_action(db, "BOOKING_CANCELLED", user=current_user, resource="booking", resource_id=booking_id, detail=f"User cancelled booking #{booking_id}", ip_address=request.client.host if request.client else None)
 
     # notify counselor
     counselor = db.query(Counselor).filter(Counselor.id == item.counselor_id).first()
@@ -385,6 +388,7 @@ def counselor_assigned_users(
 def counselor_update_booking_status(
     booking_id: int,
     payload: BookingUpdateStatus,
+    request: Request,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
@@ -425,7 +429,7 @@ def counselor_update_booking_status(
     db.commit()
     db.refresh(item)
 
-    log_action(db, "BOOKING_STATUS_UPDATED", user=current_user, resource="booking", resource_id=booking_id, detail=f"Counselor set booking #{booking_id} to {new_status}")
+    log_action(db, "BOOKING_STATUS_UPDATED", user=current_user, resource="booking", resource_id=booking_id, detail=f"Counselor set booking #{booking_id} to {new_status}", ip_address=request.client.host if request.client else None)
 
     # notify user
     if new_status == "APPROVED":

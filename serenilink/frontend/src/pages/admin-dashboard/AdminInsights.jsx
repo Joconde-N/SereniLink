@@ -4,6 +4,9 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
   LineChart, Line, Cell,
 } from "recharts";
+import { useAuth } from "../../context/AuthContext";
+import ExportMenu from "../../components/shared/ExportMenu";
+import { buildReportPdf } from "../../utils/reportPdf";
 
 const STATUS_COLOR = {
   PENDING:   "#f5c95f",
@@ -17,6 +20,10 @@ const SUPPORT_COLOR = { Low: "#67d58c", Moderate: "#f5c95f", High: "#f08f8f" };
 
 function toTitleCase(str) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+function sum(rows) {
+  return (rows ?? []).reduce((acc, r) => acc + (r.count ?? 0), 0);
 }
 
 const CHART_STYLE = {
@@ -59,6 +66,7 @@ function tickFormatter(val, index) {
 }
 
 function AdminInsights() {
+  const { user }                = useAuth();
   const [data, setData]         = useState(null);
   const [riskStats, setRiskStats] = useState(null);
   const [loading, setLoading]   = useState(true);
@@ -102,6 +110,7 @@ function AdminInsights() {
     rows.push(["--- SUMMARY TOTALS ---"]);
     rows.push(["Metric", "Value"]);
     rows.push(["Total Users", t.users ?? 0]);
+    rows.push(["Total Counselors", t.counselors ?? 0]);
     rows.push(["Total Bookings", t.bookings ?? 0]);
     rows.push(["Total Assessments", t.assessments ?? 0]);
     rows.push(["Content Publish Rate", `${publishRate}%`]);
@@ -133,13 +142,18 @@ function AdminInsights() {
     rows.push([]);
 
     rows.push(["--- 30-DAY TRENDS ---"]);
-    rows.push(["Date", "New Users", "New Bookings", "Mood Check-ins"]);
-    const users30    = tr.new_users ?? [];
-    const bookings30 = tr.new_bookings ?? [];
-    const moods30    = tr.mood_checkins ?? [];
+    rows.push(["Date", "New Users", "New Bookings", "Mood Check-ins", "New Screenings"]);
+    const users30      = tr.new_users ?? [];
+    const bookings30   = tr.new_bookings ?? [];
+    const moods30      = tr.mood_checkins ?? [];
+    const screenings30 = tr.new_screenings ?? [];
     users30.forEach((row, i) => {
-      rows.push([row.date, row.count, bookings30[i]?.count ?? 0, moods30[i]?.count ?? 0]);
+      rows.push([row.date, row.count, bookings30[i]?.count ?? 0, moods30[i]?.count ?? 0, screenings30[i]?.count ?? 0]);
     });
+    rows.push([
+      "Total",
+      sum(users30), sum(bookings30), sum(moods30), sum(screenings30),
+    ]);
 
     const csv  = rows.map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
@@ -151,10 +165,104 @@ function AdminInsights() {
     URL.revokeObjectURL(url);
   };
 
+  const generatePDF = () => {
+    const users30      = tr.new_users ?? [];
+    const bookings30   = tr.new_bookings ?? [];
+    const moods30      = tr.mood_checkins ?? [];
+    const screenings30 = tr.new_screenings ?? [];
+
+    const periodStart = users30[0]?.date ? fmtDate(users30[0].date) : null;
+    const periodEnd   = users30[users30.length - 1]?.date ? fmtDate(users30[users30.length - 1].date) : null;
+
+    const sections = [
+      {
+        title: "Summary Totals",
+        columns: ["Metric", "Value"],
+        rows: [
+          ["Total Users", t.users ?? 0],
+          ["Total Counselors", t.counselors ?? 0],
+          ["Total Bookings", t.bookings ?? 0],
+          ["Total Assessments", t.assessments ?? 0],
+          ["Content Publish Rate", `${publishRate}%`],
+          ["Users With Screening Data", riskStats?.total_users_with_data ?? 0],
+        ],
+        columnStyles: { 1: { halign: "right" } },
+      },
+    ];
+
+    if (riskStats) {
+      sections.push({
+        title: "Anonymous Support Level Distribution",
+        note: "Aggregate wellness indicators only — no individual user data.",
+        columns: ["Support Level", "Users"],
+        rows: Object.entries(supportDist).map(([k, v]) => [k, v]),
+        columnStyles: { 1: { halign: "right" } },
+      });
+      sections.push({
+        title: "Screening Completion Rates",
+        columns: ["Metric", "Value"],
+        rows: [
+          ["PHQ-9 Completed", screeningStats.phq9_completed ?? 0],
+          ["PHQ-9 Rate", `${screeningStats.phq9_rate ?? 0}%`],
+          ["GAD-7 Completed", screeningStats.gad7_completed ?? 0],
+          ["GAD-7 Rate", `${screeningStats.gad7_rate ?? 0}%`],
+        ],
+        columnStyles: { 1: { halign: "right" } },
+      });
+    }
+
+    sections.push({
+      title: "Bookings by Status",
+      columns: ["Status", "Count"],
+      rows: Object.entries(bs).map(([k, v]) => [toTitleCase(k), v]),
+      columnStyles: { 1: { halign: "right" } },
+    });
+
+    sections.push({
+      title: "Published Content by Type",
+      columns: ["Category", "Count"],
+      rows: cc.map((r) => [r.category, r.count]),
+      columnStyles: { 1: { halign: "right" } },
+    });
+
+    sections.push({
+      title: "30-Day Trends",
+      note: periodStart && periodEnd ? `${periodStart} – ${periodEnd}` : undefined,
+      columns: ["Date", "New Users", "New Bookings", "Mood Check-ins", "New Screenings"],
+      rows: [
+        ...users30.map((row, i) => [
+          fmtDate(row.date), row.count, bookings30[i]?.count ?? 0, moods30[i]?.count ?? 0, screenings30[i]?.count ?? 0,
+        ]),
+        ["Total", sum(users30), sum(bookings30), sum(moods30), sum(screenings30)],
+      ],
+      columnStyles: { 1: { halign: "right" }, 2: { halign: "right" }, 3: { halign: "right" }, 4: { halign: "right" } },
+      boldLastRow: true,
+    });
+
+    const doc = buildReportPdf({
+      title: "Platform Insights Report",
+      subtitle: "Anonymous platform metrics only — individual mental health data is never shown.",
+      generatedBy: user?.nickname || user?.email,
+      filters: [
+        "Totals & distributions: all-time",
+        `Trends: last 30 days${periodStart && periodEnd ? ` (${periodStart} – ${periodEnd})` : ""}`,
+        "Support-level data: anonymous aggregates only",
+      ],
+      sections,
+      disclaimer:
+        "Support-level figures are aggregate wellness indicators derived from anonymized screening and mood data. " +
+        "They are not a clinical diagnosis and no individual user data is included in this report.",
+      footerNote: "SereniLink — confidential platform insights report",
+    });
+
+    doc.save(`serenilink-insights-${new Date().toISOString().slice(0, 10)}.pdf`);
+  };
+
   const TREND_TABS = [
-    { key: "new_users",     label: "New Users",      color: "#60a5fa" },
-    { key: "new_bookings",  label: "Bookings",       color: "#67d58c" },
-    { key: "mood_checkins", label: "Mood Check-ins", color: "#E19A86" },
+    { key: "new_users",      label: "New Users",      color: "#60a5fa" },
+    { key: "new_bookings",   label: "Bookings",       color: "#67d58c" },
+    { key: "mood_checkins",  label: "Mood Check-ins", color: "#E19A86" },
+    { key: "new_screenings", label: "Screenings",     color: "#a78bfa" },
   ];
   const activeTrend = TREND_TABS.find((tab) => tab.key === trendKey);
 
@@ -162,23 +270,15 @@ function AdminInsights() {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
         <h1 className="dashboard-page-title" style={{ margin: 0 }}>Platform Insights</h1>
-        <button
-          onClick={generateCSV}
-          style={{
-            padding: "10px 20px", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer",
-            border: "1px solid rgba(225,154,134,0.3)", background: "rgba(225,154,134,0.08)",
-            color: "var(--accent)", whiteSpace: "nowrap",
-          }}
-        >
-          Export CSV
-        </button>
+        <ExportMenu onCsv={generateCSV} onPdf={generatePDF} />
       </div>
       <p className="dashboard-page-subtitle">
         Anonymous platform metrics only — individual mental health data is never shown.
       </p>
 
-      <div className="dashboard-grid dashboard-cards-3" style={{ marginBottom: 20 }}>
+      <div className="dashboard-grid dashboard-cards-4" style={{ marginBottom: 20 }}>
         <SummaryCard title="Total Users" value={t.users} />
+        <SummaryCard title="Total Counselors" value={t.counselors} color="#60a5fa" />
         <SummaryCard title="Total Bookings" value={t.bookings} />
         <SummaryCard title="Total Assessments" value={t.assessments} color="var(--accent)" />
       </div>

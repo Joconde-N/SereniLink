@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
+import { useUnreadCount } from "../../hooks/useUnreadCount";
 
 function Notifications() {
   const [notifications, setNotifications] = useState([]);
@@ -7,6 +8,7 @@ function Notifications() {
   const [error, setError] = useState("");
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [marking, setMarking] = useState(null);
+  const { refresh: refreshUnread } = useUnreadCount();
 
   const load = (unread = false) => {
     setLoading(true);
@@ -23,6 +25,7 @@ function Notifications() {
     try {
       await api.patch(`/notifications/${id}/read`, { is_read: true });
       setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, is_read: true } : n));
+      refreshUnread();
     } catch { /* silent */ } finally {
       setMarking(null);
     }
@@ -32,6 +35,7 @@ function Notifications() {
     const unread = notifications.filter((n) => !n.is_read);
     await Promise.all(unread.map((n) => api.patch(`/notifications/${n.id}/read`, { is_read: true }).catch(() => {})));
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+    refreshUnread();
   };
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;

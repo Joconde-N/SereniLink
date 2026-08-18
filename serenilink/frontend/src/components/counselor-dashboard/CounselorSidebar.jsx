@@ -21,7 +21,7 @@ import { useUnreadCount } from "../../hooks/useUnreadCount";
 function CounselorSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const unread = useUnreadCount();
+  const { unread } = useUnreadCount();
 
   const handleLogout = () => { logout(); navigate("/login"); };
 

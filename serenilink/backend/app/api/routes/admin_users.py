@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, require_admin
@@ -25,7 +25,7 @@ def list_users(db: Session = Depends(get_db), _admin=Depends(require_admin)):
 
 
 @router.patch("/{user_id}/promote")
-def promote_user(user_id: int, db: Session = Depends(get_db), admin=Depends(require_admin)):
+def promote_user(user_id: int, request: Request, db: Session = Depends(get_db), admin=Depends(require_admin)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -33,12 +33,12 @@ def promote_user(user_id: int, db: Session = Depends(get_db), admin=Depends(requ
         raise HTTPException(status_code=400, detail="Cannot change your own role.")
     user.role = "admin"
     db.commit()
-    log_action(db, "USER_PROMOTED", user=admin, resource="user", resource_id=user_id, detail=f"Promoted {user.nickname} to admin")
+    log_action(db, "USER_PROMOTED", user=admin, resource="user", resource_id=user_id, detail=f"Promoted {user.nickname} to admin", ip_address=request.client.host if request.client else None)
     return {"message": "User promoted to admin", "role": user.role}
 
 
 @router.patch("/{user_id}/demote")
-def demote_user(user_id: int, db: Session = Depends(get_db), admin=Depends(require_admin)):
+def demote_user(user_id: int, request: Request, db: Session = Depends(get_db), admin=Depends(require_admin)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -46,12 +46,12 @@ def demote_user(user_id: int, db: Session = Depends(get_db), admin=Depends(requi
         raise HTTPException(status_code=400, detail="Cannot change your own role.")
     user.role = "user"
     db.commit()
-    log_action(db, "USER_DEMOTED", user=admin, resource="user", resource_id=user_id, detail=f"Demoted {user.nickname} to user")
+    log_action(db, "USER_DEMOTED", user=admin, resource="user", resource_id=user_id, detail=f"Demoted {user.nickname} to user", ip_address=request.client.host if request.client else None)
     return {"message": "User demoted to user", "role": user.role}
 
 
 @router.patch("/{user_id}/toggle-active")
-def toggle_active(user_id: int, db: Session = Depends(get_db), admin=Depends(require_admin)):
+def toggle_active(user_id: int, request: Request, db: Session = Depends(get_db), admin=Depends(require_admin)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -59,5 +59,5 @@ def toggle_active(user_id: int, db: Session = Depends(get_db), admin=Depends(req
         raise HTTPException(status_code=400, detail="Cannot deactivate your own account.")
     user.is_active = not user.is_active
     db.commit()
-    log_action(db, "USER_TOGGLE_ACTIVE", user=admin, resource="user", resource_id=user_id, detail=f"Set {user.nickname} active={user.is_active}")
+    log_action(db, "USER_TOGGLE_ACTIVE", user=admin, resource="user", resource_id=user_id, detail=f"Set {user.nickname} active={user.is_active}", ip_address=request.client.host if request.client else None)
     return {"message": "Status updated", "is_active": user.is_active}

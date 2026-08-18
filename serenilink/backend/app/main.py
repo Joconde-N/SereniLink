@@ -8,7 +8,6 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
 from app.core.config import settings
-from app.api.routes.health import router as health_router
 from app.api.routes.auth import router as auth_router
 from app.api.routes.content import router as content_router
 from app.api.routes.assessment import router as assessment_router
@@ -73,7 +72,6 @@ async def protected_file(
     # For simplicity: any authenticated user can download (covers counselors viewing their own)
     return FileResponse(str(full_path))
 
-app.include_router(health_router)
 app.include_router(auth_router)
 app.include_router(content_router)
 app.include_router(assessment_router)

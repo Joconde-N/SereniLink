@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, List
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Request
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
@@ -161,6 +161,7 @@ def get_application(
 @router.patch("/{application_id}/approve", response_model=CounselorApplicationOut)
 def approve_application(
     application_id: int,
+    request: Request,
     db: Session = Depends(get_db),
     _admin=Depends(require_admin),
 ):
@@ -223,7 +224,7 @@ def approve_application(
     db.commit()
     db.refresh(item)
 
-    log_action(db, "COUNSELOR_APPROVED", user=_admin, resource="counselor_application", resource_id=application_id, detail=f"Approved application for {item.full_name}")
+    log_action(db, "COUNSELOR_APPROVED", user=_admin, resource="counselor_application", resource_id=application_id, detail=f"Approved application for {item.full_name}", ip_address=request.client.host if request.client else None)
 
     send_counselor_credentials(
         to_email=item.email,
@@ -238,6 +239,7 @@ def approve_application(
 @router.patch("/{application_id}/reject", response_model=CounselorApplicationOut)
 def reject_application(
     application_id: int,
+    request: Request,
     db: Session = Depends(get_db),
     _admin=Depends(require_admin),
 ):
@@ -251,5 +253,5 @@ def reject_application(
     item.reviewed_at = datetime.utcnow()
     db.commit()
     db.refresh(item)
-    log_action(db, "COUNSELOR_REJECTED", user=_admin, resource="counselor_application", resource_id=application_id, detail=f"Rejected application for {item.full_name}")
+    log_action(db, "COUNSELOR_REJECTED", user=_admin, resource="counselor_application", resource_id=application_id, detail=f"Rejected application for {item.full_name}", ip_address=request.client.host if request.client else None)
     return item

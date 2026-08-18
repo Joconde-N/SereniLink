@@ -11,6 +11,7 @@ from app.models.progress import Progress
 from app.models.mood import MoodEntry
 from app.models.user import User
 from app.models.counselor import Counselor
+from app.models.screening import Screening
 
 from app.models.exercise import Exercise
 
@@ -147,6 +148,7 @@ def admin_insights(db: Session = Depends(get_db), _admin=Depends(require_admin))
         "new_users": daily_counts(User, User.created_at),
         "new_bookings": daily_counts(Booking, Booking.created_at),
         "mood_checkins": daily_counts(MoodEntry, MoodEntry.created_at),
+        "new_screenings": daily_counts(Screening, Screening.created_at),
     }
 
     cat_rows = (

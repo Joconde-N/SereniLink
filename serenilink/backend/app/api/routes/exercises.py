@@ -1,5 +1,5 @@
 from datetime import date
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, require_admin, get_current_user
@@ -52,14 +52,17 @@ def get_exercise(exercise_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=ExerciseOut, status_code=201)
-def create_exercise(payload: ExerciseCreate, db: Session = Depends(get_db), _admin=Depends(require_admin)):
+def create_exercise(payload: ExerciseCreate, request: Request, db: Session = Depends(get_db), _admin=Depends(require_admin)):
     item = Exercise(**payload.model_dump())
     db.add(item)
     db.commit()
     db.refresh(item)
-    log_action(db, "EXERCISE_CREATED", user=_admin, resource="exercise", resource_id=item.id, detail=f"Created exercise: {item.title}")
+    log_action(db, "EXERCISE_CREATED", user=_admin, resource="exercise", resource_id=item.id, detail=f"Created exercise: {item.title}", ip_address=request.client.host if request.client else None)
     return item
-def update_exercise(exercise_id: int, payload: ExerciseUpdate, db: Session = Depends(get_db), _admin=Depends(require_admin)):
+
+
+@router.patch("/{exercise_id}", response_model=ExerciseOut)
+def update_exercise(exercise_id: int, payload: ExerciseUpdate, request: Request, db: Session = Depends(get_db), _admin=Depends(require_admin)):
     item = db.query(Exercise).filter(Exercise.id == exercise_id).first()
     if not item:
         raise HTTPException(status_code=404, detail="Exercise not found")
@@ -67,17 +70,23 @@ def update_exercise(exercise_id: int, payload: ExerciseUpdate, db: Session = Dep
         setattr(item, field, value)
     db.commit()
     db.refresh(item)
-    log_action(db, "EXERCISE_UPDATED", user=_admin, resource="exercise", resource_id=item.id, detail=f"Updated exercise: {item.title}")
+    log_action(db, "EXERCISE_UPDATED", user=_admin, resource="exercise", resource_id=item.id, detail=f"Updated exercise: {item.title}", ip_address=request.client.host if request.client else None)
     return item
-def toggle_exercise(exercise_id: int, db: Session = Depends(get_db), _admin=Depends(require_admin)):
+
+
+@router.patch("/{exercise_id}/toggle-active", response_model=ExerciseOut)
+def toggle_exercise(exercise_id: int, request: Request, db: Session = Depends(get_db), _admin=Depends(require_admin)):
     item = db.query(Exercise).filter(Exercise.id == exercise_id).first()
     if not item:
         raise HTTPException(status_code=404, detail="Exercise not found")
     item.is_active = not item.is_active
     db.commit()
     db.refresh(item)
-    log_action(db, "EXERCISE_TOGGLED", user=_admin, resource="exercise", resource_id=item.id, detail=f"Set exercise '{item.title}' active={item.is_active}")
+    log_action(db, "EXERCISE_TOGGLED", user=_admin, resource="exercise", resource_id=item.id, detail=f"Set exercise '{item.title}' active={item.is_active}", ip_address=request.client.host if request.client else None)
     return item
+
+
+@router.post("/{exercise_id}/complete")
 def complete_exercise(
     exercise_id: int,
     db: Session = Depends(get_db),

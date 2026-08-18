@@ -96,7 +96,8 @@ export function useBookingChat(bookingId) {
       await loadViaRest();
       return true;
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to send message.");
+      const detail = err.response?.data?.detail;
+      setError(Array.isArray(detail) ? "Invalid message data." : (detail || "Failed to send message."));
       return false;
     } finally {
       setSending(false);

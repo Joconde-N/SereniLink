@@ -4,7 +4,7 @@ import { LuBell } from "react-icons/lu";
 import { useUnreadCount } from "../../hooks/useUnreadCount";
 
 function NotificationBell({ notifPath }) {
-  const unread = useUnreadCount();
+  const { unread } = useUnreadCount();
   const navigate = useNavigate();
   const [pulse, setPulse] = useState(false);
 

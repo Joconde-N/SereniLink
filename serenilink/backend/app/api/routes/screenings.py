@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, get_current_user
@@ -31,6 +31,7 @@ def calculate_severity(type: str, score: int) -> str:
 @router.post("/", response_model=ScreeningOut, status_code=201)
 def submit_screening(
     payload: ScreeningCreate,
+    request: Request,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
@@ -55,7 +56,7 @@ def submit_screening(
     db.add(item)
     db.commit()
     db.refresh(item)
-    log_action(db, "ASSESSMENT_COMPLETED", user=current_user, resource="screening", resource_id=item.id, detail=f"{payload.type} completed, score={total}, severity={severity}")
+    log_action(db, "ASSESSMENT_COMPLETED", user=current_user, resource="screening", resource_id=item.id, detail=f"{payload.type} completed, score={total}, severity={severity}", ip_address=request.client.host if request.client else None)
     return item
 
 

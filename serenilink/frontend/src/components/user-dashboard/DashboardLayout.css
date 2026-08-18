@@ -336,6 +336,93 @@ body.light .quick-actions-panel {
   color: var(--text-main);
 }
 
+.export-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.export-menu-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid rgba(225, 154, 134, 0.3);
+  background: rgba(225, 154, 134, 0.08);
+  color: var(--accent);
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.export-menu-trigger:hover:not(:disabled) {
+  background: rgba(225, 154, 134, 0.16);
+  border-color: rgba(225, 154, 134, 0.5);
+}
+
+.export-menu-trigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.export-menu-chevron {
+  transition: transform 0.15s ease;
+}
+
+.export-menu-list {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 30;
+  min-width: 240px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+  background: linear-gradient(180deg, var(--bg-panel) 0%, var(--bg-panel-2) 100%);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  padding: 6px;
+}
+
+body.light .export-menu-list {
+  box-shadow: 0 10px 24px rgba(70, 52, 42, 0.16);
+}
+
+.export-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-main);
+}
+
+.export-menu-item:hover {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.export-menu-item small {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.export-menu-item:hover small {
+  color: inherit;
+  opacity: 0.8;
+}
+
 .form-input,
 .form-select,
 .form-textarea {
