@@ -108,11 +108,7 @@ frontend/
 |------|------|
 | `global.css` | Site-wide styles: navbar, footer, public chrome, light-mode overrides |
 
-### `src/assets/`
 
-Images used on public/auth pages (hero images, login/register side images, counselor/resource media).
-
----
 
 ### `src/components/`
 
@@ -174,16 +170,23 @@ Page folders use **kebab-case** names.
 
 | Folder / file | Role |
 |---------------|------|
-| `home/Home.jsx` | Landing page; calm tools link → login → exercises |
-| `home/GuestAiSupport.jsx` | Guest AI chat page |
-| `about/About.jsx` | About Us + bottom CTA |
+| `home/Home.jsx` | Landing page; calm tools, resources preview, how it works steps |
+| `home/Home.css` | Landing page styles |
+| `home/GuestAiSupport.jsx` | Guest AI chat full page |
+| `about/About.jsx` | About Us — who we are, mission, vision, values, bottom CTA |
+| `about/About.css` | About page styles |
 | `counselors/Counselors.jsx` | Public counselor directory + specialization filter |
+| `counselors/Counselors.css` | Counselors page styles |
 | `resources/Resources.jsx` | Public resources list |
 | `resources/ResourceView.jsx` | Single resource view |
+| `resources/Resources.css` | Resources page styles |
 | `login/Login.jsx` | Login (+ forgot password modal) |
+| `login/Login.css` | Login page styles |
 | `login/ResetPassword.jsx` | Password reset from email link |
 | `register/Register.jsx` | User registration |
+| `register/Register.css` | Register page styles |
 | `counselor-application/CounselorApplication.jsx` | Apply to become a counselor |
+| `counselor-application/CounselorApplication.css` | Counselor application page styles |
 | `NotFound.jsx` | 404 page |
 
 #### User dashboard (`pages/user-dashboard/`)
@@ -203,6 +206,7 @@ Page folders use **kebab-case** names.
 | `Progress.jsx` | Progress tracking |
 | `Notifications.jsx` | Notification list |
 | `Settings.jsx` | Thin wrapper → shared `SettingsPage` |
+| `MyBookings.jsx` | List of all user bookings with status badges |
 
 #### Counselor dashboard (`pages/counselor-dashboard/`)
 
@@ -217,6 +221,7 @@ Page folders use **kebab-case** names.
 | `CounselorNotifications.jsx` | Notifications |
 | `CounselorProfile.jsx` | Counselor profile edit |
 | `CounselorSettings.jsx` | Thin wrapper → shared `SettingsPage` |
+| `CounselorBookingDetails.jsx` | Full detail view of a single booking for the counselor |
 
 #### Admin dashboard (`pages/admin-dashboard/`)
 
@@ -229,7 +234,8 @@ Page folders use **kebab-case** names.
 | `ContentManagement.jsx` / `ExercisesManagement.jsx` | Content & exercises CRUD |
 | `AdminInsights.jsx` | Charts, anonymous support-level distribution, 30-day trends; CSV + PDF export |
 | `AdminAuditLogs.jsx` | Searchable/filterable audit log table; CSV + PDF export |
-| `AdminProfile.jsx` / `AdminSettings.jsx` | Profile / shared settings |
+| `AdminProfile.jsx` | Read-only admin account info (id, nickname, email, role) |
+| `AdminSettings.jsx` | Thin wrapper → shared `SettingsPage` |
 
 ---
 
