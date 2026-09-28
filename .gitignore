@@ -1,6 +1,10 @@
 ﻿.env
 serenilink/backend/.env
 serenilink/frontend/.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
 
 # Python cache
 __pycache__/
@@ -24,3 +28,38 @@ build/
 
 # Local database backups (may contain private application data)
 .local-backups/
+
+# Private documents uploaded at runtime
+serenilink/backend/uploads/
+
+# Local databases and database backup files
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-wal
+*.sqlite3-shm
+*.dump
+*.backup
+*.bak
+
+# Logs and local private key files
+*.log
+*.key
+*.pem
+
+# Test and tooling output
+.pytest_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage/
+
+# Operating-system metadata
+.DS_Store
+Thumbs.db
