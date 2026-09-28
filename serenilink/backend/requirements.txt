@@ -1,7 +1,7 @@
 fastapi>=0.100.0
-uvicorn
+uvicorn[standard]
 sqlalchemy>=2.0
-pydantic>=2.0
+pydantic[email]>=2.0
 python-jose
 passlib[argon2]
 python-multipart
@@ -9,5 +9,6 @@ psycopg2-binary
 openai
 slowapi
 pydantic-settings
-alembic
+alembic>=1.12
 python-dotenv
+httpx
