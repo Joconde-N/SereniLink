@@ -167,14 +167,14 @@
 .mission-image-wrap {
   display: flex;
   justify-content: flex-start;
-  margin-left: -60px;
+  margin-left: -70px;
 }
 
 .mission-image {
   width: 100%;
   max-width: 570px;
   max-height: 580px;
-  border-radius: 4px;
+  border-radius: 0 4px 4px 0;
   display: block;
   margin-left: 0;
 }
@@ -452,6 +452,10 @@
     max-width: 100%;
   }
 
+  .mission-image-wrap {
+    margin-left: -20px;
+  }
+
   .about-hero-text h1 {
     font-size: 2.7rem;
   }
@@ -511,9 +515,6 @@
     font-size: 1.8rem;
   }
 
-  .mission-image-wrap {
-    margin-left: 0;
-  }
 }
 
 /* ============================================
