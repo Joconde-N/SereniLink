@@ -4,7 +4,19 @@ This document explains **how the codebase is organized**, **what each important 
 
 Start here if you are new to the repo. For setup commands, see [README.md](./README.md).
 
----
+## Contents
+
+- [Big Picture](#big-picture)
+- [How to Navigate (Cheat Sheet)](#how-to-navigate-cheat-sheet)
+- [Frontend Structure](#frontend-structure)
+- [Backend Structure](#backend-structure)
+- [Migrations and Configuration](#migrations-and-configuration)
+- [Tests](#tests)
+- [Specialization Filtering](#specialization-filtering-how-it-works)
+- [Theme System](#theme-system-how-light-mode-works)
+- [Auth and Route Protection](#auth--route-protection-flow)
+- [Naming Conventions](#naming-conventions)
+- [Suggested Learning Path](#suggested-learning-path)
 
 ## Big Picture
 
@@ -21,8 +33,6 @@ SereniLinkApp/
 - The **frontend** talks to the **backend** over HTTP (REST) and WebSockets (booking chat).
 - Auth uses JWT tokens stored on the client; `AuthContext` keeps the logged-in user.
 - Theme (light/dark) is global via `ThemeContext` and `body.light` / `body.dark` CSS classes.
-
----
 
 ## How to Navigate (Cheat Sheet)
 
@@ -41,10 +51,11 @@ SereniLinkApp/
 | Change a database table | `backend/app/models/<feature>.py` |
 | Change request/response shapes | `backend/app/schemas/<feature>.py` |
 | Change JWT / password hashing | `backend/app/core/security.py` |
-| Change env settings | `backend/app/core/config.py` + `.env` |
+| Change env settings | `backend/app/core/config.py` + `backend/.env.example`; local values in `backend/.env` |
+| Understand database setup / migrations | `README.md`, `backend/alembic/`, `backend/BOOKING_MIGRATION.md` |
+| Change theme persistence / palette | `frontend/src/context/ThemeContext.jsx`, `utils/theme.js`, `components/user-dashboard/DashboardLayout.css` |
+| Find regression tests | `frontend/tests/`, `backend/tests/` |
 | Register routers | `backend/app/main.py` |
-
----
 
 ## Frontend Structure
 
@@ -72,27 +83,29 @@ frontend/
 
 | File | Role |
 |------|------|
+| `index.html` | Restores the saved theme before React renders, then loads `src/main.jsx` |
 | `src/main.jsx` | Mounts the app; wraps with `BrowserRouter`, `ThemeProvider`, `AuthProvider`; loads global CSS |
-| `src/App.jsx` | Declares public routes, `/dashboard/*`, `/counselor/*`, `/admin/*`; wraps dashboards in `ProtectedRoute` and the whole tree in `ErrorBoundary` |
+| `src/App.jsx` | Declares public and role-specific routes; uses `PublicOnlyRoute` for the home page, `ProtectedRoute` for dashboards, and `ErrorBoundary` around the route tree |
 
 ### `src/api/`
 
 | File | Role |
 |------|------|
-| `axios.js` | Axios instance with `baseURL` from `VITE_API_URL`; attaches JWT to requests |
+| `axios.js` | Shared HTTP client using `VITE_API_URL`; attaches JWTs, normalizes errors, handles expired sessions, and saves replacement tokens after password changes |
+| `errors.js` | Converts API validation payloads into readable error messages and preserves validation details |
 
 ### `src/context/`
 
 | File | Role |
 |------|------|
-| `AuthContext.jsx` | Login / logout / current user; persists token |
-| `ThemeContext.jsx` | `dark` / `light` theme; saves to `localStorage`; sets `body` class |
+| `AuthContext.jsx` | Restores the current user; login/logout; keeps remembered tokens in localStorage and other tokens in sessionStorage |
+| `ThemeContext.jsx` | Global light/dark state; applies the theme before paint and synchronizes changes across tabs through storage events |
 
 ### `src/hooks/`
 
 | File | Role |
 |------|------|
-| `useBookingChat.js` | WebSocket chat for a booking; falls back to REST polling |
+| `useBookingChat.js` | Booking WebSocket connection, message history and sends; REST fallback for history/send requests (not periodic polling) |
 | `useUnreadCount.js` | Polls notifications and returns unread count for badges |
 
 ### `src/utils/`
@@ -101,14 +114,20 @@ frontend/
 |------|------|
 | `chatWs.js` | Builds the WebSocket URL for booking chat (includes token) |
 | `reportPdf.js` | Shared `buildReportPdf()` helper — branded A4 PDF with header, footer, striped tables, totals row support |
+| `password.js` | Shared password-strength validation and help text for account forms |
+| `theme.js` | Validates saved themes, applies body classes and browser color scheme, and safely reads/writes storage |
 
 ### `src/styles/`
 
 | File | Role |
 |------|------|
-| `global.css` | Site-wide styles: navbar, footer, public chrome, light-mode overrides |
+| `global.css` | Public chrome, calendar styling, theme transitions, reduced-motion support and light-mode overrides |
 
+### `src/assets/`
 
+Bundled page images, authentication illustrations, counselor portraits in
+`counselors/`, and resource thumbnails in `resources/`. These are frontend assets,
+separate from private documents uploaded to the backend.
 
 ### `src/components/`
 
@@ -118,7 +137,8 @@ Grouped by **where they are used**.
 
 | File | Role |
 |------|------|
-| `ProtectedRoute.jsx` | Blocks unauthenticated users; redirects wrong roles |
+| `ProtectedRoute.jsx` | Waits for session restoration, blocks unauthenticated users and redirects wrong roles |
+| `PublicOnlyRoute.jsx` | Waits for session restoration and redirects signed-in visitors to their role dashboard |
 | `ErrorBoundary.jsx` | Catches React render errors; shows a safe fallback |
 | `PageLoader.jsx` | Full-page loading spinner |
 | `SettingsPage.jsx` | Shared settings UI (profile email, password, theme) with small role differences |
@@ -139,7 +159,7 @@ Grouped by **where they are used**.
 | File | Role |
 |------|------|
 | `DashboardLayout.jsx` | User shell (sidebar + main + notification bell) |
-| `DashboardLayout.css` | Dashboard theme variables (dark + light) and shared dashboard styles |
+| `DashboardLayout.css` | Shared dark/light palette, projection-friendly light colors, status/chart tokens, form focus styles and dashboard layout |
 | `DashboardSidebar.jsx` | User nav links + unread badge |
 | `MobileSidebarDrawer.jsx` | Mobile sidebar behavior |
 | `NotificationBell.jsx` | Top-right bell with unread badge |
@@ -160,11 +180,12 @@ Grouped by **where they are used**.
 | `AdminLayout.jsx` | Admin shell |
 | `AdminSidebar.jsx` | Admin nav |
 
----
-
 ### `src/pages/`
 
-Page folders use **kebab-case** names.
+Most page folders use lowercase or kebab-case names. The tables below follow the
+current source import paths. Git records the login directory as `pages/Login/`,
+while imports use `pages/login/`; this casing difference matters on case-sensitive
+filesystems. No files are renamed by this guide.
 
 #### Public
 
@@ -206,7 +227,6 @@ Page folders use **kebab-case** names.
 | `Progress.jsx` | Progress tracking |
 | `Notifications.jsx` | Notification list |
 | `Settings.jsx` | Thin wrapper → shared `SettingsPage` |
-| `MyBookings.jsx` | List of all user bookings with status badges |
 
 #### Counselor dashboard (`pages/counselor-dashboard/`)
 
@@ -221,7 +241,6 @@ Page folders use **kebab-case** names.
 | `CounselorNotifications.jsx` | Notifications |
 | `CounselorProfile.jsx` | Counselor profile edit |
 | `CounselorSettings.jsx` | Thin wrapper → shared `SettingsPage` |
-| `CounselorBookingDetails.jsx` | Full detail view of a single booking for the counselor |
 
 #### Admin dashboard (`pages/admin-dashboard/`)
 
@@ -236,8 +255,6 @@ Page folders use **kebab-case** names.
 | `AdminAuditLogs.jsx` | Searchable/filterable audit log table; CSV + PDF export |
 | `AdminProfile.jsx` | Read-only admin account info (id, nickname, email, role) |
 | `AdminSettings.jsx` | Thin wrapper → shared `SettingsPage` |
-
----
 
 ## Backend Structure
 
@@ -263,33 +280,37 @@ backend/
 
 For almost every feature you will see three matching pieces:
 
-1. **`models/`** — SQLAlchemy table  
-2. **`schemas/`** — Pydantic request/response shapes  
-3. **`api/routes/`** — HTTP (or WebSocket) endpoints  
+1. **`models/`** — SQLAlchemy table
+2. **`schemas/`** — Pydantic request/response shapes
+3. **`api/routes/`** — HTTP (or WebSocket) endpoints
 
 Example: bookings → `models/booking.py` + `schemas/booking.py` + `api/routes/booking.py`
 
 ### `app/main.py`
 
-Creates the FastAPI app, CORS, rate limiting, and **includes all routers**.
+Creates the FastAPI app, configures CORS and rate limiting, registers routers, and
+ensures the uploads directory exists. It also calls `Base.metadata.create_all()`
+and checks PostgreSQL booking timestamps and the active-booking index at startup.
+Those checks can block startup until the booking migration is applied. Uploaded
+files are served through the protected files router, not a public static mount.
 
 ### `app/api/`
 
 | Path | Role |
 |------|------|
-| `deps.py` | Shared dependencies: `get_db`, `get_current_user`, role helpers |
+| `deps.py` | Database sessions, JWT/password-version validation, disabled-account and required-password-change checks, and admin authorization |
 | `routes/*.py` | One module per feature area (see table below) |
 
 #### Route modules
 
 | File | Responsibility |
 |------|----------------|
-| `auth.py` | Register, login, password reset, profile |
+| `auth.py` | Registration, login, profile, password reset and password change |
 | `admin_users.py` | Admin user management |
 | `counselors.py` | Counselor list, profile, **specializations** (split/deduped tags), filter by tag |
 | `counselor_applications.py` | Apply / admin review |
-| `booking.py` | Create/list/update bookings; enriches names for chat lists |
-| `availability.py` | Counselor slots |
+| `booking.py` | Booking lifecycle, slot claims, session timing and names for chat lists |
+| `availability.py` | Counselor slots, timezone-aware scheduling and overlap checks |
 | `chat.py` | REST messages + **WebSocket** `/chat/ws/{booking_id}` |
 | `ai.py` / `ai_guest.py` | Authenticated & guest AI chat |
 | `screenings.py` | PHQ-9 / GAD-7 |
@@ -302,16 +323,19 @@ Creates the FastAPI app, CORS, rate limiting, and **includes all routers**.
 | `session_notes.py` | Counselor session notes |
 | `dashboard.py` | Dashboard summary payloads (user `/me`, admin `/insights` with 30-day trends) |
 | `audit_logs.py` | Admin audit log list, JSON export (for PDF), CSV export with context header |
+| `files.py` | Admin-only uploaded-document downloads with path traversal and symlink checks |
 
 ### `app/core/`
 
 | File | Role |
 |------|------|
-| `config.py` | Settings from environment |
-| `security.py` | JWT create/verify, password hashing |
-| `ai_client.py` | Calls Hugging Face / Groq model |
+| `config.py` | Pydantic settings from environment and backend `.env`; includes `DATABASE_URL`, `JWT_SECRET`, AI, SMTP and CORS settings |
+| `security.py` | JWT creation, password hashing/strength checks, and password-bound token validation |
+| `ai_client.py` | Creates the OpenAI-compatible client for the configured Hugging Face Router endpoint and model |
 | `email.py` | Outbound email helpers (e.g. reset) |
 | `audit.py` | `log_action()` helper — writes AuditLog rows; accepts ip_address from routes |
+| `datetime.py` | `utc_now()` and `UTCDateTime`: timezone-aware values for PostgreSQL and UTC handling in SQLite tests |
+| `rate_limit.py` | Shared SlowAPI limiter, middleware setup and rate-limit error handling |
 
 ### `app/db/`
 
@@ -322,35 +346,103 @@ Creates the FastAPI app, CORS, rate limiting, and **includes all routers**.
 
 ### `app/models/` & `app/schemas/`
 
-Mirror each domain entity (`user`, `counselor`, `booking`, `screening`, `audit_log`, …).  
-`models/__init__.py` imports models so Alembic / metadata see them.
+Models define database tables; schemas define API payloads. They are related but
+not one-to-one: for example, audit logs have a model without a dedicated schema
+module, while authentication has a schema without an `auth` table model.
 
----
+| Model modules | Domain |
+|---------------|--------|
+| `user.py`, `counselor.py`, `counselor_application.py` | Accounts, counselor profiles and applications |
+| `booking.py`, `availability.py`, `chat.py`, `session_note.py` | Scheduling, session chat and counselor notes |
+| `assessment.py`, `screening.py`, `mood.py`, `progress.py` | Assessments, screenings and wellness tracking |
+| `ai_conversation.py`, `ai_message.py`, `user_ai_summary.py` | AI conversation history and summaries |
+| `content.py`, `exercise.py`, `exercise_log.py` | Resources, exercises and completion records |
+| `notification.py`, `audit_log.py` | Notifications and audit history |
+
+`models/__init__.py` imports all model classes so Alembic and table initialization
+can see them. Schema modules cover `ai`, `assessment`, `auth`, `availability`,
+`booking`, `chat`, `content`, `counselor`, `counselor_application`, `exercise`,
+`mood`, `notification`, `progress`, `screening`, `session_note` and `user`.
+
+## Migrations and Configuration
+
+| Path (under `serenilink/`) | Purpose |
+|---------------------------|---------|
+| `backend/.env.example` | Complete backend settings template, without real credentials |
+| `backend/requirements.txt` | Backend dependencies, including email validation and WebSocket support |
+| `backend/alembic.ini` | Alembic script location and logging configuration |
+| `backend/alembic/env.py` | Loads `DATABASE_URL`, handles encoded URL characters and imports model metadata |
+| `backend/alembic/script.py.mako` | Template used when generating a revision |
+| `backend/alembic/versions/20260925_booking_safety.py` | Existing root revision: converts legacy booking timestamps and adds active-slot uniqueness |
+| `backend/BOOKING_MIGRATION.md` | Historical timezone selection, conflicts, backups and migration validation |
+| `frontend/package.json`, `frontend/package-lock.json` | Frontend scripts, dependencies and resolved npm versions |
+| `frontend/.env` | Local `VITE_API_URL` setting; values are exposed to browser code |
+
+The current migration is **not a complete initial schema migration**. It expects
+application tables to exist. Follow the [README migration guide](README.md#database-migrations)
+for fresh initialization, existing databases, schema checks and new revisions.
+
+Local `.env` files, virtual environments, `node_modules/`, caches and generated
+build output are not source-code sections of this guide. `backend/uploads/` holds
+runtime documents; it is not interchangeable with frontend assets.
+
+## Tests
+
+### Frontend (`serenilink/frontend/tests/`)
+
+| File | Coverage |
+|------|----------|
+| `api-errors.test.mjs` | Readable API errors, validation rendering, password rules and replacement-token storage |
+| `theme.test.mjs` | Theme persistence, invalid/blocked storage and early HTML theme restoration |
+
+Run from `serenilink/frontend`:
+
+```bash
+node --test tests/api-errors.test.mjs tests/theme.test.mjs
+npm run build
+```
+
+### Backend (`serenilink/backend/tests/`)
+
+| File | Coverage |
+|------|----------|
+| `test_booking_safety.py` | UTC scheduling, overlaps, active-slot uniqueness and concurrent claims |
+| `test_chat_and_booking.py` | Booking lifecycle and HTTP/WebSocket chat access |
+| `test_checkins_and_recovery.py` | Atomic mood check-ins and password recovery |
+| `test_password_lifecycle.py` | Password changes, session invalidation and required first password change |
+| `test_profiles_and_limits.py` | Profile email validation and API rate limits |
+| `test_security_regressions.py` | Audit privacy and protected uploaded-file access |
+
+Run from `serenilink/backend` with the virtual environment active:
+
+```bash
+python -B -m unittest discover -s tests -v
+```
+
+Backend tests use isolated SQLite databases. PostgreSQL migration execution and
+PostgreSQL-specific locking require separate validation.
 
 ## Specialization Filtering (How It Works)
 
 Counselors store specializations as a **comma-separated string**, e.g. `Anxiety, Stress`.
 
-1. **`GET /counselors/specializations`**  
+1. **`GET /counselors/specializations`**
    Splits every row on commas → trims → **dedupes** (case-insensitive) → sorted list of tags.
 
-2. **`GET /counselors/?specialization=Anxiety`**  
+2. **`GET /counselors/?specialization=Anxiety`**
    Matches any counselor whose field **contains** that tag (so `Anxiety, Stress` is included).
 
-3. **UI**  
+3. **UI**
    Public `Counselors.jsx` and dashboard `FindCounselors.jsx` both load options from `/specializations`.
-
----
 
 ## Theme System (How Light Mode Works)
 
-1. `ThemeContext` stores `"dark"` or `"light"` in `localStorage`.
-2. It sets `document.body.classList` to `dark` or `light`.
-3. CSS variables live in `DashboardLayout.css` (`:root` / `body.dark` and `body.light`).
-4. Public pages that used hardcoded dark hex colors also have `body.light …` overrides in their own CSS files (`Home.css`, `About.css`, `Login.css`, etc.).
-5. Toggle anywhere (navbar or settings) updates the same context → theme **sticks** until toggled again.
-
----
+1. `index.html` restores the saved theme before React renders, preventing a wrong-theme flash.
+2. `ThemeContext` wraps the entire app in `main.jsx`, so route changes share the same selection.
+3. `utils/theme.js` validates `light`/`dark`, safely handles storage, sets the body class and updates the browser color scheme.
+4. `DashboardLayout.css` supplies the global palette; light-only status and chart tokens preserve dark-mode fallback colors.
+5. Public page CSS applies additional `body.light` overrides. `global.css` coordinates transitions and respects reduced-motion preferences.
+6. Navbar and settings use the same context. Selection persists across reloads and sign-in/sign-out, and storage events synchronize open tabs.
 
 ## Auth & Route Protection Flow
 
@@ -365,32 +457,32 @@ ProtectedRoute checks AuthContext
   ok → render DashboardLayout + child page
 ```
 
+`PublicOnlyRoute` protects the home-page entry from showing to signed-in users;
+`App.jsx` does not wrap every public page with it. Server-side checks in
+`app/api/deps.py` enforce account and role access independently of frontend routing.
+Password changes/reset invalidate tokens tied to the old password; newly approved
+counselors must change their temporary password before using protected endpoints.
+
 Roles:
 
 - `user` → `/dashboard`
 - `counselor` → `/counselor`
 - `admin` → `/admin`
 
----
-
 ## Naming Conventions
 
 | Area | Convention | Example |
 |------|------------|---------|
-| Page folders | kebab-case | `counselor-application/`, `user-dashboard/` |
+| Page folders | Mostly lowercase / kebab-case; see login casing note above | `counselor-application/`, `user-dashboard/` |
 | React components | PascalCase files | `MyClients.jsx` |
 | Shared UI | under `components/shared/` | `SettingsPage.jsx` |
 | Backend routes | snake_case modules | `risk_monitoring.py` |
 | CSS | same name as page | `Home.jsx` + `Home.css` |
 
----
-
 ## Suggested Learning Path
 
-1. Read `frontend/src/App.jsx` — see every route.  
-2. Open `backend/app/main.py` — see every API router.  
-3. Pick one feature (e.g. bookings): follow `booking` model → schema → route → matching frontend page.  
-4. Skim `AuthContext` + `ProtectedRoute` to understand login gates.  
+1. Read `frontend/src/App.jsx` — see every route.
+2. Open `backend/app/main.py` — see every API router.
+3. Pick one feature (e.g. bookings): follow `booking` model → schema → route → matching frontend page.
+4. Skim `AuthContext`, `PublicOnlyRoute` and `ProtectedRoute` to understand login gates.
 5. Skim `ThemeContext` + one public CSS file’s `body.light` block to understand theming.
-
-
