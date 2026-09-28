@@ -156,7 +156,7 @@ function SettingsPage({ role = "user" }) {
                   <label className="form-label" htmlFor="current-password">Current Password</label>
                   <input id="current-password" className="form-input" type="password" autoComplete="current-password"
                     value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} required />
-                  <p>{PASSWORD_HELP}</p>
+                  <p style={{ margin: "6px 0 12px", fontSize: "11px", color: "var(--text-muted)" }}>{PASSWORD_HELP}</p>
                   <label className="form-label">New Password</label>
                   <input
                     className="form-input" type="password"
