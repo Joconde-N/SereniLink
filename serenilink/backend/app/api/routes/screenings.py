@@ -56,7 +56,7 @@ def submit_screening(
     db.add(item)
     db.commit()
     db.refresh(item)
-    log_action(db, "ASSESSMENT_COMPLETED", user=current_user, resource="screening", resource_id=item.id, detail=f"{payload.type} completed, score={total}, severity={severity}", ip_address=request.client.host if request.client else None)
+    log_action(db, "ASSESSMENT_COMPLETED", user=current_user, resource="screening", resource_id=item.id, detail="Screening completed", ip_address=request.client.host if request.client else None)
     return item
 
 

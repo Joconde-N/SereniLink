@@ -24,20 +24,20 @@ function CounselorModal({ counselor, onClose }) {
         onClick={(e) => e.stopPropagation()}
         className="counselor-modal-body"
         style={{
-          background: "#1a1a1d", borderRadius: 0, width: "100%", maxWidth: 680,
-          maxHeight: "90vh", overflowY: "auto", border: "1px solid rgba(255,255,255,0.08)",
+          background: "var(--bg-panel)", borderRadius: 0, width: "100%", maxWidth: 680,
+          maxHeight: "90vh", overflowY: "auto", border: "1px solid var(--border-soft)",
           boxShadow: "0 24px 60px rgba(0,0,0,0.5)",
         }}
       >
         {/* Header */}
         <div style={{ position: "relative" }}>
-          <div style={{ height: 120, background: "linear-gradient(135deg, #2a2b2b, #1a1a1d)" }} />
+          <div style={{ height: 120, background: "linear-gradient(135deg, var(--bg-panel-2), var(--bg-panel)" }} />
           <button
             onClick={onClose}
             style={{
               position: "absolute", top: 16, right: 16,
-              background: "rgba(255,255,255,0.08)", border: "none",
-              color: "#fff", width: 34, height: 34, borderRadius: "50%",
+              background: "var(--notif-bell-bg)", border: "none",
+              color: "var(--text-main)", width: 34, height: 34, borderRadius: "50%",
               cursor: "pointer", fontSize: 18, display: "flex",
               alignItems: "center", justifyContent: "center",
             }}
@@ -49,7 +49,7 @@ function CounselorModal({ counselor, onClose }) {
             style={{
               position: "absolute", bottom: -50, left: 32,
               width: 100, height: 100, borderRadius: "50%",
-              objectFit: "cover", border: "4px solid #1a1a1d",
+              objectFit: "cover", border: "4px solid var(--bg-panel)",
             }}
           />
         </div>
@@ -58,34 +58,34 @@ function CounselorModal({ counselor, onClose }) {
         <div style={{ padding: "64px 32px 32px" }}>
           {/* Name + title */}
           <div style={{ marginBottom: 20 }}>
-            <h2 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 700, color: "#fff" }}>{counselor.full_name}</h2>
+            <h2 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 700, color: "var(--text-main)" }}>{counselor.full_name}</h2>
             <p style={{ margin: 0, color: "#e19a86", fontSize: 15 }}>{counselor.title || counselor.specialization}</p>
           </div>
 
           {/* Quick stats */}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 20, marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 20, marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid var(--border-faint)" }}>
             {counselor.general_location && (
-              <span style={{ fontSize: 14, color: "#b8bfcc" }}>📍 {counselor.general_location}</span>
+              <span style={{ fontSize: 14, color: "var(--text-soft)" }}>📍 {counselor.general_location}</span>
             )}
             {counselor.years_of_experience && (
-              <span style={{ fontSize: 14, color: "#b8bfcc" }}>🕐 {counselor.years_of_experience} yrs experience</span>
+              <span style={{ fontSize: 14, color: "var(--text-soft)" }}>🕐 {counselor.years_of_experience} yrs experience</span>
             )}
-            {counselor.offers_online && <span style={{ fontSize: 14, color: "#b8bfcc" }}>💻 Online</span>}
-            {counselor.offers_in_person && <span style={{ fontSize: 14, color: "#b8bfcc" }}>🏢 In-Person</span>}
+            {counselor.offers_online && <span style={{ fontSize: 14, color: "var(--text-soft)" }}>💻 Online</span>}
+            {counselor.offers_in_person && <span style={{ fontSize: 14, color: "var(--text-soft)" }}>🏢 In-Person</span>}
           </div>
 
           {/* Bio */}
           {counselor.bio && (
             <div style={{ marginBottom: 24 }}>
-              <h4 style={{ margin: "0 0 10px", fontSize: 13, fontWeight: 600, color: "#8f97a8", textTransform: "uppercase", letterSpacing: "0.06em" }}>About</h4>
-              <p style={{ margin: 0, color: "#d9d9d9", lineHeight: 1.8, fontSize: 15 }}>{counselor.bio}</p>
+              <h4 style={{ margin: "0 0 10px", fontSize: 13, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>About</h4>
+              <p style={{ margin: 0, color: "var(--text-soft)", lineHeight: 1.8, fontSize: 15 }}>{counselor.bio}</p>
             </div>
           )}
 
           {/* Specializations */}
           {specializations.length > 0 && (
             <div style={{ marginBottom: 24 }}>
-              <h4 style={{ margin: "0 0 12px", fontSize: 13, fontWeight: 600, color: "#8f97a8", textTransform: "uppercase", letterSpacing: "0.06em" }}>Specializations</h4>
+              <h4 style={{ margin: "0 0 12px", fontSize: 13, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Specializations</h4>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                 {specializations.map(s => (
                   <span key={s} style={{
@@ -101,29 +101,29 @@ function CounselorModal({ counselor, onClose }) {
           {/* Counseling Approach + Languages — 2 col grid */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
             {counselor.counseling_approach && (
-              <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: "16px" }}>
-                <h4 style={{ margin: "0 0 8px", fontSize: 12, fontWeight: 600, color: "#8f97a8", textTransform: "uppercase", letterSpacing: "0.06em" }}>Counseling Approach</h4>
-                <p style={{ margin: 0, color: "#d9d9d9", fontSize: 13, lineHeight: 1.7 }}>{counselor.counseling_approach}</p>
+              <div style={{ background: "var(--bg-input)", border: "1px solid var(--border-soft)", borderRadius: 14, padding: "16px" }}>
+                <h4 style={{ margin: "0 0 8px", fontSize: 12, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Counseling Approach</h4>
+                <p style={{ margin: 0, color: "var(--text-soft)", fontSize: 13, lineHeight: 1.7 }}>{counselor.counseling_approach}</p>
               </div>
             )}
             {counselor.languages_offered && (
-              <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: "16px" }}>
-                <h4 style={{ margin: "0 0 8px", fontSize: 12, fontWeight: 600, color: "#8f97a8", textTransform: "uppercase", letterSpacing: "0.06em" }}>Languages</h4>
-                <p style={{ margin: 0, color: "#d9d9d9", fontSize: 13, lineHeight: 1.7 }}>{counselor.languages_offered}</p>
+              <div style={{ background: "var(--bg-input)", border: "1px solid var(--border-soft)", borderRadius: 14, padding: "16px" }}>
+                <h4 style={{ margin: "0 0 8px", fontSize: 12, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Languages</h4>
+                <p style={{ margin: 0, color: "var(--text-soft)", fontSize: 13, lineHeight: 1.7 }}>{counselor.languages_offered}</p>
               </div>
             )}
           </div>
 
           {/* Education & Credentials */}
           {(counselor.highest_certification || counselor.issuing_institution) && (
-            <div style={{ marginBottom: 28, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: "16px" }}>
-              <h4 style={{ margin: "0 0 12px", fontSize: 12, fontWeight: 600, color: "#8f97a8", textTransform: "uppercase", letterSpacing: "0.06em" }}>Education & Credentials</h4>
+            <div style={{ marginBottom: 28, background: "var(--bg-input)", border: "1px solid var(--border-soft)", borderRadius: 14, padding: "16px" }}>
+              <h4 style={{ margin: "0 0 12px", fontSize: 12, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Education & Credentials</h4>
               <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                 <span style={{ fontSize: 22 }}>🎓</span>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: "#fff", marginBottom: 2 }}>{counselor.highest_certification}</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-main)", marginBottom: 2 }}>{counselor.highest_certification}</div>
                   {counselor.issuing_institution && (
-                    <div style={{ fontSize: 13, color: "#8f97a8" }}>{counselor.issuing_institution}</div>
+                    <div style={{ fontSize: 13, color: "var(--text-muted)" }}>{counselor.issuing_institution}</div>
                   )}
                 </div>
               </div>

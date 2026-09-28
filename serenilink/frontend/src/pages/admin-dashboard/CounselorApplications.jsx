@@ -8,7 +8,7 @@ const BASE_URL = "http://localhost:8000";
 function toProtectedUrl(uploadPath) {
   // uploadPath is like /uploads/applications/certifications/abc.pdf
   // convert to /files/applications/certifications/abc.pdf
-  return `${BASE_URL}/files${uploadPath.replace("/uploads", "")}`;
+  return `/files${uploadPath.replace(/^\/uploads(?=\/)/, "")}`;
 }
 
 const STATUS_STYLE = {
@@ -62,22 +62,46 @@ function ThreeCol({ children }) {
 }
 
 function CertFile({ url, index }) {
+  const [downloading, setDownloading] = useState(false);
+  const [error, setError] = useState("");
   const filename = url.split("/").pop();
   const isPdf    = filename.toLowerCase().endsWith(".pdf");
+  async function download() {
+    setDownloading(true);
+    setError("");
+    try {
+      const response = await api.get(toProtectedUrl(url), { responseType: "blob" });
+      const objectUrl = URL.createObjectURL(response.data);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    } catch {
+      setError("Unable to download this certificate. Please try again.");
+    } finally {
+      setDownloading(false);
+    }
+  }
   return (
-    <a
-      href={toProtectedUrl(url)}
-      target="_blank"
-      rel="noreferrer"
-      download
-      style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border-faint)", background: "rgba(255,255,255,0.02)", textDecoration: "none", color: "var(--text-main)", fontSize: 13, marginBottom: 8 }}
+    <>
+    <button
+      type="button"
+      onClick={download}
+      disabled={downloading}
+      aria-busy={downloading}
+      style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border-faint)", background: "var(--notif-bell-bg)", textDecoration: "none", color: "var(--text-main)", fontSize: 13, marginBottom: 8 }}
     >
       <LuFileText size={15} style={{ color: "var(--accent)", flexShrink: 0 }} />
       <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
         {isPdf ? `Certificate ${index + 1}.pdf` : `Certificate ${index + 1}`}
       </span>
       <LuDownload size={14} style={{ color: "var(--text-muted)", flexShrink: 0 }} />
-    </a>
+    </button>
+    {error && <p role="alert">{error}</p>}
+    </>
   );
 }
 
@@ -90,7 +114,7 @@ function DetailsModal({ app, onClose, onAction, acting }) {
         .modal-body::-webkit-scrollbar-thumb { background: rgba(202,163,143,0.35); border-radius: 999px; }
         .modal-body::-webkit-scrollbar-thumb:hover { background: rgba(202,163,143,0.6); }
       `}</style>
-      <div style={{ width: "100%", maxWidth: 660, maxHeight: "90vh", background: "#111214", borderRadius: 14, border: "1px solid var(--border-faint)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ width: "100%", maxWidth: 660, maxHeight: "90vh", background: "var(--bg-panel)", borderRadius: 14, border: "1px solid var(--border-faint)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
         {/* Header */}
         <div style={{ padding: "22px 24px 16px", borderBottom: "1px solid var(--border-faint)", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>

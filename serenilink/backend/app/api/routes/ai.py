@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from app.core.rate_limit import limiter
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, get_current_user
@@ -10,6 +11,7 @@ from app.models.user_ai_summary import UserAISummary
 from app.models.mood import MoodEntry
 from app.models.assessment import Assessment
 from app.models.booking import Booking
+from app.models.screening import Screening
 from app.schemas.ai import AIChatIn, AIChatOut, AIConversationOut, AIMessageOut
 
 router = APIRouter(prefix="/ai", tags=["AI Support"])
@@ -34,9 +36,11 @@ def detect_risk(message: str) -> str:
 
 def safe_high_risk_reply() -> str:
     return (
-        "I'm really sorry you're feeling this way. You don't have to handle it alone. "
-        "If you feel unsafe right now, please reach out to a trusted person nearby or local emergency support. "
-        "If you want, tell me what's going on. I can help you find a safer next step."
+        "I'm really sorry you're going through this. You don't have to handle it alone. "
+        "Please reach out to someone you trust who can stay with you or support you right now. "
+        "If you feel you may hurt yourself or you're in immediate danger, contact your local emergency "
+        "services or go to the nearest emergency department. "
+        "If you can, tell me what's happening right now and whether you're somewhere safe."
     )
 
 
@@ -68,11 +72,11 @@ def get_or_create_conversation(db: Session, user_id: int, conversation_id: int |
 
 
 def build_live_context(db: Session, user_id: int) -> str:
-    """Fetch recent mood, assessment and booking data to give the AI situational awareness."""
+    """Fetch recent wellness data to give the AI situational awareness."""
     lines = []
     since = datetime.utcnow() - timedelta(days=7)
 
-    # Recent moods
+    # Recent mood check-ins
     moods = (
         db.query(MoodEntry)
         .filter(MoodEntry.user_id == user_id, MoodEntry.created_at >= since)
@@ -81,10 +85,10 @@ def build_live_context(db: Session, user_id: int) -> str:
         .all()
     )
     if moods:
-        mood_list = ", ".join(m.mood for m in moods)
-        lines.append(f"Recent moods (last 7 days): {mood_list}")
+        mood_list = ", ".join(m.mood.capitalize() for m in moods)
+        lines.append(f"Recent mood check-ins (last 7 days): {mood_list}")
 
-    # Latest assessment
+    # Latest self-assessment (mood/stress/sleep sliders)
     assessment = (
         db.query(Assessment)
         .filter(Assessment.user_id == user_id)
@@ -93,11 +97,26 @@ def build_live_context(db: Session, user_id: int) -> str:
     )
     if assessment:
         lines.append(
-            f"Latest check-in scores — Mood: {assessment.mood}/10, "
+            f"Latest self-assessment — Mood: {assessment.mood}/10, "
             f"Stress: {assessment.stress}/10, Sleep: {assessment.sleep}/10"
         )
 
-    # Upcoming bookings
+    # Latest PHQ-9 and GAD-7 screenings
+    for screening_type in ("PHQ9", "GAD7"):
+        screening = (
+            db.query(Screening)
+            .filter(Screening.user_id == user_id, Screening.type == screening_type)
+            .order_by(Screening.created_at.desc())
+            .first()
+        )
+        if screening:
+            label = "PHQ-9 (depression)" if screening_type == "PHQ9" else "GAD-7 (anxiety)"
+            lines.append(
+                f"Latest {label} screening — score: {screening.total_score}, "
+                f"severity: {screening.severity}"
+            )
+
+    # Upcoming approved counseling sessions
     upcoming = (
         db.query(Booking)
         .filter(
@@ -135,8 +154,11 @@ def update_summary(db: Session, user_id: int, conversation_excerpt: str, client,
                 "You are a calm, supportive mental health assistant who communicates in a natural, conversational, and empathetic way. Your role is to listen carefully, understand the user’s feelings, and respond with warmth and clarity. "
                 "You validate emotions without exaggeration and offer gentle support, including simple coping strategies or grounding techniques when appropriate. Your responses should be clear, well-structured, and not overwhelming."
                 "You do not act as a note-taking or memory system, and you do not summarize the user’s situation unless they explicitly ask. Avoid overly long, robotic, or complex responses. Maintain a balanced tone that is warm and human-like, but not overly dramatic or emotional."
-                "If a user appears to be in distress, gently encourage them to seek help from trusted people or professional support. When suggesting emergency contacts, only provide Rwanda-based options such as 112 (general emergency) and 114 (health emergency or ambulance)."
-                " Do not mention 911 or any non-Rwandan services."
+                "If a user appears to be in distress, gently encourage them to seek help from trusted people or professional support. If a user appears to be in distress, gently encourage them to seek help from trusted people, "
+                "mental health professionals, or local emergency services when appropriate. "
+                "Do not assume the user's country or location. "
+                "Only provide a specific emergency number when the user's location is known from the conversation "
+                "or the user explicitly asks for emergency contacts for a particular country."
                 "Always remain respectful, non-judgmental, and supportive. Your goal is to help the user feel heard, understood, and safe."
             )
         },
@@ -167,7 +189,9 @@ def update_summary(db: Session, user_id: int, conversation_excerpt: str, client,
 
 
 @router.post("/chat", response_model=AIChatOut)
+@limiter.limit("10/minute")
 def ai_chat(
+    request: Request,
     payload: AIChatIn,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
@@ -230,11 +254,14 @@ def ai_chat(
         "Risk and Safety Handling:\n"
         "- If a user expresses severe emotional distress, hopelessness, thoughts of self-harm, "
         "or concern for their immediate safety, respond with empathy and encourage immediate support "
-        "from trusted people, mental health professionals, or emergency services.\n"
-        "- For emergency situations in Rwanda, provide only these options: "
-        "112 for national emergency support and 114 for medical emergency or ambulance services.\n"
-        "- Never suggest non-Rwandan emergency numbers such as 911.\n"
-        "- In high-risk situations, prioritize safety-focused guidance over general conversation.\n\n"
+        "from a trusted person, mental health professional, local emergency services, or the nearest "
+        "emergency department.\n"
+        "- Do not assume the user's country or location.\n"
+        "- Only provide a specific emergency number when the user's location is known from the conversation "
+        "or the user explicitly asks for emergency contacts for a particular country.\n"
+        "- Do not guess emergency numbers. If the appropriate number is uncertain, advise the user to "
+        "contact their local emergency services or go to the nearest emergency department.\n"
+        "- In high-risk situations, prioritize immediate safety and human support over general wellness advice.\n\n"
 
         "Platform Awareness:\n"
         "- SereniLink offers counselor booking, mental health assessments, wellness exercises, "
@@ -249,6 +276,14 @@ def ai_chat(
 
     if summary_record.summary:
         system_content += f"What you know about this user:\n{summary_record.summary}\n\n"
+
+    live_context = build_live_context(db, current_user.id)
+    if live_context:
+        system_content += (
+            f"Recent wellness signals for this user (use only when naturally relevant — "
+            f"do not quote, list, or expose this data directly, and never make the user feel monitored or analysed):\n"
+            f"{live_context}\n\n"
+        )
 
     system_content += (
         f"The user's name is {current_user.nickname}. "

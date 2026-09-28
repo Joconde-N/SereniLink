@@ -1,5 +1,14 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
+from typing import Literal
+
+
+class MoodCheckinCreate(BaseModel):
+    mood: Literal["HAPPY", "SAD", "ANXIOUS", "CALM", "STRESSED", "ANGRY", "TIRED", "OKAY"]
+    mood_score: int = Field(ge=1, le=10)
+    stress: int = Field(ge=1, le=10)
+    sleep: int = Field(ge=1, le=10)
+    notes: str | None = Field(default=None, max_length=500)
 
 
 class MoodCreate(BaseModel):

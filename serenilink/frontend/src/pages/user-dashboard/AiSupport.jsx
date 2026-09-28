@@ -139,7 +139,7 @@ function AiSupport() {
         {/* Sidebar */}
         <div style={{
           width: sidebarCollapsed ? "48px" : "200px", flexShrink: 0, display: "flex", flexDirection: "column", gap: "8px",
-          background: "linear-gradient(180deg, #1a1a1d 0%, #171719 100%)",
+          background: "linear-gradient(180deg, var(--bg-panel) 0%, var(--bg-panel-2) 100%)",
           border: "1px solid var(--border-faint)", borderRadius: "20px", padding: "16px",
           transition: "width 0.25s ease", overflow: "hidden",
         }}>
@@ -215,7 +215,7 @@ function AiSupport() {
         {/* Chat panel */}
         <div style={{
           flex: 1, display: "flex", flexDirection: "column",
-          background: "linear-gradient(180deg, #1a1a1d 0%, #171719 100%)",
+          background: "linear-gradient(180deg, var(--bg-panel) 0%, var(--bg-panel-2) 100%)",
           border: "1px solid var(--border-faint)", borderRadius: "20px", overflow: "hidden",
         }}>
           {/* Chat header */}
@@ -271,7 +271,7 @@ function AiSupport() {
                     alignItems: msg.role === "user" ? "flex-end" : "flex-start" }}>
                     <div style={{
                       padding: "12px 16px", borderRadius: msg.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
-                      background: msg.role === "user" ? "#a86955" : "rgba(255,255,255,0.06)",
+                      background: msg.role === "user" ? "#a86955" : "var(--chat-bubble-theirs)",
                       color: msg.role === "user" ? "#fff" : "var(--text-main)",
                       fontSize: "14px", lineHeight: 1.6,
                     }}>
@@ -294,7 +294,7 @@ function AiSupport() {
                 <div style={{ width: "30px", height: "30px", borderRadius: "50%", flexShrink: 0, background: "rgba(202,163,143,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <LuBot size={14} color="var(--accent)" />
                 </div>
-                <div style={{ padding: "12px 16px", borderRadius: "18px 18px 18px 4px", background: "rgba(255,255,255,0.06)", fontSize: "14px", color: "var(--text-muted)" }}>
+                <div style={{ padding: "12px 16px", borderRadius: "18px 18px 18px 4px", background: "var(--chat-bubble-theirs)", fontSize: "14px", color: "var(--text-muted)" }}>
                   <span>Typing</span>
                   <span style={{ animation: "none" }}> ...</span>
                 </div>
@@ -327,7 +327,7 @@ function AiSupport() {
                 disabled={sending || !text.trim()}
                 style={{
                   width: "36px", height: "36px", borderRadius: "10px", border: "none",
-                  background: text.trim() ? "#a86955" : "rgba(255,255,255,0.06)",
+                  background: text.trim() ? "#a86955" : "var(--notif-bell-bg)",
                   color: text.trim() ? "#fff" : "var(--text-muted)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   cursor: text.trim() ? "pointer" : "default", flexShrink: 0,

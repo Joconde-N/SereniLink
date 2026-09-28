@@ -1,7 +1,8 @@
 import axios from "axios";
+import { normalizeApiError } from "./errors.js";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000",
+  baseURL: import.meta.env?.VITE_API_URL || "http://localhost:8000",
 });
 
 api.interceptors.request.use((config) => {
@@ -11,8 +12,17 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (response.config.url === "/auth/change-password" && response.data.access_token) {
+      const storage = localStorage.getItem("token") ? localStorage : sessionStorage;
+      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
+      storage.setItem("token", response.data.access_token);
+    }
+    return response;
+  },
   (error) => {
+    normalizeApiError(error);
     if (error.response?.status === 401) {
       const isAuthRoute = error.config?.url?.includes("/auth/login") ||
                           error.config?.url?.includes("/auth/register");

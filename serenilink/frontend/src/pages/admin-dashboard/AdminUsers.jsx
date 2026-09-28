@@ -62,7 +62,7 @@ function DetailsPanel({ user, onClose, onUpdate }) {
     }}>
       <div onClick={onClose} style={{ flex: 1, background: "rgba(0,0,0,0.5)" }} />
       <div style={{
-        width: 360, background: "#111214", borderLeft: "1px solid var(--border-faint)",
+        width: 360, background: "var(--bg-panel)", borderLeft: "1px solid var(--border-faint)",
         padding: "28px 24px", overflowY: "auto", display: "flex", flexDirection: "column", gap: 20,
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -228,7 +228,7 @@ function AdminUsers() {
                 <tr
                   key={u.id}
                   style={{ borderBottom: "1px solid var(--border-faint)", transition: "background 0.15s" }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.02)"}
+                  onMouseEnter={(e) => e.currentTarget.style.background = "var(--accent-bg)"}
                   onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
                 >
                   {/* User */}

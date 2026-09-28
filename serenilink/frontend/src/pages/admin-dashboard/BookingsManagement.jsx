@@ -25,8 +25,8 @@ function ActionPopover({ label, options, current, onSelect, accentCurrent }) {
         style={{
           height: "32px", padding: "0 12px", borderRadius: "8px", fontSize: "12px",
           fontWeight: 600, cursor: "pointer",
-          border: "1px solid rgba(176,176,176,0.15)",
-          background: "rgba(255,255,255,0.04)", color: "var(--text-soft)",
+          border: "1px solid var(--border-soft)",
+          background: "var(--notif-bell-bg)", color: "var(--text-soft)",
         }}
       >
         {label}
@@ -36,7 +36,7 @@ function ActionPopover({ label, options, current, onSelect, accentCurrent }) {
           <div style={{ position: "fixed", inset: 0, zIndex: 99 }} onClick={() => setOpen(false)} />
           <div style={{
             position: "absolute", top: "38px", right: 0, zIndex: 100,
-            background: "#1e1e22", border: "1px solid rgba(255,255,255,0.1)",
+            background: "var(--bg-panel)", border: "1px solid var(--border-soft)",
             borderRadius: "12px", padding: "6px", minWidth: "160px",
             boxShadow: "0 12px 40px rgba(0,0,0,0.4)",
           }}>

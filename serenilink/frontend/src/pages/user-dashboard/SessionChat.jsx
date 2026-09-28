@@ -28,6 +28,7 @@ function SessionChat() {
   }, [messages]);
 
   const handleSend = async () => {
+    if (booking?.status !== "APPROVED") return;
     const ok = await sendMessage(text);
     if (ok) setText("");
   };
@@ -118,6 +119,7 @@ function SessionChat() {
         </div>
 
         <div style={{ padding: "14px 16px", borderTop: "1px solid var(--border-faint)" }}>
+          {booking?.status === "COMPLETED" && <p>This session is completed. Chat history is read-only.</p>}
           {error && <p style={{ color: "#f08f8f", fontSize: "12px", marginBottom: "8px" }}>{error}</p>}
           <div style={{
             display: "flex", gap: "10px", alignItems: "center",
@@ -130,12 +132,12 @@ function SessionChat() {
               value={text}
               onChange={(e) => { setText(e.target.value); setError(""); }}
               onKeyDown={handleKey}
-              disabled={sending}
+              disabled={sending || booking?.status !== "APPROVED"}
               style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "var(--text-main)", fontSize: "14px" }}
             />
             <button
               type="button" onClick={handleSend}
-              disabled={sending || !text.trim()}
+              disabled={sending || !text.trim() || booking?.status !== "APPROVED"}
               style={{
                 width: "36px", height: "36px", borderRadius: "10px", border: "none",
                 background: text.trim() ? "#a86955" : "rgba(128,128,128,0.15)",

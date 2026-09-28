@@ -39,7 +39,7 @@ function BookingModal({ counselor, onClose, onBooked }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
-      <div style={{ background: "#1a1a1d", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "20px", padding: "28px", width: "100%", maxWidth: "480px", maxHeight: "90vh", overflowY: "auto" }}>
+      <div style={{ background: "var(--bg-panel)", border: "1px solid var(--border-soft)", borderRadius: "20px", padding: "28px", width: "100%", maxWidth: "480px", maxHeight: "90vh", overflowY: "auto" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <h3 style={{ margin: 0, fontSize: "18px" }}>Book Session with {counselor.full_name}</h3>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--text-muted)", fontSize: "22px", cursor: "pointer", lineHeight: 1 }}>×</button>
@@ -56,7 +56,7 @@ function BookingModal({ counselor, onClose, onBooked }) {
           {loadingSlots ? (
             <p style={{ color: "var(--text-muted)", fontSize: "14px" }}>Loading slots...</p>
           ) : slots.length === 0 ? (
-            <p style={{ color: "var(--text-muted)", fontSize: "14px", padding: "14px", background: "rgba(255,255,255,0.03)", borderRadius: "12px", border: "1px solid var(--border-faint)" }}>
+            <p style={{ color: "var(--text-muted)", fontSize: "14px", padding: "14px", background: "var(--bg-input)", borderRadius: "12px", border: "1px solid var(--border-faint)" }}>
               No available slots at the moment.
             </p>
           ) : (
@@ -69,7 +69,7 @@ function BookingModal({ counselor, onClose, onBooked }) {
                   style={{
                     padding: "12px 16px", borderRadius: "12px", textAlign: "left", cursor: "pointer",
                     border: selectedSlot?.id === s.id ? "2px solid var(--accent)" : "1px solid var(--border-soft)",
-                    background: selectedSlot?.id === s.id ? "rgba(202,163,143,0.1)" : "rgba(255,255,255,0.02)",
+                    background: selectedSlot?.id === s.id ? "var(--accent-bg)" : "var(--notif-bell-bg)",
                     color: "var(--text-main)",
                   }}
                 >
@@ -200,8 +200,8 @@ function FindCounselors() {
         <div className="dashboard-grid dashboard-cards-3">
           {displayed.map((c) => (
             <div key={c.id} style={{
-              background: "linear-gradient(160deg, #1c1c1f 0%, #171719 100%)",
-              border: "1px solid rgba(176,176,176,0.09)",
+              background: "linear-gradient(160deg, var(--bg-panel) 0%, var(--bg-panel-2) 100%)",
+              border: "1px solid var(--border-soft)",
               borderRadius: "20px",
               overflow: "hidden",
               display: "flex",
@@ -221,9 +221,9 @@ function FindCounselors() {
                   onError={(e) => { e.target.src = FALLBACK(c.full_name); }}
                 />
                 <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: "6px", minWidth: 0 }}>
-                  <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "#f4f4f4", lineHeight: 1.3 }}>{c.full_name}</h3>
+                  <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text-main)", lineHeight: 1.3 }}>{c.full_name}</h3>
                   <p style={{ margin: 0, fontSize: "12px", color: "var(--accent)", fontWeight: 500 }}>{c.title || "Counselor"}</p>
-                  <p style={{ margin: 0, fontSize: "12px", color: "#9ca3af", fontWeight: 500 }}>{c.specialization}</p>
+                  <p style={{ margin: 0, fontSize: "12px", color: "var(--text-muted)", fontWeight: 500 }}>{c.specialization}</p>
                   {c.general_location && (
                     <p style={{ margin: 0, fontSize: "11px", color: "var(--text-muted)" }}>📍 {c.general_location}</p>
                   )}
@@ -231,7 +231,7 @@ function FindCounselors() {
               </div>
 
               {/* Divider */}
-              <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", margin: "0 18px" }} />
+              <div style={{ height: "1px", background: "var(--border-faint)", margin: "0 18px" }} />
 
               {/* Bio */}
               {c.bio && (

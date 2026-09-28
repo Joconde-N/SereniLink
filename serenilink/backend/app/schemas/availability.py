@@ -1,10 +1,16 @@
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, AwareDatetime, field_validator
+from datetime import timezone
 
 
 class AvailabilityCreate(BaseModel):
-    start_time: datetime
-    end_time: datetime
+    start_time: AwareDatetime
+    end_time: AwareDatetime
+
+    @field_validator("start_time", "end_time")
+    @classmethod
+    def normalize_utc(cls, value):
+        return value.astimezone(timezone.utc)
 
 
 class AvailabilityOut(BaseModel):

@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import api from "../../api/axios";
 import { LuEye, LuEyeOff } from "react-icons/lu";
-import "../Login/login.css";
+import "./Login.css";
+import { passwordError, PASSWORD_HELP } from "../../utils/password";
 
 function ResetPassword() {
   const [searchParams] = useSearchParams();
@@ -20,14 +21,15 @@ function ResetPassword() {
     e.preventDefault();
     setError("");
     if (password !== confirm) return setError("Passwords do not match.");
-    if (password.length < 6) return setError("Password must be at least 6 characters.");
+    if (passwordError(password)) return setError(passwordError(password));
     setLoading(true);
     try {
       await api.post("/auth/reset-password", { token, new_password: password });
       setSuccess(true);
       setTimeout(() => navigate("/login"), 3000);
     } catch (err) {
-      setError(err.response?.data?.detail || "Invalid or expired reset link.");
+      const detail = err.response?.data?.detail;
+      setError(typeof detail === "string" ? detail : "Invalid or expired reset link.");
     } finally {
       setLoading(false);
     }
@@ -43,7 +45,7 @@ function ResetPassword() {
       <div className="login-right" style={{ minHeight: "100vh" }}>
         <div className="login-form-box">
           <h2>New Password</h2>
-          <p className="login-subtext">Enter a new password for your account.</p>
+          <p className="login-subtext">{PASSWORD_HELP}</p>
 
           {!token ? (
             <p style={{ color: "#eb5757", fontSize: 14 }}>Invalid reset link. Please request a new one.</p>

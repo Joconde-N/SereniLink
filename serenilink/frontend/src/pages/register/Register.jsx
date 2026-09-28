@@ -3,6 +3,7 @@ import "./Register.css";
 import { Link, useNavigate } from "react-router-dom";
 import registerImage from "../../assets/register.png";
 import api from "../../api/axios";
+import { LuEye, LuEyeOff } from "react-icons/lu";
 
 const RULES = [
   { key: "length",    label: "At least 8 characters",          test: (p) => p.length >= 8 },
@@ -87,6 +88,8 @@ function Register() {
   const [error, setError]     = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -128,28 +131,29 @@ function Register() {
     <div className="register-page">
       <div className="register-topbar">
         <div className="register-brand">SereniLink</div>
-        <Link to="/" className="register-back">← Back Home</Link>
+        <button className="register-back" onClick={() => navigate(-1)}>← Back</button>
       </div>
 
-      <div className="register-left">
-        <img src={registerImage} alt="SereniLink community" className="register-image" />
-        <div className="register-image-overlay"></div>
-        <div className="register-left-content">
-          <div className="register-tag">EMPOWERING MINDS</div>
-          <h1>
-            Start your journey to
-            <br />mental well-being
-            <br />today.
-          </h1>
-          <p>
-            Join a supportive community of thousands finding peace, balance, and
-            growth with SereniLink&apos;s modern wellness platform.
-          </p>
+      <div className="register-columns">
+        <div className="register-left">
+          <img src={registerImage} alt="SereniLink community" className="register-image" />
+          <div className="register-image-overlay"></div>
+          <div className="register-left-content">
+            <div className="register-tag">EMPOWERING MINDS</div>
+            <h1>
+              Start your journey to
+              <br />mental well-being
+              <br />today.
+            </h1>
+            <p>
+              Join a supportive community of thousands finding peace, balance, and
+              growth with SereniLink&apos;s modern wellness platform.
+            </p>
+          </div>
         </div>
-      </div>
 
-      <div className="register-right">
-        <div className="register-form-box">
+        <div className="register-right">
+          <div className="register-form-box">
           <h2>Join Us</h2>
           <p className="register-subtext"> <em>You choose your username.No real name needed.</em>
             
@@ -179,6 +183,8 @@ function Register() {
               <input
                 type="text"
                 name="nickname"
+                minLength={3}
+                maxLength={50}
                 placeholder="e.g. alex123"
                 value={form.nickname}
                 onChange={handleChange}
@@ -199,28 +205,48 @@ function Register() {
 
             <div className="register-split">
               <div className="register-field">
-                <label>Password</label>
+                <label htmlFor="register-password">Password</label>
+                <div className="register-password-wrap">
                 <input
-                  type="password"
+                  id="register-password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
                   name="password"
                   placeholder="••••••••"
                   value={form.password}
                   onChange={handleChange}
                   required
                 />
+                <button type="button" className="register-eye"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-pressed={showPassword} aria-controls="register-password"
+                  onClick={() => setShowPassword((visible) => !visible)}>
+                  {showPassword ? <LuEyeOff aria-hidden="true" /> : <LuEye aria-hidden="true" />}
+                </button>
+                </div>
                 <PasswordStrength password={form.password} />
               </div>
 
               <div className="register-field">
-                <label>Confirm Password</label>
+                <label htmlFor="register-confirm-password">Confirm Password</label>
+                <div className="register-password-wrap">
                 <input
-                  type="password"
+                  id="register-confirm-password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  autoComplete="new-password"
                   name="confirmPassword"
                   placeholder="••••••••"
                   value={form.confirmPassword}
                   onChange={handleChange}
                   required
                 />
+                <button type="button" className="register-eye"
+                  aria-label={showConfirmPassword ? "Hide confirmed password" : "Show confirmed password"}
+                  aria-pressed={showConfirmPassword} aria-controls="register-confirm-password"
+                  onClick={() => setShowConfirmPassword((visible) => !visible)}>
+                  {showConfirmPassword ? <LuEyeOff aria-hidden="true" /> : <LuEye aria-hidden="true" />}
+                </button>
+                </div>
               </div>
             </div>
 
@@ -242,6 +268,7 @@ function Register() {
               Already have an account? <Link to="/login">Log in</Link>
             </p>
           </form>
+          </div>
         </div>
       </div>
     </div>

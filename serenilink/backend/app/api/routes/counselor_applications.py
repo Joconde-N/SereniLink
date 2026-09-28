@@ -16,6 +16,7 @@ from app.models.counselor import Counselor
 from app.models.user import User
 from app.schemas.counselor_application import CounselorApplicationOut
 from app.core.audit import log_action
+from app.core.rate_limit import limiter
 
 router = APIRouter(prefix="/counselor-applications", tags=["Counselor Applications"])
 
@@ -58,7 +59,9 @@ def _generate_nickname(full_name: str, db: Session) -> str:
 
 
 @router.post("/", response_model=CounselorApplicationOut, status_code=201)
+@limiter.limit("5/minute")
 async def submit_application(
+    request: Request,
     full_name:              str           = Form(...),
     email:                  str           = Form(...),
     phone_number:           Optional[str] = Form(None),

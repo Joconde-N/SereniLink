@@ -19,8 +19,13 @@ function GuestAiSupport() {
   const location = useLocation();
   const seed = location.state || {};
   const [messages, setMessages] = useState(seed.messages || []);
-  const [messagesLeft, setMessagesLeft] = useState(seed.messagesLeft ?? MAX);
-  const [limitReached, setLimitReached] = useState(seed.limitReached || false);
+  const [messagesLeft, setMessagesLeft] = useState(() => {
+    const stored = localStorage.getItem("guest_ai_messages_left");
+    return stored !== null ? Number(stored) : (seed.messagesLeft ?? MAX);
+  });
+  const [limitReached, setLimitReached] = useState(() => {
+    return localStorage.getItem("guest_ai_limit_reached") === "true" || seed.limitReached || false;
+  });
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
@@ -31,6 +36,11 @@ function GuestAiSupport() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, sending]);
+
+  useEffect(() => {
+    localStorage.setItem("guest_ai_messages_left", messagesLeft);
+    localStorage.setItem("guest_ai_limit_reached", limitReached);
+  }, [messagesLeft, limitReached]);
 
   const handleSend = async () => {
     const msg = text.trim();
@@ -66,22 +76,22 @@ function GuestAiSupport() {
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "#070808", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", background: "var(--site-bg, #070808)", display: "flex", flexDirection: "column", color: "var(--site-text, #fff)", transition: "background-color 0.25s ease" }}>
 
       {/* Top bar */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "16px 32px", flexShrink: 0,
-        borderBottom: "1px solid rgba(255,255,255,0.05)",
+        borderBottom: "1px solid var(--border-faint, rgba(255,255,255,0.05))",
       }}>
-        <Link to="/" style={{ color: "#f4f4f4", fontSize: "20px", fontWeight: 700, textDecoration: "none" }}>
+        <Link to="/" style={{ color: "var(--text-main, #f4f4f4)", fontSize: "20px", fontWeight: 700, textDecoration: "none" }}>
           SereniLink
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <Link to="/register" style={{ height: "34px", padding: "0 16px", borderRadius: "9px", background: "#a86955", color: "#fff", fontSize: "13px", fontWeight: 600, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>
             Sign Up Free
           </Link>
-          <Link to="/login" style={{ height: "34px", padding: "0 16px", borderRadius: "9px", border: "1px solid rgba(176,176,176,0.15)", background: "transparent", color: "#b8bfcc", fontSize: "13px", fontWeight: 600, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>
+          <Link to="/login" style={{ height: "34px", padding: "0 16px", borderRadius: "9px", border: "1px solid var(--border-soft, rgba(176,176,176,0.15))", background: "transparent", color: "var(--text-soft, #b8bfcc)", fontSize: "13px", fontWeight: 600, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>
             Log In
           </Link>
         </div>
@@ -128,25 +138,25 @@ function GuestAiSupport() {
         {/* Chat card */}
         <div style={{
           flex: 1, display: "flex", flexDirection: "column", marginTop: "24px",
-          background: "linear-gradient(180deg, #1a1a1d 0%, #171719 100%)",
-          border: "1px solid rgba(176,176,176,0.08)", borderRadius: "20px", overflow: "hidden",
+          background: "linear-gradient(180deg, var(--bg-panel, #1a1a1d) 0%, var(--bg-panel-2, #171719) 100%)",
+          border: "1px solid var(--border-soft, rgba(176,176,176,0.08))", borderRadius: "20px", overflow: "hidden",
           boxShadow: "0 8px 40px rgba(0,0,0,0.3)",
         }}>
 
           {/* Chat header */}
           <div style={{
-            padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)",
+            padding: "16px 20px", borderBottom: "1px solid var(--border-faint, rgba(255,255,255,0.06))",
             display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0,
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <div style={{ width: "38px", height: "38px", borderRadius: "50%", background: "rgba(202,163,143,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <LuBot size={18} color="#E19A86" />
+              <div style={{ width: "38px", height: "38px", borderRadius: "50%", background: "var(--accent-bg, rgba(202,163,143,0.15))", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <LuBot size={18} color="var(--accent, #E19A86)" />
               </div>
               <div>
-                <p style={{ margin: 0, fontWeight: 700, fontSize: "14px", color: "#f4f4f4" }}>SereniLink AI</p>
+                <p style={{ margin: 0, fontWeight: 700, fontSize: "14px", color: "var(--text-main, #f4f4f4)" }}>SereniLink AI</p>
                 <p style={{ margin: 0, fontSize: "11px", color: messagesLeft > 1 ? "#67d58c" : "#f5c95f" }}>
                   {messagesLeft} free message{messagesLeft !== 1 ? "s" : ""} left ·{" "}
-                  <Link to="/register" style={{ color: "#E19A86", textDecoration: "none" }}>Sign up for unlimited</Link>
+                  <Link to="/register" style={{ color: "var(--accent, #E19A86)", textDecoration: "none" }}>Sign up for unlimited</Link>
                 </p>
               </div>
             </div>
@@ -154,12 +164,12 @@ function GuestAiSupport() {
               to="/"
               style={{
                 display: "flex", alignItems: "center", gap: "6px",
-                color: "#b0b0b0", fontSize: "13px", textDecoration: "none",
-                background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+                color: "var(--text-muted, #b0b0b0)", fontSize: "13px", textDecoration: "none",
+                background: "var(--notif-bell-bg, rgba(255,255,255,0.04))", border: "1px solid var(--border-soft, rgba(255,255,255,0.08))",
                 borderRadius: "9px", padding: "7px 12px",
               }}
-              onMouseEnter={(e) => e.currentTarget.style.color = "#E19A86"}
-              onMouseLeave={(e) => e.currentTarget.style.color = "#b0b0b0"}
+              onMouseEnter={(e) => e.currentTarget.style.color = "var(--accent, #E19A86)"}
+              onMouseLeave={(e) => e.currentTarget.style.color = "var(--text-muted, #b0b0b0)"}
             >
               <LuMinimize2 size={13} /> Minimize
             </Link>
@@ -172,10 +182,10 @@ function GuestAiSupport() {
           }}>
             {messages.length === 0 && (
               <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "14px", padding: "60px 20px", textAlign: "center" }}>
-                <div style={{ width: "60px", height: "60px", borderRadius: "50%", background: "rgba(202,163,143,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <LuBot size={28} color="#E19A86" />
+                <div style={{ width: "60px", height: "60px", borderRadius: "50%", background: "var(--accent-bg, rgba(202,163,143,0.1))", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <LuBot size={28} color="var(--accent, #E19A86)" />
                 </div>
-                <p style={{ margin: 0, color: "#b0b0b0", fontSize: "14px", lineHeight: 1.8, maxWidth: "320px" }}>
+                <p style={{ margin: 0, color: "var(--text-muted, #b0b0b0)", fontSize: "14px", lineHeight: 1.8, maxWidth: "320px" }}>
                   Hi there! I'm SereniLink AI.<br />I'm here to listen and support you.<br />What's on your mind today?
                 </p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center", maxWidth: "400px" }}>
@@ -184,12 +194,12 @@ function GuestAiSupport() {
                       key={prompt} type="button"
                       onClick={() => { setText(prompt); inputRef.current?.focus(); }}
                       style={{
-                        background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
-                        borderRadius: "999px", color: "#b8bfcc", fontSize: "13px", padding: "8px 16px",
+                        background: "var(--notif-bell-bg, rgba(255,255,255,0.04))", border: "1px solid var(--border-soft, rgba(255,255,255,0.08))",
+                        borderRadius: "999px", color: "var(--text-soft, #b8bfcc)", fontSize: "13px", padding: "8px 16px",
                         cursor: "pointer", transition: "background 0.2s",
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = "rgba(202,163,143,0.08)"}
-                      onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
+                      onMouseEnter={(e) => e.currentTarget.style.background = "var(--accent-bg, rgba(202,163,143,0.08))"}
+                      onMouseLeave={(e) => e.currentTarget.style.background = "var(--notif-bell-bg, rgba(255,255,255,0.04))"}
                     >
                       {prompt}
                     </button>
@@ -205,16 +215,16 @@ function GuestAiSupport() {
                 alignItems: "flex-end",
               }}>
                 {msg.role === "assistant" && (
-                  <div style={{ width: "30px", height: "30px", borderRadius: "50%", flexShrink: 0, background: "rgba(202,163,143,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <LuBot size={14} color="#E19A86" />
+                  <div style={{ width: "30px", height: "30px", borderRadius: "50%", flexShrink: 0, background: "var(--accent-bg, rgba(202,163,143,0.12))", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <LuBot size={14} color="var(--accent, #E19A86)" />
                   </div>
                 )}
                 <div style={{ maxWidth: "70%", display: "flex", flexDirection: "column", gap: "4px", alignItems: msg.role === "user" ? "flex-end" : "flex-start" }}>
                   <div style={{
                     padding: "12px 16px", fontSize: "14px", lineHeight: 1.65,
                     borderRadius: msg.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
-                    background: msg.role === "user" ? "#a86955" : "rgba(255,255,255,0.06)",
-                    color: msg.role === "user" ? "#fff" : "#e0e0e0",
+                    background: msg.role === "user" ? "var(--accent, #a86955)" : "var(--chat-bubble-theirs, rgba(255,255,255,0.06))",
+                    color: msg.role === "user" ? "#fff" : "var(--text-main, #e0e0e0)",
                   }}>
                     {msg.content}
                     {msg.risk_level && RISK_COLOR[msg.risk_level] && (
@@ -223,7 +233,7 @@ function GuestAiSupport() {
                       </div>
                     )}
                   </div>
-                  <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.25)" }}>
+                  <span style={{ fontSize: "10px", color: "var(--text-muted, rgba(255,255,255,0.25))" }}>
                     {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </span>
                 </div>
@@ -232,10 +242,10 @@ function GuestAiSupport() {
 
             {sending && (
               <div style={{ display: "flex", gap: "10px", alignItems: "flex-end" }}>
-                <div style={{ width: "30px", height: "30px", borderRadius: "50%", flexShrink: 0, background: "rgba(202,163,143,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <LuBot size={14} color="#E19A86" />
+                <div style={{ width: "30px", height: "30px", borderRadius: "50%", flexShrink: 0, background: "var(--accent-bg, rgba(202,163,143,0.12))", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <LuBot size={14} color="var(--accent, #E19A86)" />
                 </div>
-                <div style={{ padding: "12px 16px", borderRadius: "18px 18px 18px 4px", background: "rgba(255,255,255,0.06)", color: "#b0b0b0", fontSize: "14px" }}>
+                <div style={{ padding: "12px 16px", borderRadius: "18px 18px 18px 4px", background: "var(--chat-bubble-theirs, rgba(255,255,255,0.06))", color: "var(--text-muted, #b0b0b0)", fontSize: "14px" }}>
                   Typing...
                 </div>
               </div>
@@ -244,13 +254,13 @@ function GuestAiSupport() {
           </div>
 
           {/* Input */}
-          <div style={{ padding: "14px 16px", borderTop: "1px solid rgba(255,255,255,0.05)", flexShrink: 0 }}>
+          <div style={{ padding: "14px 16px", borderTop: "1px solid var(--border-faint, rgba(255,255,255,0.05))", flexShrink: 0 }}>
             {limitReached ? (
-              <div style={{ background: "rgba(202,163,143,0.08)", border: "1px solid rgba(202,163,143,0.18)", borderRadius: "14px", padding: "16px", textAlign: "center" }}>
-                <p style={{ margin: "0 0 12px", color: "#f4f4f4", fontSize: "14px" }}>You've used all {MAX} free messages.</p>
+              <div style={{ background: "var(--accent-bg, rgba(202,163,143,0.08))", border: "1px solid var(--border-soft, rgba(202,163,143,0.18))", borderRadius: "14px", padding: "16px", textAlign: "center" }}>
+                <p style={{ margin: "0 0 12px", color: "var(--text-main, #f4f4f4)", fontSize: "14px" }}>You've used all {MAX} free messages.</p>
                 <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
                   <Link to="/register" style={{ height: "38px", padding: "0 20px", borderRadius: "10px", background: "#a86955", color: "#fff", fontSize: "13px", fontWeight: 600, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>Create Free Account</Link>
-                  <Link to="/login" style={{ height: "38px", padding: "0 20px", borderRadius: "10px", border: "1px solid rgba(176,176,176,0.15)", background: "transparent", color: "#b8bfcc", fontSize: "13px", fontWeight: 600, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>Log In</Link>
+                  <Link to="/login" style={{ height: "38px", padding: "0 20px", borderRadius: "10px", border: "1px solid var(--border-soft, rgba(176,176,176,0.15))", background: "transparent", color: "var(--text-soft, #b8bfcc)", fontSize: "13px", fontWeight: 600, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>Log In</Link>
                 </div>
               </div>
             ) : (
@@ -258,7 +268,7 @@ function GuestAiSupport() {
                 {error && <p style={{ color: "#f08f8f", fontSize: "12px", marginBottom: "8px" }}>{error}</p>}
                 <div style={{
                   display: "flex", gap: "10px", alignItems: "center",
-                  background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)",
+                  background: "var(--notif-bell-bg, rgba(255,255,255,0.04))", border: "1px solid var(--border-soft, rgba(255,255,255,0.09))",
                   borderRadius: "14px", padding: "6px 6px 6px 16px",
                 }}>
                   <input
@@ -266,15 +276,15 @@ function GuestAiSupport() {
                     type="text" placeholder="Type your message..."
                     value={text} onChange={(e) => setText(e.target.value)}
                     onKeyDown={handleKey} disabled={sending} autoFocus
-                    style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "#f4f4f4", fontSize: "14px" }}
+                    style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "var(--text-main, #f4f4f4)", fontSize: "14px" }}
                   />
                   <button
                     type="button" onClick={handleSend}
                     disabled={sending || !text.trim()}
                     style={{
                       width: "36px", height: "36px", borderRadius: "10px", border: "none",
-                      background: text.trim() ? "#a86955" : "rgba(255,255,255,0.06)",
-                      color: text.trim() ? "#fff" : "#555",
+                      background: text.trim() ? "var(--accent, #a86955)" : "var(--notif-bell-bg, rgba(255,255,255,0.06))",
+                      color: text.trim() ? "#fff" : "var(--text-muted, #555)",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       cursor: text.trim() ? "pointer" : "default", flexShrink: 0,
                       transition: "background 0.2s ease",
@@ -283,7 +293,7 @@ function GuestAiSupport() {
                     <LuSendHorizontal size={16} />
                   </button>
                 </div>
-                <p style={{ margin: "8px 0 0", fontSize: "11px", color: "rgba(255,255,255,0.2)", textAlign: "center" }}>
+                <p style={{ margin: "8px 0 0", fontSize: "11px", color: "var(--text-muted, rgba(255,255,255,0.2))", textAlign: "center" }}>
                   Support tool only — not a replacement for professional care. Guest conversations are not saved.
                 </p>
               </>

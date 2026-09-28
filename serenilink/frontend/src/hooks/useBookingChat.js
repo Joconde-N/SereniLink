@@ -48,6 +48,8 @@ export function useBookingChat(bookingId) {
         if (data.type === "history") {
           setMessages(data.messages || []);
           setLoading(false);
+        } else if (data.type === "error") {
+          setError(data.message || "Message could not be sent.");
         } else if (data.type === "message" || data.id) {
           setMessages((prev) => {
             if (prev.some((m) => m.id === data.id)) return prev;
@@ -66,8 +68,13 @@ export function useBookingChat(bookingId) {
       loadViaRest().finally(() => setLoading(false));
     };
 
-    ws.onclose = () => {
+    ws.onclose = (event) => {
+      if (closed) return;
       setLive(false);
+      setLoading(false);
+      if (event.code === 4401 || event.code === 4403) {
+        setError("You no longer have access to this chat.");
+      }
       wsRef.current = null;
     };
 

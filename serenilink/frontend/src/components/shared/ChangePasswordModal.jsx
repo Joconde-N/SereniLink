@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
+import { passwordError, PASSWORD_HELP } from "../../utils/password";
 
 /**
  * Modal shown when a counselor must set a new password after approval.
@@ -8,15 +9,15 @@ import { useAuth } from "../../context/AuthContext";
  */
 function ChangePasswordModal() {
   const { login, user, updateUser } = useAuth();
-  const [form, setForm] = useState({ new_password: "", confirm_password: "" });
+  const [form, setForm] = useState({ current_password: "", new_password: "", confirm_password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    if (form.new_password.length < 6) {
-      setError("Password must be at least 6 characters.");
+    if (passwordError(form.new_password)) {
+      setError(passwordError(form.new_password));
       return;
     }
     if (form.new_password !== form.confirm_password) {
@@ -26,10 +27,10 @@ function ChangePasswordModal() {
 
     setLoading(true);
     try {
-      await api.post("/auth/change-password", { new_password: form.new_password });
+      await api.post("/auth/change-password", { current_password: form.current_password, new_password: form.new_password });
       const meRes = await api.get("/auth/me");
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-      login(token, meRes.data);
+      login(token, meRes.data, Boolean(localStorage.getItem("token")));
       updateUser(meRes.data);
     } catch (err) {
       setError(err.response?.data?.detail || "Failed to update password.");
@@ -50,11 +51,15 @@ function ChangePasswordModal() {
         {error && <p className="password-modal-error">{error}</p>}
 
         <form onSubmit={handleSubmit}>
+          <label className="form-label" htmlFor="temporary-password">Current / temporary password</label>
+          <input id="temporary-password" className="form-input" type="password" autoComplete="current-password"
+            value={form.current_password} onChange={(e) => setForm({ ...form, current_password: e.target.value })} required />
+          <p>{PASSWORD_HELP}</p>
           <label className="form-label">New Password</label>
           <input
             className="form-input"
             type="password"
-            placeholder="At least 6 characters"
+            placeholder="At least 8 characters"
             value={form.new_password}
             onChange={(e) => setForm({ ...form, new_password: e.target.value })}
             required

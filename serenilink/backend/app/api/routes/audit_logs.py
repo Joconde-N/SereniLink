@@ -7,6 +7,7 @@ import csv
 
 from app.api.deps import get_db, require_admin
 from app.models.audit_log import AuditLog
+from app.core.audit import safe_audit_detail
 
 router = APIRouter(prefix="/audit-logs", tags=["Audit Logs"])
 
@@ -53,7 +54,7 @@ def _serialize(l: AuditLog) -> dict:
         "action": l.action,
         "resource": l.resource,
         "resource_id": l.resource_id,
-        "detail": l.detail,
+        "detail": safe_audit_detail(l.action, l.resource, l.detail),
         "ip_address": l.ip_address,
         "created_at": l.created_at.isoformat() if l.created_at else None,
     }
@@ -145,10 +146,12 @@ def export_audit_logs_csv(
 
     writer.writerow(["ID", "User ID", "Nickname", "Role", "Action", "Resource", "Resource ID", "Detail", "IP Address", "Timestamp"])
     for l in logs:
+        row = _serialize(l)
         writer.writerow([
-            l.id, l.user_id, l.user_nickname, l.user_role,
-            l.action, l.resource, l.resource_id, l.detail,
-            l.ip_address, l.created_at.isoformat() if l.created_at else "",
+            row[key] for key in (
+                "id", "user_id", "user_nickname", "user_role", "action",
+                "resource", "resource_id", "detail", "ip_address", "created_at",
+            )
         ])
 
     output.seek(0)

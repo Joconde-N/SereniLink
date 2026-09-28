@@ -4,6 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     APP_NAME: str = "SereniLink"
     ENV: str = "dev"
+    FRONTEND_URL: str = "http://localhost:5173"
 
     DATABASE_URL: str
 

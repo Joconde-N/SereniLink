@@ -1,5 +1,6 @@
 import smtplib
 import logging
+from urllib.parse import urlencode
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
@@ -11,10 +12,10 @@ logger = logging.getLogger(__name__)
 def send_password_reset_email(to_email: str, reset_token: str):
     """Send a password reset link to the user."""
     if not settings.SMTP_USER or not settings.SMTP_PASSWORD:
-        logger.warning("SMTP not configured - skipping reset email. Token: %s", reset_token)
+        logger.warning("SMTP not configured - password reset email could not be sent.")
         return
 
-    reset_url = f"http://localhost:5173/reset-password?token={reset_token}"
+    reset_url = f"{settings.FRONTEND_URL.rstrip('/')}/reset-password?{urlencode({'token': reset_token})}"
     subject = "SereniLink - Reset Your Password"
     body = f"""Hello,
 
@@ -35,7 +36,7 @@ If you did not request this, you can safely ignore this email.
     msg.attach(MIMEText(body, "plain"))
 
     try:
-        with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT) as server:
+        with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT, timeout=15) as server:
             server.starttls()
             server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
             server.sendmail(settings.SMTP_FROM, to_email, msg.as_string())
@@ -47,10 +48,7 @@ If you did not request this, you can safely ignore this email.
 def send_counselor_credentials(to_email: str, full_name: str, nickname: str, temp_password: str):
     """Send login credentials to a newly approved counselor."""
     if not settings.SMTP_USER or not settings.SMTP_PASSWORD:
-        logger.warning(
-            "SMTP not configured — skipping email. Credentials: nickname=%s password=%s",
-            nickname, temp_password
-        )
+        logger.warning("SMTP not configured - counselor credentials email could not be sent.")
         return
 
     subject = "Welcome to SereniLink — Your Counselor Account is Ready"

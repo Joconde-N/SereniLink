@@ -1,12 +1,10 @@
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
-from slowapi import Limiter
-from slowapi.util import get_remote_address
+from app.core.rate_limit import limiter
 
 from app.core.ai_client import get_ai_client, get_ai_model
 
 router = APIRouter(prefix="/ai", tags=["AI Support"])
-limiter = Limiter(key_func=get_remote_address)
 
 GUEST_HISTORY: dict[str, list[dict]] = {}
 GUEST_COUNT: dict[str, int] = {}
@@ -78,11 +76,11 @@ def guest_chat(request: Request, payload: GuestChatIn):
 
     if risk == "HIGH":
         safe_reply = (
-            "I’m really sorry you’re feeling this way. You do not have to handle this alone. "
-            "Please reach out to someone you trust right now, like a family member, friend, counselor, "
-            "or someone nearby. If you feel unsafe or need urgent help in Rwanda, call 112 for national "
-            "emergency support or 114 for medical emergency or ambulance services. "
-            "You can also sign up or log in to book a counselor through SereniLink."
+            "I'm really sorry you're going through this. You don't have to handle it alone. "
+            "Please reach out to someone you trust who can stay with you or support you right now. "
+            "If you feel you may hurt yourself or you're in immediate danger, contact your local emergency "
+            "services or go to the nearest emergency department. "
+            "If you can, tell me what's happening right now and whether you're somewhere safe."
         )
 
         history.append({"role": "assistant", "content": safe_reply})
@@ -111,9 +109,11 @@ def guest_chat(request: Request, payload: GuestChatIn):
             "Offer simple coping tips, grounding techniques, or gentle encouragement when helpful. "
             "Because this is guest mode, avoid long follow-up conversations and gently suggest signing up "
             "or logging in if the user needs continued support. "
-            "For emergencies in Rwanda, mention only 112 for national emergency support and 114 for medical "
-            "emergency or ambulance services. "
-            "Never mention 911 or non-Rwandan emergency numbers."
+            "If urgent or emergency support is needed, encourage the user to contact their local emergency "
+            "services or go to the nearest emergency department. "
+            "Do not assume the user's country or location, and do not guess emergency numbers. "
+            "Only provide a specific emergency number when the user's location is known from the conversation "
+            "or the user explicitly asks for emergency contacts for a particular country."
         ),
     }
 
@@ -133,7 +133,8 @@ def guest_chat(request: Request, payload: GuestChatIn):
         reply = (
             "I’m sorry, the AI support service is temporarily unavailable. "
             "You can still use SereniLink to view resources, complete screenings, or book a counselor. "
-            "If this is urgent in Rwanda, call 112 for emergency support or 114 for medical emergency services."
+            "If this is urgent or you feel unsafe, please contact your local emergency services "
+            "or go to the nearest emergency department."
         )
 
     history.append({"role": "assistant", "content": reply})

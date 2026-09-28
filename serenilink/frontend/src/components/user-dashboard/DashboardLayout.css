@@ -103,7 +103,7 @@ body.light {
 .sidebar-divider {
   margin: 14px 0 18px;
   height: 1px;
-  background: rgba(255, 255, 255, 0.28);
+  background: var(--border-soft);
 }
 
 .sidebar-section {
@@ -230,6 +230,11 @@ body.light {
   padding: 22px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
   transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+body.light .sidebar-link:hover,
+body.light .logout-btn:hover {
+  background: rgba(70, 52, 42, 0.06);
 }
 
 body.light .dashboard-card {
@@ -870,7 +875,7 @@ body.light .export-menu-list {
     right: 0;
     height: 58px;
     padding: 0 18px;
-    background: #1A1D1E;
+    background: var(--sidebar-bg);
     border-bottom: 1px solid var(--border-faint);
     z-index: 200;
   }
@@ -911,7 +916,7 @@ body.light .export-menu-list {
   .dash-mobile-drawer {
     width: 280px;
     height: 100%;
-    background: #1A1D1E;
+    background: var(--sidebar-bg);
     border-right: 1px solid var(--border-faint);
     display: flex;
     flex-direction: column;

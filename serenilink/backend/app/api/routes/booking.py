@@ -3,6 +3,8 @@ from datetime import datetime, date, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
+from app.core.datetime import utc_now
 
 from app.api.deps import get_db, get_current_user, require_admin
 from app.models.booking import Booking
@@ -24,14 +26,14 @@ COUNSELOR_ALLOWED = {"APPROVED", "DECLINED", "COMPLETED", "CANCELLED"}
 
 
 def expire_stale_bookings(db: Session):
-    """Auto-expire bookings whose scheduled time has passed."""
-    now = datetime.utcnow()
+    """Expire unanswered requests at start; complete approved sessions at end."""
+    now = utc_now()
 
     # PENDING bookings that passed their slot — mark DECLINED and free the slot
     stale_pending = db.query(Booking).filter(
         Booking.status == "PENDING",
         Booking.scheduled_for <= now
-    ).all()
+    ).with_for_update(skip_locked=True).all()
     for b in stale_pending:
         b.status = "DECLINED"
         b.updated_at = now
@@ -39,17 +41,16 @@ def expire_stale_bookings(db: Session):
         if slot:
             slot.status = "AVAILABLE"
             slot.updated_at = now
-        create_notification(
-            db, b.user_id,
-            "Booking Expired",
-            "Your booking request expired as the session time passed without a response."
-        )
+        db.add(Notification(user_id=b.user_id, title="Booking Expired", is_read=False,
+                            message="Your booking request expired as the session time passed without a response."))
 
-    # APPROVED bookings that passed their slot — mark COMPLETED
-    stale_approved = db.query(Booking).filter(
+    # Keep approved bookings active throughout the entire session.
+    stale_approved = db.query(Booking).join(
+        AvailabilitySlot, AvailabilitySlot.id == Booking.slot_id
+    ).filter(
         Booking.status == "APPROVED",
-        Booking.scheduled_for <= now
-    ).all()
+        AvailabilitySlot.end_time <= now
+    ).with_for_update(of=Booking, skip_locked=True).all()
     for b in stale_approved:
         b.status = "COMPLETED"
         b.updated_at = now
@@ -110,6 +111,22 @@ def _booking_access_check(db: Session, booking: Booking, current_user) -> tuple[
     return is_owner, is_booked_counselor, is_admin
 
 
+def _validate_status_transition(db: Session, booking: Booking, new_status: str):
+    transitions = {
+        "PENDING": {"APPROVED", "DECLINED", "CANCELLED"},
+        "APPROVED": {"COMPLETED", "CANCELLED"},
+    }
+    if new_status not in transitions.get(booking.status, set()):
+        raise HTTPException(status_code=409, detail=f"Cannot change {booking.status} to {new_status}")
+    now = utc_now()
+    if new_status == "APPROVED" and booking.scheduled_for <= now:
+        raise HTTPException(status_code=409, detail="Cannot approve a past booking")
+    if new_status == "COMPLETED":
+        slot = db.query(AvailabilitySlot).filter(AvailabilitySlot.id == booking.slot_id).first()
+        if not slot or slot.end_time > now:
+            raise HTTPException(status_code=409, detail="Cannot complete a booking before its session end time")
+
+
 @router.post("/", response_model=BookingOut, status_code=201)
 def create_booking(
     payload: BookingCreate,
@@ -121,22 +138,30 @@ def create_booking(
         Counselor.id == payload.counselor_id,
         Counselor.is_active == True,
         Counselor.application_status == "APPROVED"
-    ).first()
+    ).with_for_update().first()
     if not counselor:
         raise HTTPException(status_code=404, detail="Counselor not found or inactive")
 
     slot = db.query(AvailabilitySlot).filter(
         AvailabilitySlot.id == payload.slot_id,
         AvailabilitySlot.counselor_id == counselor.id,
-    ).first()
+    ).with_for_update().first()
     if not slot:
         raise HTTPException(status_code=404, detail="Slot not found for this counselor")
 
     if slot.status != "AVAILABLE":
         raise HTTPException(status_code=409, detail="This slot is not available")
 
-    if slot.start_time <= datetime.utcnow():
+    if slot.start_time <= utc_now():
         raise HTTPException(status_code=409, detail="Slot must be in the future")
+
+    # Atomic claim is also effective on test databases without row locks.
+    claimed = db.query(AvailabilitySlot).filter(
+        AvailabilitySlot.id == slot.id, AvailabilitySlot.status == "AVAILABLE"
+    ).update({"status": "BOOKED", "updated_at": utc_now()}, synchronize_session=False)
+    if claimed != 1:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="This slot is no longer available")
 
     item = Booking(
         user_id=current_user.id,
@@ -145,15 +170,16 @@ def create_booking(
         scheduled_for=slot.start_time,
         reason=payload.reason,
         status="PENDING",
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
+        created_at=utc_now(),
+        updated_at=utc_now(),
     )
 
-    slot.status = "BOOKED"
-    slot.updated_at = datetime.utcnow()
-
     db.add(item)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="This slot already has an active booking") from None
     db.refresh(item)
 
     log_action(db, "BOOKING_CREATED", user=current_user, resource="booking", resource_id=item.id, detail=f"Booked counselor #{counselor.id} for {slot.start_time}", ip_address=request.client.host if request.client else None)
@@ -210,7 +236,7 @@ def update_booking_status_admin(
     db: Session = Depends(get_db),
     _admin=Depends(require_admin),
 ):
-    item = db.query(Booking).filter(Booking.id == booking_id).first()
+    item = db.query(Booking).filter(Booking.id == booking_id).with_for_update().first()
     if not item:
         raise HTTPException(status_code=404, detail="Booking not found")
 
@@ -218,18 +244,17 @@ def update_booking_status_admin(
     if new_status not in ALLOWED_STATUSES:
         raise HTTPException(status_code=409, detail=f"Invalid status. Allowed: {sorted(list(ALLOWED_STATUSES))}")
 
-    if new_status in ("APPROVED", "COMPLETED") and item.scheduled_for <= datetime.utcnow():
-        raise HTTPException(status_code=409, detail="Cannot set APPROVED/COMPLETED for past bookings")
+    _validate_status_transition(db, item, new_status)
 
     item.status = new_status
-    item.updated_at = datetime.utcnow()
+    item.updated_at = utc_now()
 
     # Free slot if admin cancels/declines
     if new_status in ("CANCELLED", "DECLINED"):
         slot = db.query(AvailabilitySlot).filter(AvailabilitySlot.id == item.slot_id).first()
         if slot:
             slot.status = "AVAILABLE"
-            slot.updated_at = datetime.utcnow()
+            slot.updated_at = utc_now()
 
     db.commit()
     db.refresh(item)
@@ -255,7 +280,7 @@ def cancel_my_booking(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
-    item = db.query(Booking).filter(Booking.id == booking_id).first()
+    item = db.query(Booking).filter(Booking.id == booking_id).with_for_update().first()
     if not item:
         raise HTTPException(status_code=404, detail="Booking not found")
 
@@ -266,12 +291,12 @@ def cancel_my_booking(
         raise HTTPException(status_code=409, detail="Only PENDING or APPROVED bookings can be cancelled")
 
     item.status = "CANCELLED"
-    item.updated_at = datetime.utcnow()
+    item.updated_at = utc_now()
 
     slot = db.query(AvailabilitySlot).filter(AvailabilitySlot.id == item.slot_id).first()
     if slot:
         slot.status = "AVAILABLE"
-        slot.updated_at = datetime.utcnow()
+        slot.updated_at = utc_now()
 
     db.commit()
 
@@ -320,8 +345,8 @@ def counselor_my_stats(
 ):
     counselor = _get_counselor_profile_for_user(db, current_user.id)
 
-    now = datetime.utcnow()
-    today_start = datetime.combine(date.today(), datetime.min.time())
+    now = utc_now()
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = today_start + timedelta(days=1)
 
     total = db.query(Booking).filter(Booking.counselor_id == counselor.id).count()
@@ -397,7 +422,7 @@ def counselor_update_booking_status(
     item = db.query(Booking).filter(
         Booking.id == booking_id,
         Booking.counselor_id == counselor.id
-    ).first()
+    ).with_for_update().first()
     if not item:
         raise HTTPException(status_code=404, detail="Booking not found")
 
@@ -405,26 +430,16 @@ def counselor_update_booking_status(
     if new_status not in COUNSELOR_ALLOWED:
         raise HTTPException(status_code=409, detail=f"Invalid status. Allowed: {sorted(list(COUNSELOR_ALLOWED))}")
 
-    if item.status in ("CANCELLED", "DECLINED", "COMPLETED"):
-        raise HTTPException(status_code=409, detail=f"Cannot change status from {item.status}")
-
-    if new_status == "APPROVED" and item.scheduled_for <= datetime.utcnow():
-        raise HTTPException(status_code=409, detail="Cannot approve a past booking")
-
-    if new_status == "COMPLETED":
-        if item.status != "APPROVED":
-            raise HTTPException(status_code=409, detail="Only APPROVED bookings can be COMPLETED")
-        if item.scheduled_for > datetime.utcnow():
-            raise HTTPException(status_code=409, detail="Cannot complete a booking that is in the future")
+    _validate_status_transition(db, item, new_status)
 
     if new_status in ("CANCELLED", "DECLINED"):
         slot = db.query(AvailabilitySlot).filter(AvailabilitySlot.id == item.slot_id).first()
         if slot:
             slot.status = "AVAILABLE"
-            slot.updated_at = datetime.utcnow()
+            slot.updated_at = utc_now()
 
     item.status = new_status
-    item.updated_at = datetime.utcnow()
+    item.updated_at = utc_now()
 
     db.commit()
     db.refresh(item)

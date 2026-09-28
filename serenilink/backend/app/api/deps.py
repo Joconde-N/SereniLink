@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.models.user import User
 from app.db.session import SessionLocal
+from app.core.security import token_matches_password
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -18,7 +19,7 @@ def get_db():
         db.close()
 
 
-def get_current_user(
+def get_authenticated_user(
     db: Session = Depends(get_db),
     token: str = Depends(oauth2_scheme),
 ) -> User:
@@ -31,25 +32,33 @@ def get_current_user(
         if not subject:
             raise HTTPException(status_code=401, detail="Invalid token")
         user_id = int(subject)
-    except (JWTError, ValueError):
+    except (JWTError, ValueError, TypeError):
         raise HTTPException(status_code=401, detail="Invalid or expired token")
-    
+
     try:
         user_id = int(subject)
     except ValueError:
         raise HTTPException(status_code=401, detail="Invalid token subject")
-    
+
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
-    
+    if not token_matches_password(payload, user.password_hash):
+        raise HTTPException(status_code=401, detail="Session expired. Please sign in again.")
+
     if hasattr(user, "is_active") and not user.is_active:
         raise HTTPException(status_code=403, detail="User account is disabled")
 
     return user
 
+
+def get_current_user(current_user=Depends(get_authenticated_user)):
+    if current_user.must_change_password:
+        raise HTTPException(status_code=403, detail="Set a new password before accessing your account.")
+    return current_user
+
 def require_admin(current_user=Depends(get_current_user)):
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     return current_user
-        
+

@@ -85,6 +85,7 @@ function MoodCheckins() {
   const [showAll, setShowAll] = useState(false);
 
   const [mood, setMood] = useState("OKAY");
+  const [moodScore, setMoodScore] = useState("");
   const [stress, setStress] = useState(5);
   const [sleep, setSleep] = useState(5);
   const [notes, setNotes] = useState("");
@@ -100,20 +101,22 @@ function MoodCheckins() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
+    if (!moodScore) { setError("Please choose your overall mood rating."); return; }
     setError(""); setSuccess("");
     setSubmitting(true);
     try {
-      await api.post("/assessments/", {
-        mood: 5, stress: parseInt(stress),
+      await api.post("/moods/check-in", {
+        mood, mood_score: Number(moodScore), stress: Number(stress),
         sleep: parseInt(sleep), notes: notes || undefined,
       });
-      await api.post("/moods/", { mood, note: notes || undefined });
       setSuccess("Check-in saved!");
-      setNotes(""); setMood("OKAY"); setStress(5); setSleep(5);
+      setNotes(""); setMood("OKAY"); setMoodScore(""); setStress(5); setSleep(5);
       loadHistory();
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to save check-in.");
+      const detail = err.response?.data?.detail;
+      setError(typeof detail === "string" ? detail : "Failed to save check-in. Check your ratings and notes.");
     } finally {
       setSubmitting(false);
     }
@@ -167,6 +170,15 @@ function MoodCheckins() {
 
             <div style={{ height: 1, background: "var(--border-soft)", marginBottom: 24 }} />
 
+            <label htmlFor="mood-score" className="form-label">Overall mood (1 = very low, 10 = very good)</label>
+            <select id="mood-score" className="form-input" required value={moodScore}
+              onChange={(e) => setMoodScore(e.target.value)} style={{ marginBottom: 22 }}>
+              <option value="">Choose your rating</option>
+              {Array.from({ length: 10 }, (_, i) => i + 1).map((score) => (
+                <option key={score} value={score}>{score}/10</option>
+              ))}
+            </select>
+
             {/* Sliders */}
             <p style={{ fontSize: 12, fontWeight: 600, color: "var(--text-muted)", marginBottom: 18, textTransform: "uppercase", letterSpacing: "0.07em" }}>
               How are your levels?
@@ -189,6 +201,7 @@ function MoodCheckins() {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
+              maxLength={500}
               style={{ resize: "none", marginBottom: 22 }}
             />
 

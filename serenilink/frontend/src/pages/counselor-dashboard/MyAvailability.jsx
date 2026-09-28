@@ -2,12 +2,6 @@ import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import api from "../../api/axios";
 
-// Format date as local time string without UTC conversion e.g. "2024-06-15T09:00:00"
-const toNaiveISO = (d) => {
-  const pad = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
-};
-
 const EMPTY = { date: null, start: null, end: null };
 
 function SlotForm({ initial = EMPTY, onSave, onCancel, saving, label, error }) {
@@ -153,13 +147,13 @@ function MyAvailability() {
     setSaving(true);
     try {
       await api.post("/availability/me", {
-        start_time: toNaiveISO(f.start),
-        end_time:   toNaiveISO(f.end),
+        start_time: f.start.toISOString(),
+        end_time:   f.end.toISOString(),
       });
       setSuccess("Slot created!");
       load();
     } catch (err) {
-      setFormError(err.response?.data?.detail || "Failed to create slot.");
+      setFormError(typeof err.response?.data?.detail === "string" ? err.response.data.detail : "Failed to create slot. Check the selected times.");
     } finally {
       setSaving(false);
     }
@@ -172,14 +166,14 @@ function MyAvailability() {
     setEditSaving(true);
     try {
       await api.patch(`/availability/me/${id}`, {
-        start_time: toNaiveISO(f.start),
-        end_time:   toNaiveISO(f.end),
+        start_time: f.start.toISOString(),
+        end_time:   f.end.toISOString(),
       });
       setSuccess("Slot updated!");
       setEditingId(null);
       load();
     } catch (err) {
-      setEditError(err.response?.data?.detail || "Failed to update slot.");
+      setEditError(typeof err.response?.data?.detail === "string" ? err.response.data.detail : "Failed to update slot. Check the selected times.");
     } finally {
       setEditSaving(false);
     }
@@ -204,7 +198,7 @@ function MyAvailability() {
   return (
     <div>
       <h1 className="dashboard-page-title">My Availability</h1>
-      <p className="dashboard-page-subtitle">Manage your available time slots for client bookings.</p>
+      <p className="dashboard-page-subtitle">Manage your available time slots for client bookings. Times are shown in {Intl.DateTimeFormat().resolvedOptions().timeZone}.</p>
 
       <div className="dashboard-grid dashboard-cards-2" style={{ marginBottom: "20px" }}>
         <div className="dashboard-card">

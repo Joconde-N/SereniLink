@@ -20,6 +20,8 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = (token, userData, rememberMe = false) => {
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
     if (rememberMe) {
       localStorage.setItem("token", token);
     } else {

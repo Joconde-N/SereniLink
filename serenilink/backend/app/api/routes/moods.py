@@ -4,11 +4,29 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, get_current_user
 from app.models.mood import MoodEntry
-from app.schemas.mood import MoodCreate, MoodOut
+from app.schemas.mood import MoodCreate, MoodOut, MoodCheckinCreate
+from app.models.assessment import Assessment
+from app.schemas.assessment import AssessmentOut
 
 router = APIRouter(prefix="/moods", tags=["Moods"])
 
 ALLOWED_MOODS = {"HAPPY", "SAD", "ANXIOUS", "CALM", "STRESSED", "ANGRY", "TIRED", "OKAY"}
+
+
+@router.post("/check-in", response_model=AssessmentOut, status_code=201)
+def create_checkin(payload: MoodCheckinCreate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    now = datetime.utcnow()
+    entry = MoodEntry(user_id=current_user.id, mood=payload.mood, note=payload.notes, created_at=now)
+    assessment = Assessment(user_id=current_user.id, mood=payload.mood_score,
+                            stress=payload.stress, sleep=payload.sleep, notes=payload.notes, created_at=now)
+    try:
+        db.add_all([entry, assessment])
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    db.refresh(assessment)
+    return assessment
 
 
 @router.post("/", response_model=MoodOut, status_code=201)

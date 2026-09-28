@@ -60,10 +60,10 @@ function ExerciseModal({ ex, onClose, onMarkDone, isDone }) {
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.72)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}
     >
-      <div style={{ background: "linear-gradient(160deg, #1e1e22 0%, #18181b 100%)", border: `1px solid ${meta.border}`, borderRadius: "24px", padding: "32px", width: "100%", maxWidth: "520px", boxShadow: "0 24px 80px rgba(0,0,0,0.5)", position: "relative", maxHeight: "90vh", overflowY: "auto" }}>
+      <div style={{ background: "linear-gradient(160deg, var(--bg-panel) 0%, var(--bg-panel-2) 100%)", border: `1px solid ${meta.border}`, borderRadius: "24px", padding: "32px", width: "100%", maxWidth: "520px", boxShadow: "0 24px 80px rgba(0,0,0,0.5)", position: "relative", maxHeight: "90vh", overflowY: "auto" }}>
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: `linear-gradient(90deg, ${meta.text}88, transparent)`, borderRadius: "24px 24px 0 0" }} />
 
-        <button type="button" onClick={onClose} style={{ position: "absolute", top: "16px", right: "16px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#b8bfcc" }}>
+        <button type="button" onClick={onClose} style={{ position: "absolute", top: "16px", right: "16px", background: "var(--notif-bell-bg)", border: "1px solid var(--border-soft)", borderRadius: "8px", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--text-soft)" }}>
           <IoMdClose size={16} />
         </button>
 
@@ -72,7 +72,7 @@ function ExerciseModal({ ex, onClose, onMarkDone, isDone }) {
             <Icon size={22} color={meta.text} />
           </div>
           <div>
-            <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 700, color: "#f4f4f4" }}>{ex.title}</h2>
+            <h2 style={{ margin: 0, fontSize: "18px", fontWeight: 700, color: "var(--text-main)" }}>{ex.title}</h2>
             <span style={{ fontSize: "12px", color: meta.text, fontWeight: 600 }}>{meta.label}</span>
           </div>
         </div>
@@ -80,12 +80,12 @@ function ExerciseModal({ ex, onClose, onMarkDone, isDone }) {
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", margin: "8px 0 24px" }}>
           <div style={{ position: "relative", width: "110px", height: "110px" }}>
             <svg width="110" height="110" style={{ transform: "rotate(-90deg)" }}>
-              <circle cx="55" cy="55" r="44" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
+              <circle cx="55" cy="55" r="44" fill="none" stroke="var(--border-soft)" strokeWidth="6" />
               <circle cx="55" cy="55" r="44" fill="none" stroke={finished ? "#67d58c" : meta.text} strokeWidth="6" strokeDasharray={circumference} strokeDashoffset={circumference - (circumference * progress) / 100} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.9s linear, stroke 0.4s ease" }} />
             </svg>
             <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-              <div style={{ fontSize: "26px", fontWeight: 700, color: finished ? "#67d58c" : "#f4f4f4", fontVariantNumeric: "tabular-nums" }}>{finished ? "✓" : fmtTime(timeLeft)}</div>
-              <div style={{ fontSize: "11px", color: "#b0b0b0", marginTop: "2px" }}>{finished ? "Complete" : `of ${fmtDuration(ex.durationSec)}`}</div>
+              <div style={{ fontSize: "26px", fontWeight: 700, color: finished ? "#67d58c" : "var(--text-main)", fontVariantNumeric: "tabular-nums" }}>{finished ? "✓" : fmtTime(timeLeft)}</div>
+              <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{finished ? "Complete" : `of ${fmtDuration(ex.durationSec)}`}</div>
             </div>
           </div>
           <div style={{ display: "flex", gap: "10px", marginTop: "18px" }}>
@@ -94,17 +94,17 @@ function ExerciseModal({ ex, onClose, onMarkDone, isDone }) {
                 {running ? "Pause" : timeLeft < ex.durationSec ? "Resume" : "Start Timer"}
               </button>
             )}
-            <button type="button" onClick={() => { setTimeLeft(ex.durationSec); setRunning(false); setFinished(false); }} style={{ height: "34px", padding: "0 16px", borderRadius: "9px", border: "1px solid rgba(176,176,176,0.15)", background: "transparent", color: "#b8bfcc", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
+            <button type="button" onClick={() => { setTimeLeft(ex.durationSec); setRunning(false); setFinished(false); }} style={{ height: "34px", padding: "0 16px", borderRadius: "9px", border: "1px solid var(--border-soft)", background: "transparent", color: "var(--text-soft)", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
               Reset
             </button>
           </div>
         </div>
 
-        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "18px", color: "#c8cdd6", fontSize: "14px", lineHeight: 1.85, whiteSpace: "pre-wrap", marginBottom: "20px" }}>
+        <div style={{ background: "var(--bg-input)", border: "1px solid var(--border-soft)", borderRadius: "14px", padding: "18px", color: "var(--text-soft)", fontSize: "14px", lineHeight: 1.85, whiteSpace: "pre-wrap", marginBottom: "20px" }}>
           {ex.instructions}
         </div>
 
-        <button type="button" onClick={() => { onMarkDone(ex.id); onClose(); }} style={{ width: "100%", height: "40px", borderRadius: "10px", border: `1px solid ${isDone ? "rgba(103,213,140,0.4)" : "rgba(176,176,176,0.15)"}`, background: isDone ? "rgba(103,213,140,0.1)" : "transparent", color: isDone ? "#67d58c" : "#b8bfcc", fontSize: "13px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px" }}>
+        <button type="button" onClick={() => { onMarkDone(ex.id); onClose(); }} style={{ width: "100%", height: "40px", borderRadius: "10px", border: `1px solid ${isDone ? "rgba(103,213,140,0.4)" : "var(--border-soft)"}`, background: isDone ? "rgba(103,213,140,0.1)" : "transparent", color: isDone ? "#67d58c" : "var(--text-soft)", fontSize: "13px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px" }}>
           <IoCheckmarkCircleOutline size={16} />
           {isDone ? "Marked as Done — Undo" : "Mark as Done"}
         </button>
@@ -119,22 +119,22 @@ function ExerciseCard({ ex, isDone, onToggleDone, onOpen }) {
 
   return (
     <div
-      style={{ background: "linear-gradient(160deg, #1c1c1f 0%, #171719 100%)", border: "1px solid rgba(176,176,176,0.09)", borderRadius: "20px", padding: "20px", boxShadow: "0 6px 28px rgba(0,0,0,0.22)", display: "flex", flexDirection: "column", transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease", opacity: isDone ? 0.65 : 1, position: "relative", overflow: "hidden" }}
+      style={{ background: "linear-gradient(160deg, var(--bg-panel) 0%, var(--bg-panel-2) 100%)", border: "1px solid var(--border-soft)", borderRadius: "20px", padding: "20px", boxShadow: "0 6px 28px rgba(0,0,0,0.22)", display: "flex", flexDirection: "column", transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease", opacity: isDone ? 0.65 : 1, position: "relative", overflow: "hidden" }}
       onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 14px 40px rgba(0,0,0,0.32)"; e.currentTarget.style.borderColor = meta.border; }}
-      onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 6px 28px rgba(0,0,0,0.22)"; e.currentTarget.style.borderColor = "rgba(176,176,176,0.09)"; }}
+      onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 6px 28px rgba(0,0,0,0.22)"; e.currentTarget.style.borderColor = "var(--border-soft)"; }}
     >
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: `linear-gradient(90deg, ${meta.text}55, transparent)`, borderRadius: "20px 20px 0 0" }} />
 
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "8px", marginBottom: "8px" }}>
-        <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "#f4f4f4", lineHeight: 1.3 }}>{ex.title}</h3>
+        <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text-main)", lineHeight: 1.3 }}>{ex.title}</h3>
         <Icon size={16} color={meta.text} style={{ flexShrink: 0, marginTop: "2px" }} />
       </div>
 
-      <p style={{ margin: "0 0 12px", fontSize: "13px", color: "#b8bfcc", lineHeight: 1.6 }}>{ex.desc}</p>
+      <p style={{ margin: "0 0 12px", fontSize: "13px", color: "var(--text-soft)", lineHeight: 1.6 }}>{ex.desc}</p>
 
       <div style={{ display: "flex", alignItems: "center", gap: "5px", marginBottom: "16px" }}>
-        <LuClock3 size={13} color="#b0b0b0" />
-        <span style={{ fontSize: "12px", color: "#b0b0b0" }}>{fmtDuration(ex.durationSec)}</span>
+        <LuClock3 size={13} color="var(--text-muted)" />
+        <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>{fmtDuration(ex.durationSec)}</span>
       </div>
 
       <div style={{ display: "flex", gap: "8px", marginTop: "auto" }}>
@@ -144,7 +144,7 @@ function ExerciseCard({ ex, isDone, onToggleDone, onOpen }) {
         >
           Start Exercise
         </button>
-        <button type="button" onClick={() => onToggleDone(ex.id)} style={{ flex: 1, height: "34px", borderRadius: "9px", border: `1px solid ${isDone ? "rgba(103,213,140,0.35)" : "rgba(176,176,176,0.12)"}`, background: isDone ? "rgba(103,213,140,0.08)" : "transparent", color: isDone ? "#67d58c" : "#b8bfcc", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
+        <button type="button" onClick={() => onToggleDone(ex.id)} style={{ flex: 1, height: "34px", borderRadius: "9px", border: `1px solid ${isDone ? "rgba(103,213,140,0.35)" : "var(--border-soft)"}`, background: isDone ? "rgba(103,213,140,0.08)" : "transparent", color: isDone ? "#67d58c" : "var(--text-soft)", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
           {isDone ? "Undo" : "Mark Done"}
         </button>
       </div>
@@ -208,7 +208,7 @@ function Exercises() {
           const active = activeType === t;
           const TabIcon = t === "ALL" ? RiAppsLine : meta?.Icon ?? RiAppsLine;
           return (
-            <button key={t} type="button" onClick={() => setActiveType(t)} style={{ padding: "6px 14px", borderRadius: "999px", cursor: "pointer", fontSize: "13px", fontWeight: 600, display: "flex", alignItems: "center", gap: "6px", border: `1px solid ${active ? (meta?.border || "rgba(202,163,143,0.4)") : "rgba(176,176,176,0.1)"}`, background: active ? (meta?.bg || "rgba(202,163,143,0.1)") : "transparent", color: active ? (meta?.text || "#E19A86") : "#b8bfcc" }}>
+            <button key={t} type="button" onClick={() => setActiveType(t)} style={{ padding: "6px 14px", borderRadius: "999px", cursor: "pointer", fontSize: "13px", fontWeight: 600, display: "flex", alignItems: "center", gap: "6px", border: `1px solid ${active ? (meta?.border || "rgba(202,163,143,0.4)") : "var(--border-soft)"}`, background: active ? (meta?.bg || "rgba(202,163,143,0.1)") : "transparent", color: active ? (meta?.text || "var(--accent)") : "var(--text-soft)" }}>
               <TabIcon size={14} />
               {t === "ALL" ? "All" : (meta?.label ?? t)}
             </button>

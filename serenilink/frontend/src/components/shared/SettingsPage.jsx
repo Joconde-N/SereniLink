@@ -3,6 +3,7 @@ import { LuUser, LuLock, LuPalette, LuCheck, LuMoon, LuSun } from "react-icons/l
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
+import { passwordError, PASSWORD_HELP } from "../../utils/password";
 
 function SectionHeader({ icon: Icon, title, subtitle }) {
   return (
@@ -57,6 +58,7 @@ function SettingsPage({ role = "user" }) {
   const [savingEmail, setSavingEmail] = useState(false);
 
   const [newPw, setNewPw] = useState("");
+  const [currentPw, setCurrentPw] = useState("");
   const [confirmPw, setConfirmPw] = useState("");
   const [pwMsg, setPwMsg] = useState("");
   const [savingPw, setSavingPw] = useState(false);
@@ -68,6 +70,7 @@ function SettingsPage({ role = "user" }) {
     try {
       const res = await api.patch("/auth/me", { email });
       updateUser({ email: res.data.email });
+      setEmail(res.data.email || "");
       setEmailMsg("success:Email updated successfully.");
     } catch (err) {
       setEmailMsg("error:" + (err.response?.data?.detail || "Failed to update email."));
@@ -81,12 +84,12 @@ function SettingsPage({ role = "user" }) {
     e.preventDefault();
     setPwMsg("");
     if (newPw !== confirmPw) { setPwMsg("error:Passwords do not match."); return; }
-    if (newPw.length < 6) { setPwMsg("error:Password must be at least 6 characters."); return; }
+    if (passwordError(newPw)) { setPwMsg("error:" + passwordError(newPw)); return; }
     setSavingPw(true);
     try {
-      await api.post("/auth/change-password", { new_password: newPw });
+      await api.post("/auth/change-password", { current_password: currentPw, new_password: newPw });
       setPwMsg("success:Password updated successfully.");
-      setNewPw(""); setConfirmPw("");
+      setNewPw(""); setConfirmPw(""); setCurrentPw("");
     } catch (err) {
       setPwMsg("error:" + (err.response?.data?.detail || "Failed to update password."));
     } finally {
@@ -150,6 +153,10 @@ function SettingsPage({ role = "user" }) {
               {pwMsg && <p style={msgStyle(pwMsg)}>{msgText(pwMsg)}</p>}
               <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "16px" }}>
                 <div>
+                  <label className="form-label" htmlFor="current-password">Current Password</label>
+                  <input id="current-password" className="form-input" type="password" autoComplete="current-password"
+                    value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} required />
+                  <p>{PASSWORD_HELP}</p>
                   <label className="form-label">New Password</label>
                   <input
                     className="form-input" type="password"

@@ -5,6 +5,8 @@ from datetime import datetime
 from app.api.deps import get_db, get_current_user
 from app.models.counselor import Counselor
 from app.models.availability import AvailabilitySlot
+from app.models.booking import Booking
+from app.core.datetime import utc_now
 from app.schemas.availability import AvailabilityCreate, AvailabilityOut
 
 router = APIRouter(prefix="/availability", tags=["Availability"])
@@ -14,7 +16,7 @@ def _get_my_counselor_profile(db: Session, user_id: int) -> Counselor:
         Counselor.user_id == user_id,
         Counselor.is_active == True,
         Counselor.application_status == "APPROVED"
-    ).first()
+    ).with_for_update().first()
     if not counselor:
         raise HTTPException(status_code=403, detail="Only approved counselors can manage availability")
     return counselor
@@ -27,29 +29,29 @@ def create_slot(
 ): 
     counselor = _get_my_counselor_profile(db, current_user.id)
 
-    start = payload.start_time.replace(tzinfo=None)
-    end   = payload.end_time.replace(tzinfo=None)
+    start = payload.start_time
+    end = payload.end_time
 
     if end <= start:
         raise HTTPException(status_code=409, detail="end time must be after start time")
-    if start <= datetime.utcnow():
+    if start <= utc_now():
         raise HTTPException(status_code=409, detail="start time must be in the future")
 
     overlap = db.query(AvailabilitySlot).filter(
         AvailabilitySlot.counselor_id == counselor.id,
-        AvailabilitySlot.status == "AVAILABLE",
+        AvailabilitySlot.status.in_(["AVAILABLE", "BOOKED"]),
         AvailabilitySlot.start_time < end,
         AvailabilitySlot.end_time > start,
     ).first()
     if overlap:
-        raise HTTPException(status_code=409, detail="This slot overlaps an existing available slot")
+        raise HTTPException(status_code=409, detail="This slot overlaps an existing available or booked slot")
 
     slot = AvailabilitySlot(
         counselor_id=counselor.id,
         start_time=start,
         end_time=end,
         status="AVAILABLE",
-        updated_at=datetime.utcnow(),
+        updated_at=utc_now(),
     )
     db.add(slot)
     db.commit()
@@ -68,7 +70,7 @@ def list_my_slots(
     counselor = _get_my_counselor_profile(db, current_user.id)
 
     # Auto-expire past AVAILABLE slots
-    now = datetime.utcnow()
+    now = utc_now()
     db.query(AvailabilitySlot).filter(
         AvailabilitySlot.counselor_id == counselor.id,
         AvailabilitySlot.status == "AVAILABLE",
@@ -95,27 +97,30 @@ def update_slot(
     slot = db.query(AvailabilitySlot).filter(
         AvailabilitySlot.id == slot_id,
         AvailabilitySlot.counselor_id == counselor.id,
-    ).first()
+    ).with_for_update().first()
     if not slot:
         raise HTTPException(status_code=404, detail="Slot not found")
     if slot.status == "BOOKED":
         raise HTTPException(status_code=409, detail="Booked slot cannot be edited")
     if payload.end_time <= payload.start_time:
         raise HTTPException(status_code=409, detail="end time must be after start time")
+    if payload.start_time <= utc_now():
+        raise HTTPException(status_code=409, detail="start time must be in the future")
 
     overlap = db.query(AvailabilitySlot).filter(
         AvailabilitySlot.counselor_id == counselor.id,
-        AvailabilitySlot.status == "AVAILABLE",
+        AvailabilitySlot.status.in_(["AVAILABLE", "BOOKED"]),
         AvailabilitySlot.id != slot_id,
         AvailabilitySlot.start_time < payload.end_time,
         AvailabilitySlot.end_time > payload.start_time,
     ).first()
     if overlap:
-        raise HTTPException(status_code=409, detail="This slot overlaps an existing available slot")
+        raise HTTPException(status_code=409, detail="This slot overlaps an existing available or booked slot")
 
-    slot.start_time = payload.start_time.replace(tzinfo=None)
-    slot.end_time   = payload.end_time.replace(tzinfo=None)
-    slot.updated_at = datetime.utcnow()
+    slot.start_time = payload.start_time
+    slot.end_time = payload.end_time
+    slot.status = "AVAILABLE"
+    slot.updated_at = utc_now()
     db.commit()
     db.refresh(slot)
     return slot
@@ -132,13 +137,15 @@ def delete_my_slot(
     slot = db.query(AvailabilitySlot).filter(
         AvailabilitySlot.id == slot_id,
         AvailabilitySlot.counselor_id == counselor.id
-    ).first()
+    ).with_for_update().first()
 
     if not slot:
         raise HTTPException(status_code=404, detail="Slot not found")
 
     if slot.status == "BOOKED":
         raise HTTPException(status_code=409, detail="Booked slot cannot be deleted")
+    if db.query(Booking.id).filter(Booking.slot_id == slot_id).first():
+        raise HTTPException(status_code=409, detail="A slot with booking history cannot be deleted")
 
     db.delete(slot)
     db.commit()
@@ -153,7 +160,7 @@ def list_counselor_available_slots(
     limit: int = Query(default=20, le=100),
 ):
     # only future AVAILABLE slots
-    now = datetime.utcnow()
+    now = utc_now()
     return (
         db.query(AvailabilitySlot)
         .filter(

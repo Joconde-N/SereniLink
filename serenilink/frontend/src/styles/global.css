@@ -11,6 +11,16 @@ body {
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
+/* Smooth theme transitions — targeted properties, no transition:all */
+body,
+body *:not(img):not(svg):not(canvas):not(video) {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
 a {
   text-decoration: none;
 }
@@ -195,8 +205,8 @@ a {
 .page-section {
   min-height: 60vh;
   padding: 60px 70px;
-  background: #070808;
-  color: #FFFFFF;
+  background: var(--site-bg, #070808);
+  color: var(--site-text, #FFFFFF);
 }
 
 /* RESPONSIVE */

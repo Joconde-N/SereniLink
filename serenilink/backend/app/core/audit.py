@@ -2,6 +2,13 @@ from sqlalchemy.orm import Session
 from app.models.audit_log import AuditLog
 
 
+def safe_audit_detail(action: str, resource: str | None, detail: str | None) -> str | None:
+    """Keep health results out of operational logs, including legacy exports."""
+    if resource == "screening" or action == "ASSESSMENT_COMPLETED":
+        return "Screening completed"
+    return detail
+
+
 def log_action(
     db: Session,
     action: str,
@@ -18,7 +25,7 @@ def log_action(
         action=action,
         resource=resource,
         resource_id=str(resource_id) if resource_id is not None else None,
-        detail=detail,
+        detail=safe_audit_detail(action, resource, detail),
         ip_address=ip_address,
     )
     db.add(entry)

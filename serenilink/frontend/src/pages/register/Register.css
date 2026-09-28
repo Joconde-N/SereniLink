@@ -1,24 +1,22 @@
 .register-page {
   min-height: 100vh;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   background: #070808;
   color: #ffffff;
-  position: relative;
-  overflow: hidden;
 }
 
-.register-topbar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+.register-page .register-topbar {
+  position: static;
+  inset: auto;
+  z-index: auto;
+  background: inherit;
   height: 82px;
   padding: 0 26px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  z-index: 10;
+  flex-shrink: 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -33,44 +31,49 @@
   color: #aab0c4;
   font-size: 15px;
   font-weight: 500;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.register-page .register-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: calc(100vh - 82px);
 }
 
 .register-left {
   position: relative;
-  min-height: 100vh;
+  flex: 1;
   overflow: hidden;
 }
 
-.register-image {
+.register-page .register-image {
+  position: absolute;
+  inset: 0;
   width: 100%;
+  height: 100%;
   display: block;
   object-fit: cover;
-  margin-top: 82px;
-  height: 95vh;
 }
 
 .register-image-overlay {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 82px;
-  bottom: 0;
-  background:
-    linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.12) 46%, rgba(0, 0, 0, 0)),
-    linear-gradient(to right, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
+  display: none;
 }
 
-.register-left-content {
+.register-page .register-left-content {
   position: absolute;
-  left: 64px;
-  bottom: 72px;
+  left: 62px;
+  right: 32px;
+  bottom: 70px;
   z-index: 2;
   max-width: 560px;
 }
 
 .register-tag {
   display: inline-block;
-  margin-bottom: 18px;
+  margin-bottom: 10px;
   padding: 10px 18px;
   border-radius: 999px;
   background: rgba(184, 145, 126, 0.18);
@@ -97,24 +100,24 @@
   color: rgba(255, 255, 255, 0.82);
 }
 
-.register-right {
-  min-height: 100vh;
-  padding-top: 82px;
+.register-page .register-right {
+  flex: 1;
   background: #050505;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 40px 32px;
 }
 
-.register-form-box {
+.register-page .register-form-box {
   width: 100%;
-  max-width: 480px;
+  max-width: 465px;
   padding: 20px 8px;
 }
 
-.register-form-box h2 {
+.register-page .register-form-box h2 {
   margin: 0 0 10px;
-  font-size: 54px;
+  font-size: 48px;
   line-height: 1.05;
   letter-spacing: -1.5px;
   color: #ffffff;
@@ -160,6 +163,39 @@
   color: #566680;
 }
 
+.register-page .register-password-wrap {
+  position: relative;
+}
+
+.register-page .register-password-wrap input {
+  padding-right: 48px;
+}
+
+.register-page .register-eye {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted, #98a1b3);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.register-page .register-eye:focus-visible,
+.register-page .register-field input:focus-visible {
+  outline: 2px solid var(--accent, #c99d87);
+  outline-offset: 2px;
+}
+
 .register-split {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -192,7 +228,7 @@
   font-size: 17px;
   font-weight: 700;
   cursor: pointer;
-  transition: 0.25s ease;
+  transition: opacity 0.25s ease;
 }
 
 .register-btn:hover {
@@ -200,19 +236,18 @@
 }
 
 @media (max-width: 1100px) {
-  .register-page {
-    grid-template-columns: 1fr;
+  .register-page .register-columns {
+    grid-template-columns: minmax(0, 1fr);
   }
-
   .register-left {
     display: none;
   }
 
-  .register-right {
-    padding: 110px 24px 40px;
+  .register-page .register-right {
+    padding: 40px 24px;
   }
 
-  .register-form-box {
+  .register-page .register-form-box {
     max-width: 520px;
   }
 
@@ -223,11 +258,11 @@
 }
 
 @media (max-width: 480px) {
-  .register-right {
-    padding: 100px 16px 32px;
+  .register-page .register-right {
+    padding: 32px 16px;
   }
 
-  .register-form-box h2 {
+  .register-page .register-form-box h2 {
     font-size: 38px;
   }
 }
@@ -241,6 +276,7 @@ body.light .register-page {
 }
 
 body.light .register-topbar {
+  background: #e8e1d6;
   border-bottom-color: rgba(70, 52, 42, 0.12);
 }
 
@@ -281,6 +317,10 @@ body.light .register-field input::placeholder {
 
 body.light .register-subtext a {
   color: #a86955;
+}
+
+body.light .register-image-overlay {
+  display: none;
 }
 
 body.light .register-left-content h1 {

@@ -84,9 +84,7 @@ function CounselorApplication() {
     <div className="counselor-page">
       <div className="register-topbar">
         <div className="register-brand">SereniLink</div>
-        <Link to="/" className="register-back">
-          ← Back Home
-        </Link>
+        <button className="register-back" onClick={() => navigate(-1)}>← Back</button>
       </div>
 
       <div className="counselor-wrapper">
