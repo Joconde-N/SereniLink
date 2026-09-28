@@ -24,25 +24,66 @@ body.dark {
 
 body.light {
   --bg-main: #e8e1d6;
-  --bg-panel: #f4eee5;
+  --bg-panel: #fffcf7;
   --bg-panel-2: #efe8dd;
-  --bg-input: #ece5d9;
-  --border-soft: rgba(70, 52, 42, 0.18);
-  --border-faint: rgba(70, 52, 42, 0.1);
+  --bg-input: #fffcf7;
+  --border-soft: #b6a99b;
+  --border-faint: #c8bcad;
   --text-main: #2b2521;
-  --text-soft: #57504a;
-  --text-muted: #7a7168;
-  --accent: #a86955;
-  --accent-dark: #96593f;
+  --text-soft: #463d36;
+  --text-muted: #544b43;
+  --accent: #7c3f2c;
+  --accent-dark: #633020;
   --accent-bg: rgba(168, 105, 85, 0.14);
   --site-bg: #e8e1d6;
   --site-text: #2b2521;
-  --site-muted: #6b6259;
+  --site-muted: #544b43;
   --chat-bubble-theirs: rgba(70, 52, 42, 0.08);
   --notif-bell-bg: rgba(70, 52, 42, 0.06);
   --notif-bell-border: rgba(70, 52, 42, 0.15);
   --sidebar-bg: #f1eae0;
+  /* Light-only overrides: component fallbacks preserve their dark palette. */
+  --projection-primary: #7c3f2c;
+  --projection-primary-hover: #633020;
+  --projection-success: #166534;
+  --projection-warning: #854d0e;
+  --projection-mild: #42651c;
+  --projection-orange: #9a3412;
+  --projection-danger: #b42318;
+  --projection-info: #1e40af;
+  --projection-purple: #6b21a8;
+  --projection-neutral: #544b43;
+  --control-border: #817568;
+  --chart-grid: #b6a99b;
+  --chart-text: #463d36;
+  --chart-surface: #fffcf7;
+  --chart-track: #c8bcad;
+  --read-content-opacity: 1;
+  --card-bg: var(--bg-panel);
+  --text: var(--text-main);
   color-scheme: light;
+}
+
+body.light .form-input,
+body.light .form-select,
+body.light .form-textarea,
+body.light .secondary-btn {
+  border-color: var(--control-border);
+}
+
+body.light input::placeholder,
+body.light textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+body.light input:focus-visible,
+body.light textarea:focus-visible,
+body.light select:focus-visible,
+body.light button:focus-visible,
+body.light a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
 .dashboard-shell {
@@ -331,7 +372,7 @@ body.light .quick-actions-panel {
 
 .primary-btn {
   border: none;
-  background: #a86955;
+  background: var(--projection-primary, #a86955);
   color: #ffffff;
 }
 

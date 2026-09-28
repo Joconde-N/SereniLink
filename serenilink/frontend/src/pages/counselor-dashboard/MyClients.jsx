@@ -3,23 +3,23 @@ import { Link } from "react-router-dom";
 import api from "../../api/axios";
 
 const LEVEL_STYLE = {
-  Low:      { color: "#67d58c", bg: "rgba(103,213,140,0.12)" },
-  Moderate: { color: "#f5c95f", bg: "rgba(245,201,95,0.12)" },
-  High:     { color: "#f08f8f", bg: "rgba(240,143,143,0.12)" },
+  Low:      { color: "var(--projection-success, #67d58c)", bg: "rgba(103,213,140,0.12)" },
+  Moderate: { color: "var(--projection-warning, #f5c95f)", bg: "rgba(245,201,95,0.12)" },
+  High:     { color: "var(--projection-danger, #f08f8f)", bg: "rgba(240,143,143,0.12)" },
 };
 
 const TYPE_LABEL = { PHQ9: "PHQ-9 (Depression)", GAD7: "GAD-7 (Anxiety)" };
 
 function SeverityBadge({ severity }) {
   const color = severity === "Severe" || severity === "Moderately Severe"
-    ? "#f08f8f"
+    ? "var(--projection-danger, #f08f8f)"
     : severity === "Moderate"
-      ? "#f5c95f"
-      : "#67d58c";
+      ? "var(--projection-warning, #f5c95f)"
+      : "var(--projection-success, #67d58c)";
   return (
     <span style={{
       padding: "3px 10px", borderRadius: 999, fontSize: 11, fontWeight: 600,
-      background: `${color}18`, color, border: `1px solid ${color}30`,
+      background: `color-mix(in srgb, ${color} 9.412%, transparent)`, color, border: `1px solid color-mix(in srgb, ${color} 18.824%, transparent)`,
     }}>
       {severity}
     </span>

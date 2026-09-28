@@ -60,7 +60,7 @@ function CounselorSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
         roleLabel="Counselor"
-        roleColor="#67d58c"
+        roleColor="var(--projection-success, #67d58c)"
       />
       <aside className={`dashboard-sidebar ${collapsed ? "collapsed" : ""}`}>
       <div className="sidebar-top">
@@ -90,7 +90,7 @@ function CounselorSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }
             <p style={{ margin: 0, fontWeight: 600, fontSize: "14px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
               {user.nickname}
             </p>
-            <p style={{ margin: 0, fontSize: "11px", color: "#67d58c" }}>Counselor</p>
+            <p style={{ margin: 0, fontSize: "11px", color: "var(--projection-success, #67d58c)" }}>Counselor</p>
           </div>
         </div>
       )}

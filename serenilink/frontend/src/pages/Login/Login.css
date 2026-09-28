@@ -218,7 +218,7 @@
   background: none;
   border: none;
   padding: 0;
-  color: #E19A86;
+  color: var(--projection-primary, #E19A86);
   font-size: 14px;
   cursor: pointer;
 }
@@ -228,7 +228,7 @@
   height: 56px;
   border: none;
   border-radius: 12px;
-  background: #a86955;
+  background: var(--projection-primary, #a86955);
   color: #ffffff;
   font-size: 17px;
   font-weight: 700;
@@ -252,7 +252,7 @@
 }
 
 .login-bottom-links a {
-  color: #E19A86;
+  color: var(--projection-primary, #E19A86);
   text-decoration: none;
   font-weight: 600;
 }
@@ -371,7 +371,7 @@
   height: 52px;
   border: none;
   border-radius: 12px;
-  background: #a86955;
+  background: var(--projection-primary, #a86955);
   color: #ffffff;
   font-size: 16px;
   font-weight: 700;
@@ -384,13 +384,13 @@
 }
 
 .forgot-success {
-  color: #6fcf97;
+  color: var(--projection-success, #6fcf97);
   font-size: 14px;
   margin: 0;
 }
 
 .forgot-error {
-  color: #eb5757;
+  color: var(--projection-danger, #eb5757);
   font-size: 14px;
   margin: 0 0 14px;
 }
@@ -408,11 +408,11 @@ body.light .login-topbar {
 }
 
 body.light .login-brand {
-  color: #6b6259;
+  color: var(--text-muted);
 }
 
 body.light .login-back {
-  color: #57504a;
+  color: var(--text-soft);
 }
 
 body.light .login-right {
@@ -428,30 +428,30 @@ body.light .login-form-box h2 {
 }
 
 body.light .login-subtext {
-  color: #6b6259;
+  color: var(--text-muted);
 }
 
 body.light .login-field label,
 body.light .login-remember {
-  color: #57504a;
+  color: var(--text-soft);
 }
 
 body.light .login-field input {
-  background: #f4eee5;
+  background: var(--bg-panel);
   color: #2b2521;
-  border: 1px solid rgba(70, 52, 42, 0.14);
+  border: 1px solid var(--control-border);
 }
 
 body.light .login-field input::placeholder {
-  color: #7a7168;
+  color: var(--text-muted);
 }
 
 body.light .login-eye {
-  color: #7a7168;
+  color: var(--text-muted);
 }
 
 body.light .login-bottom-links p {
-  color: #6b6259;
+  color: var(--text-muted);
 }
 
 body.light .forgot-overlay {
@@ -459,7 +459,7 @@ body.light .forgot-overlay {
 }
 
 body.light .forgot-modal {
-  background: #f4eee5;
+  background: var(--bg-panel);
   border-color: rgba(70, 52, 42, 0.14);
 }
 
@@ -468,7 +468,7 @@ body.light .forgot-modal h3 {
 }
 
 body.light .forgot-modal p {
-  color: #6b6259;
+  color: var(--text-muted);
 }
 
 body.light .forgot-close {
@@ -479,9 +479,9 @@ body.light .forgot-close {
 body.light .forgot-input {
   background: #ece5d9;
   color: #2b2521;
-  border: 1px solid rgba(70, 52, 42, 0.14);
+  border: 1px solid var(--control-border);
 }
 
 body.light .forgot-input::placeholder {
-  color: #7a7168;
+  color: var(--text-muted);
 }

@@ -9,7 +9,7 @@ function NotFound() {
       <p style={{ fontSize: 16, color: "var(--site-muted, #b0b0b0)", marginBottom: 32, maxWidth: 400 }}>
         The page you're looking for doesn't exist or has been moved.
       </p>
-      <Link to="/" style={{ background: "#a86955", color: "#fff", padding: "12px 28px", borderRadius: 999, fontWeight: 600, fontSize: 15, textDecoration: "none" }}>
+      <Link to="/" style={{ background: "var(--projection-primary, #a86955)", color: "#fff", padding: "12px 28px", borderRadius: 999, fontWeight: 600, fontSize: 15, textDecoration: "none" }}>
         Back to Home
       </Link>
     </div>

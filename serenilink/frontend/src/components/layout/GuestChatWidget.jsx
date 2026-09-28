@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { LuBot, LuSendHorizontal, LuMaximize2, LuX, LuMinus, LuMessagesSquare } from "react-icons/lu";
 import api from "../../api/axios";
 
-const RISK_COLOR = { MODERATE: "#f5c95f", HIGH: "#f08f8f" };
+const RISK_COLOR = { MODERATE: "var(--projection-warning, #f5c95f)", HIGH: "var(--projection-danger, #f08f8f)" };
 const MAX = 5;
 
 function getGuestId() {
@@ -89,12 +89,12 @@ function GuestChatWidget() {
         style={{ position: "fixed", right: "35px", bottom: "35px", zIndex: 999, background: "transparent", border: "none", padding: 0, cursor: "pointer" }}
       >
         <div style={{ position: "relative", display: "inline-flex" }}>
-          <LuMessagesSquare size={42} color="#a86955" fill="#a86955" strokeWidth={1} />
+          <LuMessagesSquare size={42} color="var(--projection-primary, #a86955)" fill="var(--projection-primary, #a86955)" strokeWidth={1} />
           {hasUnread && (
             <span style={{
               position: "absolute", top: "2px", right: "2px",
               width: "11px", height: "11px", borderRadius: "50%",
-              background: "#67d58c", border: "2px solid #050505",
+              background: "var(--projection-success, #67d58c)", border: "2px solid #050505",
             }} />
           )}
         </div>
@@ -110,7 +110,7 @@ function GuestChatWidget() {
       className="home-chat-btn"
       style={{ position: "fixed", right: "35px", bottom: "35px", zIndex: 999, background: "transparent", border: "none", padding: 0, cursor: "pointer" }}
     >
-      <LuMessagesSquare size={42} color="#a86955" fill="#a86955" strokeWidth={1} />
+      <LuMessagesSquare size={42} color="var(--projection-primary, #a86955)" fill="var(--projection-primary, #a86955)" strokeWidth={1} />
     </button>
   );
 
@@ -141,9 +141,9 @@ function GuestChatWidget() {
           </div>
           <div>
             <p style={{ margin: 0, fontWeight: 700, fontSize: "14px", color: "var(--text-main)" }}>SereniLink AI</p>
-            <p style={{ margin: 0, fontSize: "11px", color: messagesLeft > 1 ? "#67d58c" : "#f5c95f" }}>
+            <p style={{ margin: 0, fontSize: "11px", color: messagesLeft > 1 ? "var(--projection-success, #67d58c)" : "var(--projection-warning, #f5c95f)" }}>
               {messagesLeft} message{messagesLeft !== 1 ? "s" : ""} left ·{" "}
-              <Link to="/register" style={{ color: "#E19A86", textDecoration: "none" }}>Sign up free</Link>
+              <Link to="/register" style={{ color: "var(--accent, #E19A86)", textDecoration: "none" }}>Sign up free</Link>
             </p>
           </div>
         </div>
@@ -163,7 +163,7 @@ function GuestChatWidget() {
       {/* Crisis strip */}
       <div style={{
         background: "rgba(220,80,80,0.08)", borderBottom: "1px solid rgba(220,80,80,0.12)",
-        padding: "6px 16px", color: "#f08f8f", fontSize: "11px", textAlign: "center", flexShrink: 0,
+        padding: "6px 16px", color: "var(--projection-danger, #f08f8f)", fontSize: "11px", textAlign: "center", flexShrink: 0,
       }}>
         <strong>Crisis?</strong> Call <strong>112</strong> or <strong>114</strong> immediately.
       </div>
@@ -177,9 +177,9 @@ function GuestChatWidget() {
         {messages.length === 0 && (
           <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "12px", padding: "30px 16px", textAlign: "center" }}>
             <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "rgba(202,163,143,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <LuBot size={24} color="#E19A86" />
+              <LuBot size={24} color="var(--accent, #E19A86)" />
             </div>
-            <p style={{ margin: 0, color: "#b0b0b0", fontSize: "13px", lineHeight: 1.7, maxWidth: "240px" }}>
+            <p style={{ margin: 0, color: "var(--projection-neutral, #b0b0b0)", fontSize: "13px", lineHeight: 1.7, maxWidth: "240px" }}>
               Hi there! I'm SereniLink AI.<br />I'm here to listen and support you. What's on your mind?
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: "6px", width: "100%" }}>
@@ -189,7 +189,7 @@ function GuestChatWidget() {
                   onClick={() => { setChatText(prompt); inputRef.current?.focus(); }}
                   style={{
                     background: "var(--notif-bell-bg)", border: "1px solid rgba(255,255,255,0.08)",
-                    borderRadius: "10px", color: "#b8bfcc", fontSize: "12px", padding: "8px 12px",
+                    borderRadius: "10px", color: "var(--projection-neutral, #b8bfcc)", fontSize: "12px", padding: "8px 12px",
                     cursor: "pointer", textAlign: "left", transition: "background 0.2s",
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.background = "rgba(202,163,143,0.08)"}
@@ -213,14 +213,14 @@ function GuestChatWidget() {
                 width: "26px", height: "26px", borderRadius: "50%", flexShrink: 0,
                 background: "rgba(202,163,143,0.12)", display: "flex", alignItems: "center", justifyContent: "center",
               }}>
-                <LuBot size={13} color="#E19A86" />
+                <LuBot size={13} color="var(--accent, #E19A86)" />
               </div>
             )}
             <div style={{ maxWidth: "78%", display: "flex", flexDirection: "column", gap: "3px", alignItems: msg.role === "user" ? "flex-end" : "flex-start" }}>
               <div style={{
                 padding: "10px 14px", fontSize: "13px", lineHeight: 1.6,
                 borderRadius: msg.role === "user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
-                background: msg.role === "user" ? "#a86955" : "var(--chat-bubble-theirs)",
+                background: msg.role === "user" ? "var(--projection-primary, #a86955)" : "var(--chat-bubble-theirs)",
                 color: msg.role === "user" ? "#fff" : "var(--text-main)",
               }}>
                 {msg.content}
@@ -240,7 +240,7 @@ function GuestChatWidget() {
         {sending && (
           <div style={{ display: "flex", gap: "8px", alignItems: "flex-end" }}>
             <div style={{ width: "26px", height: "26px", borderRadius: "50%", flexShrink: 0, background: "rgba(202,163,143,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <LuBot size={13} color="#E19A86" />
+              <LuBot size={13} color="var(--accent, #E19A86)" />
             </div>
             <div style={{ padding: "10px 14px", borderRadius: "16px 16px 16px 4px", background: "var(--chat-bubble-theirs)", color: "var(--text-muted)", fontSize: "13px" }}>
               Typing...
@@ -256,8 +256,8 @@ function GuestChatWidget() {
           <div style={{ textAlign: "center" }}>
             <p style={{ margin: "0 0 10px", color: "var(--text-main)", fontSize: "12px" }}>You've used all {MAX} free messages.</p>
             <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
-              <Link to="/register" style={{ height: "34px", padding: "0 16px", borderRadius: "9px", background: "#a86955", color: "#fff", fontSize: "12px", fontWeight: 600, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>Create Account</Link>
-              <Link to="/login" style={{ height: "34px", padding: "0 16px", borderRadius: "9px", border: "1px solid rgba(176,176,176,0.15)", background: "transparent", color: "#b8bfcc", fontSize: "12px", fontWeight: 600, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>Log In</Link>
+              <Link to="/register" style={{ height: "34px", padding: "0 16px", borderRadius: "9px", background: "var(--projection-primary, #a86955)", color: "#fff", fontSize: "12px", fontWeight: 600, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>Create Account</Link>
+              <Link to="/login" style={{ height: "34px", padding: "0 16px", borderRadius: "9px", border: "1px solid rgba(176,176,176,0.15)", background: "transparent", color: "var(--projection-neutral, #b8bfcc)", fontSize: "12px", fontWeight: 600, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>Log In</Link>
             </div>
           </div>
         ) : (
@@ -278,7 +278,7 @@ function GuestChatWidget() {
               disabled={sending || !chatText.trim()}
               style={{
                 width: "32px", height: "32px", borderRadius: "9px", border: "none",
-                background: chatText.trim() ? "#a86955" : "var(--chat-bubble-theirs)",
+                background: chatText.trim() ? "var(--projection-primary, #a86955)" : "var(--chat-bubble-theirs)",
                 color: chatText.trim() ? "#fff" : "#555",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 cursor: chatText.trim() ? "pointer" : "default", flexShrink: 0,

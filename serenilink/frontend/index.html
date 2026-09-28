@@ -6,6 +6,17 @@
     <title>SereniLink</title>
   </head>
   <body>
+    <script>
+      // Restore the theme before page content or React can paint.
+      (() => {
+        let theme = "dark";
+        try {
+          if (localStorage.getItem("theme") === "light") theme = "light";
+        } catch {}
+        document.body.classList.add(theme);
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

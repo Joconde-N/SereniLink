@@ -15,9 +15,9 @@ function getActionLabel(category) {
 
 function getCategoryIcon(category) {
   const key = (category || "").toLowerCase();
-  if (key === "video") return <LuVideo size={18} color="#7eb8f7" />;
-  if (key === "audio") return <LuHeadphones size={18} color="#a78bfa" />;
-  return <LuBookOpen size={18} color="#9ca3af" />;
+  if (key === "video") return <LuVideo size={18} color="var(--projection-info, #7eb8f7)" />;
+  if (key === "audio") return <LuHeadphones size={18} color="var(--projection-purple, #a78bfa)" />;
+  return <LuBookOpen size={18} color="var(--projection-neutral, #9ca3af)" />;
 }
 
 function DashboardResources() {
@@ -108,7 +108,7 @@ function DashboardResources() {
         </div>
       </div>
 
-      {error && <p style={{ color: "#f08f8f", marginBottom: 16 }}>{error}</p>}
+      {error && <p style={{ color: "var(--projection-danger, #f08f8f)", marginBottom: 16 }}>{error}</p>}
 
       {loading && items.length === 0 ? (
         <div style={{ color: "var(--text-muted)", padding: 40, textAlign: "center" }}>Loading resources...</div>
@@ -152,7 +152,7 @@ function DashboardResources() {
                     style={{
                       height: 30, padding: "0 12px", borderRadius: 9, fontSize: 13,
                       fontWeight: 600, cursor: "pointer", border: "none",
-                      background: "#a86955", color: "#ffffff",
+                      background: "var(--projection-primary, #a86955)", color: "#ffffff",
                     }}
                   >
                     {getActionLabel(item.category)}

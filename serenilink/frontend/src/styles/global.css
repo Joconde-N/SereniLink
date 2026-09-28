@@ -21,6 +21,18 @@ body *:not(img):not(svg):not(canvas):not(video) {
     box-shadow 0.25s ease;
 }
 
+/* Theme-aware icons and charts follow the same timing as text and panels. */
+svg {
+  transition: color 0.25s ease, fill 0.25s ease, stroke 0.25s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  body * {
+    transition-duration: 0s !important;
+  }
+}
+
 a {
   text-decoration: none;
 }
@@ -97,7 +109,7 @@ a {
 }
 
 .nav-login-btn {
-  background: #a86955;
+  background: var(--projection-primary, #a86955);
   color: #FFFFFF;
   padding: 11px 15px;
   border-radius: 14px;
@@ -345,14 +357,14 @@ a {
 .react-datepicker__day { color: var(--text, #fff); border-radius: 6px; }
 .react-datepicker__day:hover { background: rgba(225,154,134,0.2); }
 .react-datepicker__day--selected,
-.react-datepicker__day--keyboard-selected { background: #E19A86 !important; color: #fff !important; }
+.react-datepicker__day--keyboard-selected { background: var(--projection-primary, #E19A86) !important; color: #fff !important; }
 .react-datepicker__day--disabled { color: rgba(255,255,255,0.25); }
 .react-datepicker__navigation-icon::before { border-color: var(--text, #fff); }
 .react-datepicker__time-container { border-left: 1px solid rgba(255,255,255,0.08); }
 .react-datepicker__time { background: #fff; }
 .react-datepicker__time-list-item { color: #1a1a1a !important; }
 .react-datepicker__time-list-item:hover { background: rgba(225,154,134,0.3) !important; color: #1a1a1a !important; }
-.react-datepicker__time-list-item--selected { background: #E19A86 !important; color: #fff !important; }
+.react-datepicker__time-list-item--selected { background: var(--projection-primary, #E19A86) !important; color: #fff !important; }
 
 /* ============================================
    LIGHT MODE — public chrome (navbar + footer)
@@ -363,17 +375,17 @@ body.light .nav-links a,
 body.light .nav-logo a,
 body.light .theme-icon-btn,
 body.light .nav-burger {
-  color: #57504a;
+  color: var(--text-soft);
 }
 
 body.light .nav-links a:hover,
 body.light .nav-links .active {
-  color: #a86955;
+  color: var(--accent);
 }
 
 body.light .theme-icon-btn:hover {
   background: rgba(168, 105, 85, 0.12);
-  color: #a86955;
+  color: var(--accent);
 }
 
 body.light .custom-footer {
@@ -382,11 +394,11 @@ body.light .custom-footer {
 }
 
 body.light .footer-description {
-  color: #57504a;
+  color: var(--text-soft);
 }
 
 body.light .footer-left h2 {
-  color: #6b6259;
+  color: var(--text-muted);
 }
 
 body.light .footer-left h3,
@@ -396,15 +408,15 @@ body.light .footer-right h3 {
 
 body.light .footer-links-grid a,
 body.light .footer-bottom p {
-  color: #6b6259;
+  color: var(--text-muted);
 }
 
 body.light .footer-links-grid a:hover {
-  color: #a86955;
+  color: var(--accent);
 }
 
 body.light .social-icons a {
-  color: #57504a;
+  color: var(--text-soft);
 }
 
 body.light .footer-bottom {
@@ -428,11 +440,40 @@ body.light .page-section {
 
   body.light .nav-mobile-drawer a,
   body.light .nav-mobile-drawer span {
-    color: #57504a;
+    color: var(--text-soft);
     border-bottom-color: rgba(70, 52, 42, 0.08);
   }
 
   body.light .nav-mobile-drawer a.active {
-    color: #a86955;
+    color: var(--accent);
   }
+}
+
+/* Keep the calendar readable alongside light-mode form fields. */
+body.light .react-datepicker,
+body.light .react-datepicker__header {
+  background: var(--bg-panel);
+  color: var(--text-main);
+}
+
+body.light .react-datepicker__current-month,
+body.light .react-datepicker__day-name,
+body.light .react-datepicker-time__header,
+body.light .react-datepicker__day {
+  color: var(--text-main);
+}
+
+body.light .react-datepicker__navigation-icon::before {
+  border-color: var(--text-soft);
+}
+
+body.light .react-datepicker,
+body.light .react-datepicker__header,
+body.light .react-datepicker__time-container {
+  border-color: var(--control-border);
+}
+
+body.light .react-datepicker__day--disabled {
+  color: var(--text-muted);
+  text-decoration: line-through;
 }

@@ -61,10 +61,10 @@ function CheckinCard({ item }) {
       </div>
       <div style={{ display: "flex", gap: 16 }}>
         <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
-          Stress: <span style={{ color: "#f5c95f", fontWeight: 600 }}>{item.stress}/10</span>
+          Stress: <span style={{ color: "var(--projection-warning, #f5c95f)", fontWeight: 600 }}>{item.stress}/10</span>
         </span>
         <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
-          Sleep: <span style={{ color: "#67d58c", fontWeight: 600 }}>{item.sleep}/10</span>
+          Sleep: <span style={{ color: "var(--projection-success, #67d58c)", fontWeight: 600 }}>{item.sleep}/10</span>
         </span>
       </div>
       {item.notes && (
@@ -134,9 +134,9 @@ function MoodCheckins() {
         {/* Main form card */}
         <div className="dashboard-card" style={{ marginBottom: 20 }}>
 
-          {error && <p style={{ color: "#f08f8f", marginBottom: 14, fontSize: 13 }}>{error}</p>}
+          {error && <p style={{ color: "var(--projection-danger, #f08f8f)", marginBottom: 14, fontSize: 13 }}>{error}</p>}
           {success && (
-            <p style={{ color: "#67d58c", marginBottom: 14, fontSize: 13 }}>✓ {success}</p>
+            <p style={{ color: "var(--projection-success, #67d58c)", marginBottom: 14, fontSize: 13 }}>✓ {success}</p>
           )}
 
           <form onSubmit={handleSubmit}>
@@ -183,8 +183,8 @@ function MoodCheckins() {
             <p style={{ fontSize: 12, fontWeight: 600, color: "var(--text-muted)", marginBottom: 18, textTransform: "uppercase", letterSpacing: "0.07em" }}>
               How are your levels?
             </p>
-            <SliderRow label="Stress Level" value={stress} onChange={setStress} getLabel={SCORE_LABEL} color="#f5c95f" />
-            <SliderRow label="Sleep Quality" value={sleep} onChange={setSleep} getLabel={SLEEP_LABEL} color="#67d58c" />
+            <SliderRow label="Stress Level" value={stress} onChange={setStress} getLabel={SCORE_LABEL} color="var(--projection-warning, #f5c95f)" />
+            <SliderRow label="Sleep Quality" value={sleep} onChange={setSleep} getLabel={SLEEP_LABEL} color="var(--projection-success, #67d58c)" />
 
             <div style={{ height: 1, background: "var(--border-soft)", marginBottom: 24 }} />
 

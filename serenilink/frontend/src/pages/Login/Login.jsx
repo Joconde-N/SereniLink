@@ -124,7 +124,7 @@ function Login() {
           </p>
 
           {sessionExpired && (
-            <div style={{ marginBottom: 16, padding: "12px 16px", borderRadius: 12, background: "rgba(245,201,95,0.1)", border: "1px solid rgba(245,201,95,0.25)", color: "#f5c95f", fontSize: 14 }}>
+            <div style={{ marginBottom: 16, padding: "12px 16px", borderRadius: 12, background: "rgba(245,201,95,0.1)", border: "1px solid rgba(245,201,95,0.25)", color: "var(--projection-warning, #f5c95f)", fontSize: 14 }}>
               Your session expired. Please log in again.
             </div>
           )}

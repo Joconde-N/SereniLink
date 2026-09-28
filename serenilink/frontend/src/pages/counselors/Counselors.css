@@ -49,7 +49,7 @@
 }
 
 .counselors-btn {
-  background: #a86955;
+  background: var(--projection-primary, #a86955);
   color: #ffffff;
   padding: 14px 36px;
   border-radius: 999px;
@@ -235,7 +235,7 @@
 .book-btn {
   margin-top: 28px;
   align-self: flex-start;
-  background: #a86955;
+  background: var(--projection-primary, #a86955);
   color: #ffffff;
   padding: 12px 20px;
   border-radius: 999px;
@@ -249,9 +249,9 @@
   margin-top: 28px;
   align-self: flex-end;
   background: transparent;
-  color: #a86955;
+  color: var(--projection-primary, #a86955);
   padding: 12px 20px;
-  border: 1px solid #a86955;
+  border: 1px solid var(--projection-primary, #a86955);
   border-radius: 999px;
   font-weight: 600;
   font-size: 0.95rem;
@@ -388,11 +388,11 @@ body.light .counselors-hero-text h1 {
 }
 
 body.light .counselors-hero-text h1 span {
-  color: #a86955;
+  color: var(--accent);
 }
 
 body.light .counselors-hero-text p {
-  color: #57504a;
+  color: var(--text-soft);
 }
 
 body.light .counselors-shape {
@@ -405,7 +405,7 @@ body.light .counselors-list-section {
 
 body.light .counselors-search-box,
 body.light .counselors-filter-box {
-  background: #f4eee5;
+  background: var(--bg-panel);
   border: 1px solid rgba(70, 52, 42, 0.14);
 }
 
@@ -414,7 +414,7 @@ body.light .counselors-search {
 }
 
 body.light .counselors-search::placeholder {
-  color: #7a7168;
+  color: var(--text-muted);
 }
 
 body.light .counselors-filter-box {
@@ -422,12 +422,12 @@ body.light .counselors-filter-box {
 }
 
 body.light .counselors-filter-box select option {
-  background: #f4eee5;
+  background: var(--bg-panel);
   color: #2b2521;
 }
 
 body.light .counselor-card {
-  background: #f4eee5;
+  background: var(--bg-panel);
   border: 1px solid rgba(70, 52, 42, 0.1);
 }
 
@@ -436,11 +436,11 @@ body.light .counselor-card-body h3 {
 }
 
 body.light .counselor-card-body h4 {
-  color: #57504a;
+  color: var(--text-soft);
 }
 
 body.light .counselor-card-body p {
-  color: #6b6259;
+  color: var(--text-muted);
 }
 
 body.light .view-more-btn {

@@ -1,18 +1,27 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useLayoutEffect, useState } from "react";
+import { applyTheme, isTheme, readTheme } from "../utils/theme";
 
 const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
-  const [theme, setThemeState] = useState(() => localStorage.getItem("theme") || "dark");
+  const [theme, setThemeState] = useState(readTheme);
 
-  useEffect(() => {
-    document.body.classList.remove("dark", "light");
-    document.body.classList.add(theme);
-    localStorage.setItem("theme", theme);
+  useLayoutEffect(() => {
+    applyTheme(theme);
   }, [theme]);
 
+  useEffect(() => {
+    const syncTheme = (event) => {
+      if (event.key === "theme" && isTheme(event.newValue) && event.storageArea === window.localStorage) {
+        setThemeState(event.newValue);
+      }
+    };
+    window.addEventListener("storage", syncTheme);
+    return () => window.removeEventListener("storage", syncTheme);
+  }, []);
+
   const setTheme = (next) => {
-    if (next === "dark" || next === "light") setThemeState(next);
+    if (isTheme(next)) setThemeState(next);
   };
 
   const toggle = () => setThemeState((t) => (t === "dark" ? "light" : "dark"));

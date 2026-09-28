@@ -6,9 +6,9 @@ const EMPTY_FORM = { title: "", summary: "", body: "", category: "", tags: "", v
 const CATEGORIES = ["Video", "Audio", "Article"];
 
 const CATEGORY_STYLE = {
-  Video:   { color: "#60a5fa", bg: "rgba(96,165,250,0.1)" },
-  Audio:   { color: "#b39ddb", bg: "rgba(147,112,219,0.1)" },
-  Article: { color: "#9ca3af", bg: "rgba(156,163,175,0.1)" },
+  Video:   { color: "var(--projection-info, #60a5fa)", bg: "rgba(96,165,250,0.1)" },
+  Audio:   { color: "var(--projection-purple, #b39ddb)", bg: "rgba(147,112,219,0.1)" },
+  Article: { color: "var(--projection-neutral, #9ca3af)", bg: "rgba(156,163,175,0.1)" },
 };
 
 function ContentManagement() {
@@ -84,7 +84,7 @@ function ContentManagement() {
       <p className="dashboard-page-subtitle">Create, edit, publish, and delete resource content.</p>
 
       {msg && (
-        <div style={{ marginBottom: 16, padding: "12px 16px", borderRadius: 12, background: msg.ok ? "rgba(103,213,140,0.1)" : "rgba(239,68,68,0.1)", color: msg.ok ? "#67d58c" : "#f08f8f", border: `1px solid ${msg.ok ? "rgba(103,213,140,0.2)" : "rgba(239,68,68,0.2)"}` }}>
+        <div style={{ marginBottom: 16, padding: "12px 16px", borderRadius: 12, background: msg.ok ? "rgba(103,213,140,0.1)" : "rgba(239,68,68,0.1)", color: msg.ok ? "var(--projection-success, #67d58c)" : "var(--projection-danger, #f08f8f)", border: `1px solid ${msg.ok ? "rgba(103,213,140,0.2)" : "rgba(239,68,68,0.2)"}` }}>
           {msg.text}
         </div>
       )}
@@ -214,7 +214,7 @@ function ContentManagement() {
 
                     {/* Status */}
                     <td style={{ padding: "14px" }}>
-                      <span style={{ padding: "3px 10px", borderRadius: 999, fontSize: 12, fontWeight: 600, color: item.is_published ? "#67d58c" : "#f5c95f", background: item.is_published ? "rgba(103,213,140,0.1)" : "rgba(245,201,95,0.1)" }}>
+                      <span style={{ padding: "3px 10px", borderRadius: 999, fontSize: 12, fontWeight: 600, color: item.is_published ? "var(--projection-success, #67d58c)" : "var(--projection-warning, #f5c95f)", background: item.is_published ? "rgba(103,213,140,0.1)" : "rgba(245,201,95,0.1)" }}>
                         {item.is_published ? "Published" : "Draft"}
                       </span>
                     </td>
@@ -227,13 +227,13 @@ function ContentManagement() {
                     {/* Actions */}
                     <td style={{ padding: "14px" }}>
                       <div style={{ display: "flex", gap: 8 }}>
-                        <button onClick={() => togglePublish(item)} title={item.is_published ? "Unpublish" : "Publish"} style={{ padding: "5px 8px", borderRadius: 8, fontSize: 12, cursor: "pointer", border: `1px solid ${item.is_published ? "rgba(245,201,95,0.3)" : "rgba(103,213,140,0.3)"}`, background: "transparent", color: item.is_published ? "#f5c95f" : "#67d58c", display: "flex", alignItems: "center" }}>
+                        <button onClick={() => togglePublish(item)} title={item.is_published ? "Unpublish" : "Publish"} style={{ padding: "5px 8px", borderRadius: 8, fontSize: 12, cursor: "pointer", border: `1px solid ${item.is_published ? "rgba(245,201,95,0.3)" : "rgba(103,213,140,0.3)"}`, background: "transparent", color: item.is_published ? "var(--projection-warning, #f5c95f)" : "var(--projection-success, #67d58c)", display: "flex", alignItems: "center" }}>
                           {item.is_published ? <LuEyeOff size={15} /> : <LuEye size={15} />}
                         </button>
                         <button onClick={() => openEdit(item)} title="Edit" style={{ padding: "5px 8px", borderRadius: 8, fontSize: 12, cursor: "pointer", border: "1px solid var(--border-soft)", background: "transparent", color: "var(--text-main)", display: "flex", alignItems: "center" }}>
                           <LuPencil size={15} />
                         </button>
-                        <button onClick={() => handleDelete(item.id)} title="Delete" style={{ padding: "5px 8px", borderRadius: 8, fontSize: 12, cursor: "pointer", border: "1px solid rgba(240,143,143,0.3)", background: "transparent", color: "#f08f8f", display: "flex", alignItems: "center" }}>
+                        <button onClick={() => handleDelete(item.id)} title="Delete" style={{ padding: "5px 8px", borderRadius: 8, fontSize: 12, cursor: "pointer", border: "1px solid rgba(240,143,143,0.3)", background: "transparent", color: "var(--projection-danger, #f08f8f)", display: "flex", alignItems: "center" }}>
                           <LuTrash2 size={15} />
                         </button>
                       </div>

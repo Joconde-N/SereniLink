@@ -26,14 +26,14 @@ const QUICK_ACTIONS = [
     to: "/dashboard/checkins",
     icon: LuHeartPulse,
     iconBg: "rgba(103, 213, 140, 0.15)",
-    iconColor: "#67d58c",
+    iconColor: "var(--projection-success, #67d58c)",
   },
   {
     label: "Start AI Chat",
     to: "/dashboard/ai-support",
     icon: LuMessageCircle,
     iconBg: "rgba(96, 165, 250, 0.15)",
-    iconColor: "#60a5fa",
+    iconColor: "var(--projection-info, #60a5fa)",
   },
   {
     label: "Book Counselor",
@@ -47,7 +47,7 @@ const QUICK_ACTIONS = [
     to: "/dashboard/screenings",
     icon: LuClipboardList,
     iconBg: "rgba(167, 139, 250, 0.15)",
-    iconColor: "#a78bfa",
+    iconColor: "var(--projection-purple, #a78bfa)",
   },
 ];
 
@@ -177,7 +177,7 @@ function Overview() {
   }, []);
 
   if (loading) return <div style={{ color: "var(--text-muted)", padding: "40px" }}>Loading dashboard...</div>;
-  if (error) return <div style={{ color: "#f08f8f", padding: "40px" }}>{error}</div>;
+  if (error) return <div style={{ color: "var(--projection-danger, #f08f8f)", padding: "40px" }}>{error}</div>;
 
   const { moods_last_7_days, assessments_last_7_days, progress, recommended_content } = data;
 
@@ -237,7 +237,7 @@ function Overview() {
             title="Avg Stress"
             value={assessments_last_7_days?.avg_stress != null ? assessments_last_7_days.avg_stress.toFixed(1) : "—"}
             label="Last 7 days"
-            accent="#f5c95f"
+            accent="var(--projection-warning, #f5c95f)"
           />
           <StatCard
             title="Milestones"
@@ -274,11 +274,11 @@ function Overview() {
             </div>
             <div className="simple-item" style={{ display: "flex", justifyContent: "space-between" }}>
               <span>Average Stress</span>
-              <span style={{ color: "#f5c95f" }}>{assessments_last_7_days?.avg_stress?.toFixed(1) ?? "—"}/10</span>
+              <span style={{ color: "var(--projection-warning, #f5c95f)" }}>{assessments_last_7_days?.avg_stress?.toFixed(1) ?? "—"}/10</span>
             </div>
             <div className="simple-item" style={{ display: "flex", justifyContent: "space-between" }}>
               <span>Average Sleep</span>
-              <span style={{ color: "#67d58c" }}>{assessments_last_7_days?.avg_sleep?.toFixed(1) ?? "—"}/10</span>
+              <span style={{ color: "var(--projection-success, #67d58c)" }}>{assessments_last_7_days?.avg_sleep?.toFixed(1) ?? "—"}/10</span>
             </div>
           </div>
         </div>

@@ -2,11 +2,11 @@ import React, { useEffect, useState, useCallback } from "react";
 import api from "../../api/axios";
 
 const STATUS_STYLE = {
-  PENDING:   { color: "#f5c95f", bg: "rgba(245,201,95,0.12)" },
-  APPROVED:  { color: "#67d58c", bg: "rgba(103,213,140,0.12)" },
-  COMPLETED: { color: "#7eb8f7", bg: "rgba(126,184,247,0.12)" },
-  DECLINED:  { color: "#f08f8f", bg: "rgba(240,143,143,0.12)" },
-  CANCELLED: { color: "#9ca3af", bg: "rgba(156,163,175,0.12)" },
+  PENDING:   { color: "var(--projection-warning, #f5c95f)", bg: "rgba(245,201,95,0.12)" },
+  APPROVED:  { color: "var(--projection-success, #67d58c)", bg: "rgba(103,213,140,0.12)" },
+  COMPLETED: { color: "var(--projection-info, #7eb8f7)", bg: "rgba(126,184,247,0.12)" },
+  DECLINED:  { color: "var(--projection-danger, #f08f8f)", bg: "rgba(240,143,143,0.12)" },
+  CANCELLED: { color: "var(--projection-neutral, #9ca3af)", bg: "rgba(156,163,175,0.12)" },
 };
 const STATUS_TABS = ["ALL", "PENDING", "APPROVED", "DECLINED", "COMPLETED", "CANCELLED"];
 
@@ -98,7 +98,7 @@ function BookingsManagement() {
       <p className="dashboard-page-subtitle">View all bookings and update their statuses.</p>
 
       {msg && (
-        <div style={{ marginBottom: "16px", padding: "12px 16px", borderRadius: "12px", background: "rgba(103,213,140,0.1)", color: "#67d58c", border: "1px solid rgba(103,213,140,0.2)" }}>
+        <div style={{ marginBottom: "16px", padding: "12px 16px", borderRadius: "12px", background: "rgba(103,213,140,0.1)", color: "var(--projection-success, #67d58c)", border: "1px solid rgba(103,213,140,0.2)" }}>
           {msg}
         </div>
       )}

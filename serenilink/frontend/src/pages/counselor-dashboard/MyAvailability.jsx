@@ -42,7 +42,7 @@ function SlotForm({ initial = EMPTY, onSave, onCancel, saving, label, error }) {
 
   return (
     <form onSubmit={submit}>
-      {error && <p style={{ color: "#f08f8f", fontSize: "13px", marginBottom: "10px" }}>{error}</p>}
+      {error && <p style={{ color: "var(--projection-danger, #f08f8f)", fontSize: "13px", marginBottom: "10px" }}>{error}</p>}
 
       <div style={{ marginBottom: "14px" }}>
         <label className="form-label">Date</label>
@@ -203,14 +203,14 @@ function MyAvailability() {
       <div className="dashboard-grid dashboard-cards-2" style={{ marginBottom: "20px" }}>
         <div className="dashboard-card">
           <h3>Add New Slot</h3>
-          {success && <p style={{ color: "#67d58c", fontSize: "13px", marginBottom: "10px" }}>{success}</p>}
+          {success && <p style={{ color: "var(--projection-success, #67d58c)", fontSize: "13px", marginBottom: "10px" }}>{success}</p>}
           <SlotForm onSave={handleCreate} saving={saving} label="Create Slot" error={formError} />
         </div>
 
         <div className="dashboard-card">
           <h3>Slot Summary</h3>
           <div className="list-stack">
-            {[["Total Slots", slots.length, "var(--accent)"], ["Available", available, "#67d58c"], ["Booked", booked, "#f5c95f"]].map(([lbl, val, color]) => (
+            {[["Total Slots", slots.length, "var(--accent)"], ["Available", available, "var(--projection-success, #67d58c)"], ["Booked", booked, "var(--projection-warning, #f5c95f)"]].map(([lbl, val, color]) => (
               <div key={lbl} className="simple-item" style={{ display: "flex", justifyContent: "space-between" }}>
                 <span>{lbl}</span>
                 <span style={{ color, fontWeight: 600, fontSize: "16px" }}>{val}</span>
@@ -231,7 +231,7 @@ function MyAvailability() {
           </select>
         </div>
 
-        {error && <p style={{ color: "#f08f8f", fontSize: "13px", marginBottom: "10px" }}>{error}</p>}
+        {error && <p style={{ color: "var(--projection-danger, #f08f8f)", fontSize: "13px", marginBottom: "10px" }}>{error}</p>}
 
         {loading ? (
           <div style={{ color: "var(--text-muted)", padding: "30px", textAlign: "center" }}>Loading slots...</div>
@@ -274,7 +274,7 @@ function MyAvailability() {
                         <span style={{
                           padding: "4px 12px", borderRadius: "999px", fontSize: "12px", fontWeight: 600,
                           background: s.status === "AVAILABLE" ? "rgba(103,213,140,0.1)" : s.status === "BOOKED" ? "rgba(245,201,95,0.1)" : "rgba(156,163,175,0.1)",
-                          color: s.status === "AVAILABLE" ? "#67d58c" : s.status === "BOOKED" ? "#f5c95f" : "#9ca3af",
+                          color: s.status === "AVAILABLE" ? "var(--projection-success, #67d58c)" : s.status === "BOOKED" ? "var(--projection-warning, #f5c95f)" : "var(--projection-neutral, #9ca3af)",
                         }}>
                           {s.status}
                         </span>
@@ -293,7 +293,7 @@ function MyAvailability() {
                               type="button"
                               onClick={() => handleDelete(s.id)}
                               disabled={deleting === s.id}
-                              style={{ height: "36px", padding: "0 14px", fontSize: "13px", color: "#f08f8f", borderColor: "rgba(240,143,143,0.3)" }}
+                              style={{ height: "36px", padding: "0 14px", fontSize: "13px", color: "var(--projection-danger, #f08f8f)", borderColor: "rgba(240,143,143,0.3)" }}
                             >
                               {deleting === s.id ? "..." : "Delete"}
                             </button>

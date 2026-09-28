@@ -14,9 +14,9 @@ const ALLOWED_ACTIONS = {
 };
 
 const ACTION_LABELS = {
-  APPROVED:  { label: "Approve",  color: "#67d58c",       bg: "rgba(103,213,140,0.12)" },
-  DECLINED:  { label: "Decline",  color: "#f08f8f",       bg: "rgba(240,143,143,0.12)" },
-  CANCELLED: { label: "Cancel",   color: "#f08f8f",       bg: "rgba(240,143,143,0.12)" },
+  APPROVED:  { label: "Approve",  color: "var(--projection-success, #67d58c)",       bg: "rgba(103,213,140,0.12)" },
+  DECLINED:  { label: "Decline",  color: "var(--projection-danger, #f08f8f)",       bg: "rgba(240,143,143,0.12)" },
+  CANCELLED: { label: "Cancel",   color: "var(--projection-danger, #f08f8f)",       bg: "rgba(240,143,143,0.12)" },
   COMPLETED: { label: "Complete", color: "var(--accent)", bg: "rgba(202,163,143,0.12)" },
 };
 
@@ -87,7 +87,7 @@ function CounselorBookingDetails() {
   };
 
   if (loading) return <div style={{ color: "var(--text-muted)", padding: "40px" }}>Loading...</div>;
-  if (error)   return <div style={{ color: "#f08f8f", padding: "40px" }}>{error}</div>;
+  if (error)   return <div style={{ color: "var(--projection-danger, #f08f8f)", padding: "40px" }}>{error}</div>;
 
   const actions = ALLOWED_ACTIONS[booking.status] || [];
 
@@ -232,7 +232,7 @@ function CounselorBookingDetails() {
             </label>
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               {noteMsg && (
-                <span style={{ fontSize: "13px", color: noteMsg === "Note saved." ? "#67d58c" : "#f08f8f" }}>
+                <span style={{ fontSize: "13px", color: noteMsg === "Note saved." ? "var(--projection-success, #67d58c)" : "var(--projection-danger, #f08f8f)" }}>
                   {noteMsg}
                 </span>
               )}

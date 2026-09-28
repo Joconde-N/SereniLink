@@ -51,7 +51,7 @@ function Navbar() {
           <NavLink to="/counselors" onClick={close} className={({ isActive }) => isActive ? "active" : ""}>Counselors</NavLink>
           <NavLink to="/resources" onClick={close} className={({ isActive }) => isActive ? "active" : ""}>Resources</NavLink>
           {!loading && (
-            <span onClick={() => { user ? navigate(dashboardPath) : navigate("/login"); close(); }} style={{ cursor: "pointer", color: "#E19A86", fontWeight: 600 }}>
+            <span onClick={() => { user ? navigate(dashboardPath) : navigate("/login"); close(); }} style={{ cursor: "pointer", color: "var(--accent, #E19A86)", fontWeight: 600 }}>
               {user ? "Dashboard" : "Login"}
             </span>
           )}

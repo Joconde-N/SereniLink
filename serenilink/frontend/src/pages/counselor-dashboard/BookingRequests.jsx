@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import api from "../../api/axios";
 
 const STATUS_STYLE = {
-  PENDING:   { color: "#f5c95f", bg: "rgba(245,201,95,0.12)" },
-  APPROVED:  { color: "#67d58c", bg: "rgba(103,213,140,0.12)" },
-  COMPLETED: { color: "#7eb8f7", bg: "rgba(126,184,247,0.12)" },
-  DECLINED:  { color: "#f08f8f", bg: "rgba(240,143,143,0.12)" },
-  CANCELLED: { color: "#9ca3af", bg: "rgba(156,163,175,0.12)" },
+  PENDING:   { color: "var(--projection-warning, #f5c95f)", bg: "rgba(245,201,95,0.12)" },
+  APPROVED:  { color: "var(--projection-success, #67d58c)", bg: "rgba(103,213,140,0.12)" },
+  COMPLETED: { color: "var(--projection-info, #7eb8f7)", bg: "rgba(126,184,247,0.12)" },
+  DECLINED:  { color: "var(--projection-danger, #f08f8f)", bg: "rgba(240,143,143,0.12)" },
+  CANCELLED: { color: "var(--projection-neutral, #9ca3af)", bg: "rgba(156,163,175,0.12)" },
 };
 
 const ALLOWED_ACTIONS = {
@@ -19,10 +19,10 @@ const ALLOWED_ACTIONS = {
 };
 
 const ACTION_CFG = {
-  APPROVED:  { label: "Approve",  color: "#67d58c", bg: "rgba(103,213,140,0.12)" },
-  DECLINED:  { label: "Decline",  color: "#e05555", bg: "rgba(224,85,85,0.12)" },
-  CANCELLED: { label: "Cancel",   color: "#e05555", bg: "rgba(224,85,85,0.12)" },
-  COMPLETED: { label: "Complete", color: "#7eb8f7", bg: "rgba(126,184,247,0.12)" },
+  APPROVED:  { label: "Approve",  color: "var(--projection-success, #67d58c)", bg: "rgba(103,213,140,0.12)" },
+  DECLINED:  { label: "Decline",  color: "var(--projection-danger, #e05555)", bg: "rgba(224,85,85,0.12)" },
+  CANCELLED: { label: "Cancel",   color: "var(--projection-danger, #e05555)", bg: "rgba(224,85,85,0.12)" },
+  COMPLETED: { label: "Complete", color: "var(--projection-info, #7eb8f7)", bg: "rgba(126,184,247,0.12)" },
 };
 
 export default function BookingRequests() {
@@ -87,7 +87,7 @@ export default function BookingRequests() {
         ))}
       </div>
 
-      {error && <p style={{ color: "#f08f8f", marginBottom: 16 }}>{error}</p>}
+      {error && <p style={{ color: "var(--projection-danger, #f08f8f)", marginBottom: 16 }}>{error}</p>}
 
       {loading ? (
         <div style={{ color: "var(--text-muted)", padding: 40, textAlign: "center" }}>Loading...</div>
@@ -162,7 +162,7 @@ export default function BookingRequests() {
                               fontWeight: 600, cursor: "pointer", textDecoration: "none",
                               display: "inline-flex", alignItems: "center",
                               border: "1px solid rgba(242, 242, 242, 0.18)",
-                              background: "rgba(242, 242, 242, 0.12)", color: "#f2f2f2",
+                              background: "rgba(242, 242, 242, 0.12)", color: "var(--projection-neutral, #f2f2f2)",
                             }}
                           >
                             Chat

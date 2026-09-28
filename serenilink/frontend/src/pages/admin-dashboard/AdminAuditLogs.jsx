@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import ExportMenu from "../../components/shared/ExportMenu";
 import { buildReportPdf } from "../../utils/reportPdf";
 
-const ROLE_COLOR = { admin: "#f5c95f", counselor: "#60a5fa", user: "#67d58c" };
+const ROLE_COLOR = { admin: "var(--projection-warning, #f5c95f)", counselor: "var(--projection-info, #60a5fa)", user: "var(--projection-success, #67d58c)" };
 
 const ACTION_OPTIONS = [
   "USER_LOGIN", "USER_REGISTERED", "PROFILE_UPDATED",
@@ -22,14 +22,14 @@ const RESOURCE_OPTIONS = [
 ];
 
 const ACTION_COLOR = {
-  USER_LOGIN: "#60a5fa", USER_REGISTERED: "#67d58c",
-  COUNSELOR_APPROVED: "#67d58c", COUNSELOR_REJECTED: "#f08f8f",
-  BOOKING_CREATED: "var(--accent)", BOOKING_STATUS_UPDATED: "#f5c95f", BOOKING_CANCELLED: "#f08f8f",
-  ASSESSMENT_COMPLETED: "#a78bfa", USER_PROMOTED: "#f5c95f",
-  USER_DEMOTED: "#f08f8f", USER_TOGGLE_ACTIVE: "#b8bfcc",
+  USER_LOGIN: "var(--projection-info, #60a5fa)", USER_REGISTERED: "var(--projection-success, #67d58c)",
+  COUNSELOR_APPROVED: "var(--projection-success, #67d58c)", COUNSELOR_REJECTED: "var(--projection-danger, #f08f8f)",
+  BOOKING_CREATED: "var(--accent)", BOOKING_STATUS_UPDATED: "var(--projection-warning, #f5c95f)", BOOKING_CANCELLED: "var(--projection-danger, #f08f8f)",
+  ASSESSMENT_COMPLETED: "var(--projection-purple, #a78bfa)", USER_PROMOTED: "var(--projection-warning, #f5c95f)",
+  USER_DEMOTED: "var(--projection-danger, #f08f8f)", USER_TOGGLE_ACTIVE: "#b8bfcc",
   PROFILE_UPDATED: "var(--accent)",
-  CONTENT_CREATED: "#67d58c", CONTENT_UPDATED: "#f5c95f", CONTENT_DELETED: "#f08f8f",
-  EXERCISE_CREATED: "#67d58c", EXERCISE_UPDATED: "#f5c95f", EXERCISE_TOGGLED: "#60a5fa",
+  CONTENT_CREATED: "var(--projection-success, #67d58c)", CONTENT_UPDATED: "var(--projection-warning, #f5c95f)", CONTENT_DELETED: "var(--projection-danger, #f08f8f)",
+  EXERCISE_CREATED: "var(--projection-success, #67d58c)", EXERCISE_UPDATED: "var(--projection-warning, #f5c95f)", EXERCISE_TOGGLED: "var(--projection-info, #60a5fa)",
 };
 
 const PAGE_SIZE = 50;
@@ -38,7 +38,7 @@ function Badge({ label, color }) {
   return (
     <span style={{
       padding: "2px 10px", borderRadius: 999, fontSize: 11, fontWeight: 600,
-      background: `${color}18`, color, border: `1px solid ${color}30`,
+      background: `color-mix(in srgb, ${color} 9.412%, transparent)`, color, border: `1px solid color-mix(in srgb, ${color} 18.824%, transparent)`,
       whiteSpace: "nowrap",
     }}>{label}</span>
   );

@@ -21,9 +21,9 @@ function StatCard({ title, value, label, color }) {
 
 const QUICK_ACTIONS = [
   { label: "View Appointments", to: "/counselor/requests", icon: LuInbox, iconBg: "rgba(202,163,143,0.18)", iconColor: "var(--accent)" },
-  { label: "My Clients", to: "/counselor/clients", icon: LuUsers, iconBg: "rgba(96,165,250,0.15)", iconColor: "#60a5fa" },
-  { label: "My Sessions", to: "/counselor/sessions", icon: LuCalendarDays, iconBg: "rgba(167,139,250,0.15)", iconColor: "#a78bfa" },
-  { label: "Update Availability", to: "/counselor/availability", icon: LuClock, iconBg: "rgba(103,213,140,0.15)", iconColor: "#67d58c" },
+  { label: "My Clients", to: "/counselor/clients", icon: LuUsers, iconBg: "rgba(96,165,250,0.15)", iconColor: "var(--projection-info, #60a5fa)" },
+  { label: "My Sessions", to: "/counselor/sessions", icon: LuCalendarDays, iconBg: "rgba(167,139,250,0.15)", iconColor: "var(--projection-purple, #a78bfa)" },
+  { label: "Update Availability", to: "/counselor/availability", icon: LuClock, iconBg: "rgba(103,213,140,0.15)", iconColor: "var(--projection-success, #67d58c)" },
 ];
 
 function CounselorOverview() {
@@ -87,9 +87,9 @@ function CounselorOverview() {
 
       <div className="dashboard-grid dashboard-cards-4" style={{ marginBottom: "20px" }}>
         <StatCard title="Total Bookings"   value={stats?.total_bookings}    label="All time" />
-        <StatCard title="Pending Requests" value={stats?.pending_requests}  label="Awaiting action" color="#f5c95f" />
+        <StatCard title="Pending Requests" value={stats?.pending_requests}  label="Awaiting action" color="var(--projection-warning, #f5c95f)" />
         <StatCard title="Today's Sessions" value={stats?.today_sessions}    label="Scheduled today"  color="var(--accent)" />
-        <StatCard title="Upcoming"         value={stats?.upcoming_approved} label="Approved sessions" color="#67d58c" />
+        <StatCard title="Upcoming"         value={stats?.upcoming_approved} label="Approved sessions" color="var(--projection-success, #67d58c)" />
       </div>
 
       <div className="dashboard-grid dashboard-cards-2" style={{ marginBottom: "20px" }}>
@@ -186,7 +186,7 @@ function CounselorOverview() {
                       {new Date(s.end_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                     </p>
                   </div>
-                  <span style={{ padding: "4px 10px", borderRadius: "999px", background: "rgba(103,213,140,0.1)", color: "#67d58c", fontSize: "12px" }}>
+                  <span style={{ padding: "4px 10px", borderRadius: "999px", background: "rgba(103,213,140,0.1)", color: "var(--projection-success, #67d58c)", fontSize: "12px" }}>
                     {s.status}
                   </span>
                 </div>

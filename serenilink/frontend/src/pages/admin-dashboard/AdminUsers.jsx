@@ -4,9 +4,9 @@ import api from "../../api/axios";
 const ROLE_TABS = ["ALL", "user", "counselor", "admin"];
 
 const ROLE_STYLE = {
-  admin:     { color: "#a78bfa", bg: "rgba(167,139,250,0.1)" },
-  counselor: { color: "#60a5fa", bg: "rgba(96,165,250,0.1)" },
-  user:      { color: "#9ca3af", bg: "rgba(156,163,175,0.08)" },
+  admin:     { color: "var(--projection-purple, #a78bfa)", bg: "rgba(167,139,250,0.1)" },
+  counselor: { color: "var(--projection-info, #60a5fa)", bg: "rgba(96,165,250,0.1)" },
+  user:      { color: "var(--projection-neutral, #9ca3af)", bg: "rgba(156,163,175,0.08)" },
 };
 
 function Avatar({ name }) {
@@ -36,7 +36,7 @@ function StatusPill({ active }) {
   return (
     <span style={{
       padding: "3px 10px", borderRadius: 999, fontSize: 12, fontWeight: 600,
-      color: active ? "#67d58c" : "#f08f8f",
+      color: active ? "var(--projection-success, #67d58c)" : "var(--projection-danger, #f08f8f)",
       background: active ? "rgba(103,213,140,0.1)" : "rgba(240,143,143,0.1)",
     }}>{active ? "Active" : "Inactive"}</span>
   );
@@ -108,7 +108,7 @@ function DetailsPanel({ user, onClose, onUpdate }) {
               padding: "10px 0", borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: "pointer",
               border: `1px solid ${user.is_active ? "rgba(240,143,143,0.3)" : "rgba(103,213,140,0.3)"}`,
               background: "transparent",
-              color: user.is_active ? "#f08f8f" : "#67d58c",
+              color: user.is_active ? "var(--projection-danger, #f08f8f)" : "var(--projection-success, #67d58c)",
             }}
           >
             {user.is_active ? "Deactivate Account" : "Activate Account"}
@@ -120,7 +120,7 @@ function DetailsPanel({ user, onClose, onUpdate }) {
               onClick={() => patch("promote", { role: "admin" })}
               style={{
                 padding: "10px 0", borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: "pointer",
-                border: "1px solid rgba(245,201,95,0.3)", background: "transparent", color: "#f5c95f",
+                border: "1px solid rgba(245,201,95,0.3)", background: "transparent", color: "var(--projection-warning, #f5c95f)",
               }}
             >
               Promote to Admin

@@ -3,11 +3,11 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 
 const STATUS_STYLE = {
-  PENDING:   { color: "#f5c95f", bg: "rgba(245,201,95,0.12)" },
-  APPROVED:  { color: "#67d58c", bg: "rgba(103,213,140,0.12)" },
-  COMPLETED: { color: "#7eb8f7", bg: "rgba(126,184,247,0.12)" },
-  DECLINED:  { color: "#f08f8f", bg: "rgba(240,143,143,0.12)" },
-  CANCELLED: { color: "#9ca3af", bg: "rgba(156,163,175,0.12)" },
+  PENDING:   { color: "var(--projection-warning, #f5c95f)", bg: "rgba(245,201,95,0.12)" },
+  APPROVED:  { color: "var(--projection-success, #67d58c)", bg: "rgba(103,213,140,0.12)" },
+  COMPLETED: { color: "var(--projection-info, #7eb8f7)", bg: "rgba(126,184,247,0.12)" },
+  DECLINED:  { color: "var(--projection-danger, #f08f8f)", bg: "rgba(240,143,143,0.12)" },
+  CANCELLED: { color: "var(--projection-neutral, #9ca3af)", bg: "rgba(156,163,175,0.12)" },
 };
 
 function BookingDetails() {
@@ -98,7 +98,7 @@ function BookingDetails() {
   };
 
   if (loading) return <div style={{ color: "var(--text-muted)", padding: "40px" }}>Loading...</div>;
-  if (error) return <div style={{ color: "#f08f8f", padding: "40px" }}>{error}</div>;
+  if (error) return <div style={{ color: "var(--projection-danger, #f08f8f)", padding: "40px" }}>{error}</div>;
 
   const ss = STATUS_STYLE[booking.status] || STATUS_STYLE.PENDING;
 
@@ -164,7 +164,7 @@ function BookingDetails() {
                         fontWeight: 600, textDecoration: "none",
                         display: "inline-flex", alignItems: "center",
                         border: "1px solid rgba(103,213,140,0.25)",
-                        background: "rgba(103,213,140,0.1)", color: "#67d58c",
+                        background: "rgba(103,213,140,0.1)", color: "var(--projection-success, #67d58c)",
                       }}
                     >
                       Open Chat
@@ -178,7 +178,7 @@ function BookingDetails() {
                         fontWeight: 600, textDecoration: "none",
                         display: "inline-flex", alignItems: "center",
                         border: "1px solid rgba(126,184,247,0.25)",
-                        background: "rgba(126,184,247,0.08)", color: "#7eb8f7",
+                        background: "rgba(126,184,247,0.08)", color: "var(--projection-info, #7eb8f7)",
                       }}
                     >
                       View Chat
@@ -194,7 +194,7 @@ function BookingDetails() {
                         height: 34, padding: "0 14px", borderRadius: 10, fontSize: 13,
                         fontWeight: 600, cursor: "pointer",
                         border: "1px solid rgba(240,143,143,0.25)",
-                        background: "rgba(240,143,143,0.1)", color: "#f08f8f",
+                        background: "rgba(240,143,143,0.1)", color: "var(--projection-danger, #f08f8f)",
                       }}
                     >
                       {cancelling ? "..." : "Cancel"}
@@ -299,7 +299,7 @@ function BookingDetails() {
               }}
             />
 
-            {bookError && <p style={{ color: "#f08f8f", fontSize: "13px", marginBottom: "12px" }}>{bookError}</p>}
+            {bookError && <p style={{ color: "var(--projection-danger, #f08f8f)", fontSize: "13px", marginBottom: "12px" }}>{bookError}</p>}
 
             <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
               <button

@@ -31,11 +31,11 @@ const OPTIONS = [
 ];
 
 const SEVERITY_COLOR = {
-  Minimal: "#67d58c",
-  Mild: "#a3d58c",
-  Moderate: "#f5c95f",
-  "Moderately Severe": "#f0a05f",
-  Severe: "#f08f8f",
+  Minimal: "var(--projection-success, #67d58c)",
+  Mild: "var(--projection-mild, #a3d58c)",
+  Moderate: "var(--projection-warning, #f5c95f)",
+  "Moderately Severe": "var(--projection-orange, #f0a05f)",
+  Severe: "var(--projection-danger, #f08f8f)",
 };
 
 function Screenings() {
@@ -114,7 +114,7 @@ function Screenings() {
           borderRadius: "12px",
           padding: "10px 16px",
           marginBottom: "24px",
-          color: "#f5c95f",
+          color: "var(--projection-warning, #f5c95f)",
           fontSize: "13px",
         }}
       >
@@ -240,7 +240,7 @@ function Screenings() {
               {error && (
                 <p
                   style={{
-                    color: "#f08f8f",
+                    color: "var(--projection-danger, #f08f8f)",
                     fontSize: "13px",
                     marginTop: "16px",
                   }}
@@ -280,7 +280,7 @@ function Screenings() {
                   height: "80px",
                   borderRadius: "50%",
                   margin: "0 auto 20px",
-                  background: `${SEVERITY_COLOR[result.severity]}20`,
+                  background: `color-mix(in srgb, ${SEVERITY_COLOR[result.severity]} 12.549%, transparent)`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -349,17 +349,17 @@ function Screenings() {
                 </p>
                 {(activeTab === "PHQ9"
                   ? [
-                      ["0–4", "Minimal", "#67d58c"],
-                      ["5–9", "Mild", "#a3d58c"],
-                      ["10–14", "Moderate", "#f5c95f"],
-                      ["15–19", "Moderately Severe", "#f0a05f"],
-                      ["20–27", "Severe", "#f08f8f"],
+                      ["0–4", "Minimal", "var(--projection-success, #67d58c)"],
+                      ["5–9", "Mild", "var(--projection-mild, #a3d58c)"],
+                      ["10–14", "Moderate", "var(--projection-warning, #f5c95f)"],
+                      ["15–19", "Moderately Severe", "var(--projection-orange, #f0a05f)"],
+                      ["20–27", "Severe", "var(--projection-danger, #f08f8f)"],
                     ]
                   : [
-                      ["0–4", "Minimal", "#67d58c"],
-                      ["5–9", "Mild", "#a3d58c"],
-                      ["10–14", "Moderate", "#f5c95f"],
-                      ["15–21", "Severe", "#f08f8f"],
+                      ["0–4", "Minimal", "var(--projection-success, #67d58c)"],
+                      ["5–9", "Mild", "var(--projection-mild, #a3d58c)"],
+                      ["10–14", "Moderate", "var(--projection-warning, #f5c95f)"],
+                      ["15–21", "Severe", "var(--projection-danger, #f08f8f)"],
                     ]
                 ).map(([range, label, color]) => (
                   <div
@@ -403,7 +403,7 @@ function Screenings() {
                     borderRadius: "12px",
                     padding: "12px 16px",
                     marginBottom: "20px",
-                    color: "#f08f8f",
+                    color: "var(--projection-danger, #f08f8f)",
                     fontSize: "13px",
                     textAlign: "left",
                   }}

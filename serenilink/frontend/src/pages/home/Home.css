@@ -58,7 +58,7 @@
 }
 
 .home-btn {
-  background: #a86955;
+  background: var(--projection-primary, #a86955);
   color: #ffffff;
   padding: 14px 30px;
   border-radius: 999px;
@@ -448,11 +448,11 @@ body.light .hero-text h1 {
 }
 
 body.light .hero-text h1 span {
-  color: #a86955;
+  color: var(--accent);
 }
 
 body.light .hero-text p {
-  color: #57504a;
+  color: var(--text-soft);
 }
 
 body.light .hero-shape {
@@ -477,13 +477,13 @@ body.light .why-section h2 span,
 body.light .resources-section h2 span,
 body.light .works-section h2 span,
 body.light .tools-section h2 span {
-  color: #a86955;
+  color: var(--accent);
 }
 
 body.light .info-card,
 body.light .resource-card,
 body.light .tool-card {
-  background: #f4eee5;
+  background: var(--bg-panel);
   border: 1px solid rgba(70, 52, 42, 0.1);
 }
 
@@ -499,11 +499,11 @@ body.light .step-box p {
 }
 
 body.light .resources-subtitle {
-  color: #57504a;
+  color: var(--text-soft);
 }
 
 body.light .tool-cta {
-  color: #a86955;
+  color: var(--accent);
 }
 
 body.light .rings {

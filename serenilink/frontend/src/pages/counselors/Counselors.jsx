@@ -59,7 +59,7 @@ function CounselorModal({ counselor, onClose }) {
           {/* Name + title */}
           <div style={{ marginBottom: 20 }}>
             <h2 style={{ margin: "0 0 4px", fontSize: 24, fontWeight: 700, color: "var(--text-main)" }}>{counselor.full_name}</h2>
-            <p style={{ margin: 0, color: "#e19a86", fontSize: 15 }}>{counselor.title || counselor.specialization}</p>
+            <p style={{ margin: 0, color: "var(--accent, #e19a86)", fontSize: 15 }}>{counselor.title || counselor.specialization}</p>
           </div>
 
           {/* Quick stats */}
@@ -90,7 +90,7 @@ function CounselorModal({ counselor, onClose }) {
                 {specializations.map(s => (
                   <span key={s} style={{
                     padding: "6px 14px", borderRadius: 999, fontSize: 13,
-                    background: "rgba(225,154,134,0.12)", color: "#e19a86",
+                    background: "rgba(225,154,134,0.12)", color: "var(--accent, #e19a86)",
                     border: "1px solid rgba(225,154,134,0.2)",
                   }}>{s}</span>
                 ))}
@@ -291,7 +291,7 @@ function Counselors() {
             <button
               onClick={() => fetchCounselors(skip, true)}
               disabled={loading}
-              style={{ background: "transparent", border: "none", color: "#E19A86", padding: "8px 0", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
+              style={{ background: "transparent", border: "none", color: "var(--accent, #E19A86)", padding: "8px 0", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
             >
               {loading ? "Loading..." : <>{"View More"} <LuArrowRight size={14} /></>}
             </button>

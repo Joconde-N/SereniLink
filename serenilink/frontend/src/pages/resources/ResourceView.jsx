@@ -60,7 +60,7 @@ function ResourceView() {
 
       <div style={{ maxWidth: "820px", margin: "0 auto", padding: "48px 24px 80px", paddingTop: "112px" }}>
         {loading && <p style={{ color: "var(--text-muted, #888)", textAlign: "center" }}>Loading...</p>}
-        {error && <p style={{ color: "#f08f8f", textAlign: "center" }}>{error}</p>}
+        {error && <p style={{ color: "var(--projection-danger, #f08f8f)", textAlign: "center" }}>{error}</p>}
 
         {item && (
           <>
@@ -96,7 +96,7 @@ function ResourceView() {
             )}
 
             {cat === "video" && !youtubeEmbed && item.video_url && (
-              <p style={{ color: "#f08f8f", marginBottom: "24px" }}>
+              <p style={{ color: "var(--projection-danger, #f08f8f)", marginBottom: "24px" }}>
                 Could not embed video. <a href={item.video_url} target="_blank" rel="noreferrer" style={{ color: "var(--accent, #b89381)" }}>Open on YouTube</a>
               </p>
             )}

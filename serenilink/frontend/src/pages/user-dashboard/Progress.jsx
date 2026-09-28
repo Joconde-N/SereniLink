@@ -2,19 +2,19 @@ import React, { useEffect, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import api from "../../api/axios";
 
-const TREND_COLOR = { IMPROVING: "#67d58c", STABLE: "#f5c95f", DECLINING: "#f08f8f" };
+const TREND_COLOR = { IMPROVING: "var(--projection-success, #67d58c)", STABLE: "var(--projection-warning, #f5c95f)", DECLINING: "var(--projection-danger, #f08f8f)" };
 const TREND_ICON = { IMPROVING: "↑", STABLE: "→", DECLINING: "↓" };
 
 const METRICS = [
   { key: "avg_mood", label: "Mood", color: "var(--accent)" },
-  { key: "avg_stress", label: "Stress", color: "#f5c95f" },
-  { key: "avg_sleep", label: "Sleep", color: "#67d58c" },
+  { key: "avg_stress", label: "Stress", color: "var(--projection-warning, #f5c95f)" },
+  { key: "avg_sleep", label: "Sleep", color: "var(--projection-success, #67d58c)" },
 ];
 
 function MiniBar({ value, max = 10, color }) {
   const pct = Math.min(100, ((value || 0) / max) * 100);
   return (
-    <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: "999px", height: "8px", width: "100%", overflow: "hidden" }}>
+    <div style={{ background: "var(--chart-track, rgba(255,255,255,0.06))", borderRadius: "999px", height: "8px", width: "100%", overflow: "hidden" }}>
       <div style={{ width: `${pct}%`, height: "100%", background: color, borderRadius: "999px", transition: "width 0.6s ease" }} />
     </div>
   );
@@ -46,11 +46,11 @@ function StreakCard({ streak }) {
       <h3>Streak</h3>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "12px" }}>
         <div>
-          <div className="metric-value" style={{ color: "#f08f8f" }}>{streak}</div>
+          <div className="metric-value" style={{ color: "var(--projection-danger, #f08f8f)" }}>{streak}</div>
           <p className="small-muted">Consecutive days</p>
         </div>
       </div>
-      <MiniBar value={Math.min(streak, 30)} max={30} color="#f08f8f" />
+      <MiniBar value={Math.min(streak, 30)} max={30} color="var(--projection-danger, #f08f8f)" />
     </div>
   );
 }
@@ -76,7 +76,7 @@ function WellnessChart({ data, days }) {
   const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
     return (
-      <div style={{ background: "#1a1a1d", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "10px 14px", fontSize: "12px" }}>
+      <div style={{ background: "var(--chart-surface, #1a1a1d)", border: "1px solid var(--chart-grid, rgba(255,255,255,0.1))", borderRadius: "10px", padding: "10px 14px", fontSize: "12px" }}>
         <p style={{ margin: "0 0 6px", color: "var(--text-muted)" }}>{label}</p>
         {payload.map((p) => (
           <p key={p.dataKey} style={{ margin: "2px 0", color: p.color }}>
@@ -90,9 +90,9 @@ function WellnessChart({ data, days }) {
   return (
     <ResponsiveContainer width="100%" height={220}>
       <LineChart data={formatted} margin={{ top: 8, right: 16, bottom: 0, left: -16 }}>
-        <CartesianGrid stroke="rgba(255,255,255,0.06)" strokeDasharray="4 4" vertical={false} />
-        <XAxis dataKey="label" tick={{ fill: "rgba(255,255,255,0.35)", fontSize: 11 }} axisLine={false} tickLine={false} />
-        <YAxis domain={[0, 10]} tick={{ fill: "rgba(255,255,255,0.35)", fontSize: 11 }} axisLine={false} tickLine={false} />
+        <CartesianGrid stroke="var(--chart-grid, rgba(255,255,255,0.06))" strokeDasharray="4 4" vertical={false} />
+        <XAxis dataKey="label" tick={{ fill: "var(--chart-text, rgba(255,255,255,0.35))", fontSize: 11 }} axisLine={false} tickLine={false} />
+        <YAxis domain={[0, 10]} tick={{ fill: "var(--chart-text, rgba(255,255,255,0.35))", fontSize: 11 }} axisLine={false} tickLine={false} />
         <Tooltip content={<CustomTooltip />} />
         {METRICS.map(({ key, label, color }) => (
           <Line
@@ -158,7 +158,7 @@ function Progress() {
   };
 
   if (loading) return <div style={{ color: "var(--text-muted)", padding: "40px" }}>Loading progress...</div>;
-  if (error && !analytics) return <div style={{ color: "#f08f8f", padding: "40px" }}>{error}</div>;
+  if (error && !analytics) return <div style={{ color: "var(--projection-danger, #f08f8f)", padding: "40px" }}>{error}</div>;
 
   const l7 = analytics?.last_7_days;
   const trend = analytics?.trend;
@@ -171,8 +171,8 @@ function Progress() {
       {/* Metric Cards */}
       <div className="dashboard-grid dashboard-cards-4" style={{ marginBottom: "20px" }}>
         <MetricCard title="Mood" value7={l7?.avg_mood} trend={trend?.mood} color="var(--accent)" />
-        <MetricCard title="Stress" value7={l7?.avg_stress} trend={trend?.stress} color="#f5c95f" />
-        <MetricCard title="Sleep" value7={l7?.avg_sleep} trend={trend?.sleep} color="#67d58c" />
+        <MetricCard title="Stress" value7={l7?.avg_stress} trend={trend?.stress} color="var(--projection-warning, #f5c95f)" />
+        <MetricCard title="Sleep" value7={l7?.avg_sleep} trend={trend?.sleep} color="var(--projection-success, #67d58c)" />
         <StreakCard streak={analytics?.streak ?? 0} />
       </div>
 
@@ -187,7 +187,7 @@ function Progress() {
             {/* Legend */}
             <div style={{ display: "flex", gap: "12px" }}>
               {METRICS.map(({ label, color }) => (
-                <span key={label} style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", color: "rgba(255,255,255,0.6)" }}>
+                <span key={label} style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", color: "var(--chart-text, rgba(255,255,255,0.6))" }}>
                   <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: color, display: "inline-block" }} />
                   {label}
                 </span>
@@ -219,8 +219,8 @@ function Progress() {
       <div className="dashboard-grid dashboard-cards-2">
         <div className="dashboard-card">
           <h3>Add Milestone</h3>
-          {error && <p style={{ color: "#f08f8f", fontSize: "13px", marginBottom: "8px" }}>{error}</p>}
-          {success && <p style={{ color: "#67d58c", fontSize: "13px", marginBottom: "8px" }}>{success}</p>}
+          {error && <p style={{ color: "var(--projection-danger, #f08f8f)", fontSize: "13px", marginBottom: "8px" }}>{error}</p>}
+          {success && <p style={{ color: "var(--projection-success, #67d58c)", fontSize: "13px", marginBottom: "8px" }}>{success}</p>}
           <form onSubmit={handleAddMilestone}>
             <div style={{ marginBottom: "12px" }}>
               <label className="form-label">Title</label>

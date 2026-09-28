@@ -81,7 +81,7 @@ function SessionChat() {
           {loading ? (
             <div style={{ color: "var(--text-muted)", textAlign: "center", paddingTop: "40px" }}>Loading messages...</div>
           ) : error && messages.length === 0 ? (
-            <div style={{ color: "#f08f8f", textAlign: "center", paddingTop: "40px" }}>{error}</div>
+            <div style={{ color: "var(--projection-danger, #f08f8f)", textAlign: "center", paddingTop: "40px" }}>{error}</div>
           ) : messages.length === 0 ? (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: "12px" }}>
               <p style={{ color: "var(--text-soft)", fontSize: "14px", textAlign: "center" }}>
@@ -101,7 +101,7 @@ function SessionChat() {
                     <div style={{
                       padding: "12px 16px",
                       borderRadius: isMine ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
-                      background: isMine ? "#a86955" : "var(--chat-bubble-theirs)",
+                      background: isMine ? "var(--projection-primary, #a86955)" : "var(--chat-bubble-theirs)",
                       color: isMine ? "#fff" : "var(--text-main)",
                       fontSize: "14px", lineHeight: 1.6,
                     }}>
@@ -120,7 +120,7 @@ function SessionChat() {
 
         <div style={{ padding: "14px 16px", borderTop: "1px solid var(--border-faint)" }}>
           {booking?.status === "COMPLETED" && <p>This session is completed. Chat history is read-only.</p>}
-          {error && <p style={{ color: "#f08f8f", fontSize: "12px", marginBottom: "8px" }}>{error}</p>}
+          {error && <p style={{ color: "var(--projection-danger, #f08f8f)", fontSize: "12px", marginBottom: "8px" }}>{error}</p>}
           <div style={{
             display: "flex", gap: "10px", alignItems: "center",
             background: "var(--bg-input)", border: "1px solid var(--border-soft)",
@@ -140,7 +140,7 @@ function SessionChat() {
               disabled={sending || !text.trim() || booking?.status !== "APPROVED"}
               style={{
                 width: "36px", height: "36px", borderRadius: "10px", border: "none",
-                background: text.trim() ? "#a86955" : "rgba(128,128,128,0.15)",
+                background: text.trim() ? "var(--projection-primary, #a86955)" : "rgba(128,128,128,0.15)",
                 color: text.trim() ? "#fff" : "var(--text-muted)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 cursor: text.trim() ? "pointer" : "default", flexShrink: 0,

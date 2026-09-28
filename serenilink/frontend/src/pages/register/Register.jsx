@@ -15,10 +15,10 @@ const RULES = [
 function getStrength(password) {
   const passed = RULES.filter((r) => r.test(password)).length;
   if (passed === 0) return null;
-  if (passed <= 1) return { level: 1, label: "Weak",   color: "#f08f8f" };
-  if (passed === 2) return { level: 2, label: "Fair",   color: "#f5c95f" };
-  if (passed === 3) return { level: 3, label: "Good",   color: "#60a5fa" };
-  return             { level: 4, label: "Strong", color: "#67d58c" };
+  if (passed <= 1) return { level: 1, label: "Weak",   color: "var(--projection-danger, #f08f8f)" };
+  if (passed === 2) return { level: 2, label: "Fair",   color: "var(--projection-warning, #f5c95f)" };
+  if (passed === 3) return { level: 3, label: "Good",   color: "var(--projection-info, #60a5fa)" };
+  return             { level: 4, label: "Strong", color: "var(--projection-success, #67d58c)" };
 }
 
 function PasswordStrength({ password }) {
@@ -58,8 +58,8 @@ function PasswordStrength({ password }) {
                 width: 14, height: 14, borderRadius: "50%", flexShrink: 0,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 background: passed ? "rgba(103,213,140,0.15)" : "var(--bg-input)",
-                border: `1px solid ${passed ? "#67d58c" : "var(--border-soft)"}`,
-                fontSize: 9, color: passed ? "#67d58c" : "transparent",
+                border: `1px solid ${passed ? "var(--projection-success, #67d58c)" : "var(--border-soft)"}`,
+                fontSize: 9, color: passed ? "var(--projection-success, #67d58c)" : "transparent",
                 transition: "all 0.2s ease",
               }}>
                 ✓
@@ -160,7 +160,7 @@ function Register() {
           </p>
 
           {error && (
-            <p style={{ color: "#f08f8f", marginBottom: 12, fontSize: 14 }}>{error}</p>
+            <p style={{ color: "var(--projection-danger, #f08f8f)", marginBottom: 12, fontSize: 14 }}>{error}</p>
           )}
 
           {success && (
@@ -171,7 +171,7 @@ function Register() {
             }}>
               <span style={{ fontSize: 18 }}>✓</span>
               <div>
-                <p style={{ margin: 0, fontWeight: 700, fontSize: 14, color: "#67d58c" }}>Account created successfully!</p>
+                <p style={{ margin: 0, fontWeight: 700, fontSize: 14, color: "var(--projection-success, #67d58c)" }}>Account created successfully!</p>
                 <p style={{ margin: "2px 0 0", fontSize: 12, color: "var(--text-soft)" }}>Redirecting you to login...</p>
               </div>
             </div>

@@ -206,7 +206,7 @@
 
 .counselor-check input {
   margin-top: 3px;
-  accent-color: #a86955;
+  accent-color: var(--projection-primary, #a86955);
 }
 
 .submit-btn {
@@ -214,7 +214,7 @@
   height: 60px;
   border: none;
   border-radius: 14px;
-  background: #a86955;
+  background: var(--projection-primary, #a86955);
   color: #ffffff;
   font-size: 18px;
   font-weight: 700;
@@ -274,11 +274,11 @@ body.light .counselor-page .register-topbar {
 }
 
 body.light .counselor-page .register-brand {
-  color: #6b6259;
+  color: var(--text-muted);
 }
 
 body.light .counselor-page .register-back {
-  color: #57504a;
+  color: var(--text-soft);
 }
 
 body.light .counselor-header h1 {
@@ -286,15 +286,15 @@ body.light .counselor-header h1 {
 }
 
 body.light .counselor-header h1 span {
-  color: #a86955;
+  color: var(--accent);
 }
 
 body.light .counselor-header p {
-  color: #6b6259;
+  color: var(--text-muted);
 }
 
 body.light .counselor-card {
-  background: linear-gradient(180deg, #f4eee5 0%, #ece5d9 100%);
+  background: linear-gradient(180deg, var(--bg-panel) 0%, #ece5d9 100%);
   border-color: rgba(70, 52, 42, 0.12);
   box-shadow: 0 4px 16px rgba(70, 52, 42, 0.08);
 }
@@ -304,20 +304,20 @@ body.light .counselor-card h2 {
 }
 
 body.light .field label {
-  color: #57504a;
+  color: var(--text-soft);
 }
 
 body.light .field input,
 body.light .field select,
 body.light .field textarea {
   background: #faf6f0;
-  border-color: rgba(70, 52, 42, 0.16);
+  border-color: var(--control-border);
   color: #2b2521;
 }
 
 body.light .field input::placeholder,
 body.light .field textarea::placeholder {
-  color: #7a7168;
+  color: var(--text-muted);
 }
 
 body.light .upload-box {
@@ -330,9 +330,9 @@ body.light .upload-box p {
 }
 
 body.light .upload-box span {
-  color: #6b6259;
+  color: var(--text-muted);
 }
 
 body.light .counselor-check {
-  color: #57504a;
+  color: var(--text-soft);
 }

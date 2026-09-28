@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import api from "../../api/axios";
 
 const LEVEL_CONFIG = {
-  Low:      { color: "#67d58c", bg: "rgba(103,213,140,0.08)", border: "rgba(103,213,140,0.2)" },
-  Moderate: { color: "#f5c95f", bg: "rgba(245,201,95,0.08)",  border: "rgba(245,201,95,0.2)" },
-  High:     { color: "#f08f8f", bg: "rgba(240,143,143,0.08)", border: "rgba(240,143,143,0.2)" },
+  Low:      { color: "var(--projection-success, #67d58c)", bg: "rgba(103,213,140,0.08)", border: "rgba(103,213,140,0.2)" },
+  Moderate: { color: "var(--projection-warning, #f5c95f)", bg: "rgba(245,201,95,0.08)",  border: "rgba(245,201,95,0.2)" },
+  High:     { color: "var(--projection-danger, #f08f8f)", bg: "rgba(240,143,143,0.08)", border: "rgba(240,143,143,0.2)" },
 };
 
 function RiskMonitorCard() {
@@ -31,7 +31,7 @@ function RiskMonitorCard() {
         <h3 style={{ margin: 0 }}>Wellness Support Level</h3>
         <span style={{
           padding: "4px 14px", borderRadius: 999, fontSize: 13, fontWeight: 700,
-          background: `${cfg.color}22`, color: cfg.color, border: `1px solid ${cfg.border}`,
+          background: `color-mix(in srgb, ${cfg.color} 13.333%, transparent)`, color: cfg.color, border: `1px solid ${cfg.border}`,
         }}>
           {data.support_level}
         </span>
@@ -98,7 +98,7 @@ function RiskMonitorCard() {
               fontSize: 13, color: "var(--text-soft)", lineHeight: 1.5,
             }}>
               {data.support_level === "High" && rec.includes("112") ? (
-                <span style={{ color: "#f08f8f", fontWeight: 600 }}>{rec}</span>
+                <span style={{ color: "var(--projection-danger, #f08f8f)", fontWeight: 600 }}>{rec}</span>
               ) : rec}
             </div>
           ))}
@@ -108,7 +108,7 @@ function RiskMonitorCard() {
               style={{
                 display: "block", textAlign: "center", marginTop: 4,
                 padding: "10px", borderRadius: 10, fontSize: 13, fontWeight: 600,
-                background: `${cfg.color}18`, color: cfg.color,
+                background: `color-mix(in srgb, ${cfg.color} 9.412%, transparent)`, color: cfg.color,
                 border: `1px solid ${cfg.border}`, textDecoration: "none",
               }}
             >

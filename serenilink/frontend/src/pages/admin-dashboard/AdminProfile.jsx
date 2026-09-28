@@ -16,7 +16,7 @@ function AdminProfile() {
           </div>
           <div>
             <h2 style={{ margin: 0, fontSize: "22px" }}>{user?.nickname ?? "—"}</h2>
-            <span style={{ padding: "3px 12px", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(245,201,95,0.1)", color: "#f5c95f" }}>
+            <span style={{ padding: "3px 12px", borderRadius: "999px", fontSize: "12px", fontWeight: 600, background: "rgba(245,201,95,0.1)", color: "var(--projection-warning, #f5c95f)" }}>
               Admin
             </span>
           </div>

@@ -4,7 +4,7 @@ import { LuSendHorizontal, LuPlus, LuBot, LuChevronsLeft, LuChevronsRight } from
 import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 
-const RISK_COLOR = { LOW: "#67d58c", MODERATE: "#f5c95f", HIGH: "#f08f8f" };
+const RISK_COLOR = { LOW: "var(--projection-success, #67d58c)", MODERATE: "var(--projection-warning, #f5c95f)", HIGH: "var(--projection-danger, #f08f8f)" };
 
 function AiSupport() {
   const { user } = useAuth();
@@ -101,7 +101,7 @@ function AiSupport() {
       <div style={{
         background: "rgba(220,80,80,0.08)", border: "1px solid rgba(220,80,80,0.2)",
         borderRadius: "12px", padding: "10px 16px", marginBottom: "20px",
-        color: "#f08f8f", fontSize: "13px", textAlign: "center",
+        color: "var(--projection-danger, #f08f8f)", fontSize: "13px", textAlign: "center",
       }}>
         <strong>In crisis or emergency?</strong> Call <strong>112</strong> or <strong>114</strong> for health services.
       </div>
@@ -113,7 +113,7 @@ function AiSupport() {
           display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap",
         }}>
           <div>
-            <p style={{ margin: "0 0 4px", color: "#f08f8f", fontSize: 15, fontWeight: 700 }}>
+            <p style={{ margin: "0 0 4px", color: "var(--projection-danger, #f08f8f)", fontSize: 15, fontWeight: 700 }}>
               Extra support may help right now
             </p>
             <p style={{ margin: 0, color: "var(--text-soft)", fontSize: 13, lineHeight: 1.5 }}>
@@ -232,7 +232,7 @@ function AiSupport() {
             </div>
             <div>
               <p style={{ margin: 0, fontWeight: 700, fontSize: "14px" }}>SereniLink AI</p>
-              <p style={{ margin: 0, fontSize: "11px", color: "#67d58c" }}>● Online</p>
+              <p style={{ margin: 0, fontSize: "11px", color: "var(--projection-success, #67d58c)" }}>● Online</p>
             </div>
           </div>
 
@@ -271,7 +271,7 @@ function AiSupport() {
                     alignItems: msg.role === "user" ? "flex-end" : "flex-start" }}>
                     <div style={{
                       padding: "12px 16px", borderRadius: msg.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
-                      background: msg.role === "user" ? "#a86955" : "var(--chat-bubble-theirs)",
+                      background: msg.role === "user" ? "var(--projection-primary, #a86955)" : "var(--chat-bubble-theirs)",
                       color: msg.role === "user" ? "#fff" : "var(--text-main)",
                       fontSize: "14px", lineHeight: 1.6,
                     }}>
@@ -305,7 +305,7 @@ function AiSupport() {
 
           {/* Input area */}
           <div style={{ padding: "14px 16px", borderTop: "1px solid var(--border-faint)" }}>
-            {error && <p style={{ color: "#f08f8f", fontSize: "12px", marginBottom: "8px" }}>{error}</p>}
+            {error && <p style={{ color: "var(--projection-danger, #f08f8f)", fontSize: "12px", marginBottom: "8px" }}>{error}</p>}
             <div style={{ display: "flex", gap: "10px", alignItems: "center",
               background: "var(--bg-input)", border: "1px solid var(--border-soft)",
               borderRadius: "14px", padding: "6px 6px 6px 16px",
@@ -327,7 +327,7 @@ function AiSupport() {
                 disabled={sending || !text.trim()}
                 style={{
                   width: "36px", height: "36px", borderRadius: "10px", border: "none",
-                  background: text.trim() ? "#a86955" : "var(--notif-bell-bg)",
+                  background: text.trim() ? "var(--projection-primary, #a86955)" : "var(--notif-bell-bg)",
                   color: text.trim() ? "#fff" : "var(--text-muted)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   cursor: text.trim() ? "pointer" : "default", flexShrink: 0,

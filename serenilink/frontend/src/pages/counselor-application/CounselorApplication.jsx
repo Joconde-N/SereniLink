@@ -99,7 +99,7 @@ function CounselorApplication() {
         </div>
 
         {error && <p style={{ color: "red", textAlign: "center", marginBottom: "16px" }}>{error}</p>}
-        {success && <p style={{ color: "#67d58c", textAlign: "center", marginBottom: "16px" }}>{success}</p>}
+        {success && <p style={{ color: "var(--projection-success, #67d58c)", textAlign: "center", marginBottom: "16px" }}>{success}</p>}
 
         <form className="counselor-form" onSubmit={handleSubmit}>
           <section className="counselor-card card-small">

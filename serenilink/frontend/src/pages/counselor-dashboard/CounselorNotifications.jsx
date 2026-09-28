@@ -64,7 +64,7 @@ function CounselorNotifications() {
                 <div
                   key={item.id}
                   className={`simple-item notification-item ${!item.is_read ? "unread" : ""}`}
-                  style={{ opacity: item.is_read ? 0.65 : 1 }}
+                  style={{ opacity: item.is_read ? "var(--read-content-opacity, 0.65)" : 1 }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                     <div style={{ flex: 1 }}>

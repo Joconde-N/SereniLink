@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 import api from "../../api/axios";
 
 const STATUS_STYLE = {
-  APPROVED:  { color: "#67d58c", bg: "rgba(103,213,140,0.12)", label: "Upcoming" },
+  APPROVED:  { color: "var(--projection-success, #67d58c)", bg: "rgba(103,213,140,0.12)", label: "Upcoming" },
   COMPLETED: { color: "var(--accent)", bg: "rgba(202,163,143,0.12)", label: "Completed" },
-  CANCELLED: { color: "#e05555", bg: "rgba(224,85,85,0.12)", label: "Cancelled" },
-  DECLINED:  { color: "#e05555", bg: "rgba(224,85,85,0.12)", label: "Declined" },
+  CANCELLED: { color: "var(--projection-danger, #e05555)", bg: "rgba(224,85,85,0.12)", label: "Cancelled" },
+  DECLINED:  { color: "var(--projection-danger, #e05555)", bg: "rgba(224,85,85,0.12)", label: "Declined" },
 };
 
 function timeUntil(dateStr) {
@@ -118,7 +118,7 @@ export default function MySessions() {
                         Session #{b.id}
                       </div>
                       {isUpcoming && (
-                        <div style={{ fontSize: 12, color: "#67d58c", marginTop: 3 }}>
+                        <div style={{ fontSize: 12, color: "var(--projection-success, #67d58c)", marginTop: 3 }}>
                           {timeUntil(b.scheduled_for)}
                         </div>
                       )}
@@ -168,7 +168,7 @@ export default function MySessions() {
                                 fontWeight: 600, textDecoration: "none",
                                 display: "inline-flex", alignItems: "center",
                                 border: "1px solid rgba(255,255,255,0.12)",
-                                background: "rgba(255,255,255,0.06)", color: "#e8e8e8",
+                                background: "rgba(255,255,255,0.06)", color: "var(--projection-neutral, #e8e8e8)",
                               }}
                             >
                               Chat
@@ -181,7 +181,7 @@ export default function MySessions() {
                                 height: 34, padding: "0 14px", borderRadius: 10, fontSize: 13,
                                 fontWeight: 600, cursor: "pointer",
                                 border: "1px solid rgba(126,184,247,0.2)",
-                                background: "rgba(126,184,247,0.1)", color: "#7eb8f7",
+                                background: "rgba(126,184,247,0.1)", color: "var(--projection-info, #7eb8f7)",
                               }}
                             >
                               {acting === b.id ? "..." : "Mark Complete"}

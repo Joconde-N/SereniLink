@@ -15,10 +15,10 @@ const STATUS_CLASS = {
 };
 
 const QUICK_ACTIONS = [
-  { label: "Approve Counselors", to: "/admin/applications", icon: LuUserCheck, iconBg: "rgba(103,213,140,0.15)", iconColor: "#67d58c" },
-  { label: "Manage Users", to: "/admin/users", icon: LuUsers, iconBg: "rgba(96,165,250,0.15)", iconColor: "#60a5fa" },
+  { label: "Approve Counselors", to: "/admin/applications", icon: LuUserCheck, iconBg: "rgba(103,213,140,0.15)", iconColor: "var(--projection-success, #67d58c)" },
+  { label: "Manage Users", to: "/admin/users", icon: LuUsers, iconBg: "rgba(96,165,250,0.15)", iconColor: "var(--projection-info, #60a5fa)" },
   { label: "Platform Insights", to: "/admin/insights", icon: LuChartBar, iconBg: "rgba(202,163,143,0.18)", iconColor: "var(--accent)" },
-  { label: "Audit Logs", to: "/admin/audit-logs", icon: LuScrollText, iconBg: "rgba(245,201,95,0.15)", iconColor: "#f5c95f" },
+  { label: "Audit Logs", to: "/admin/audit-logs", icon: LuScrollText, iconBg: "rgba(245,201,95,0.15)", iconColor: "var(--projection-warning, #f5c95f)" },
 ];
 
 function StatCard({ title, value, color }) {
@@ -101,15 +101,15 @@ function AdminOverview() {
       </section>
 
       {actionMsg && (
-        <div style={{ marginBottom: "16px", padding: "12px 16px", borderRadius: "12px", background: "rgba(103,213,140,0.1)", color: "#67d58c", border: "1px solid rgba(103,213,140,0.2)" }}>
+        <div style={{ marginBottom: "16px", padding: "12px 16px", borderRadius: "12px", background: "rgba(103,213,140,0.1)", color: "var(--projection-success, #67d58c)", border: "1px solid rgba(103,213,140,0.2)" }}>
           {actionMsg}
         </div>
       )}
 
       <div className="dashboard-grid dashboard-cards-4" style={{ marginBottom: "20px" }}>
         <StatCard title="Total Users"          value={t.users} />
-        <StatCard title="Approved Counselors"  value={t.counselors}        color="#67d58c" />
-        <StatCard title="Pending Applications" value={pending.length}      color="#f5c95f" />
+        <StatCard title="Approved Counselors"  value={t.counselors}        color="var(--projection-success, #67d58c)" />
+        <StatCard title="Pending Applications" value={pending.length}      color="var(--projection-warning, #f5c95f)" />
         <StatCard title="Total Bookings"       value={t.bookings} />
       </div>
 
@@ -133,7 +133,7 @@ function AdminOverview() {
                     </div>
                     <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
                       <button className="primary-btn" style={{ height: "36px", padding: "0 14px", fontSize: "13px" }} onClick={() => handleApplication(a.id, "approve")}>Approve</button>
-                      <button className="secondary-btn" style={{ height: "36px", padding: "0 14px", fontSize: "13px", color: "#f08f8f", borderColor: "rgba(239,68,68,0.3)" }} onClick={() => handleApplication(a.id, "reject")}>Reject</button>
+                      <button className="secondary-btn" style={{ height: "36px", padding: "0 14px", fontSize: "13px", color: "var(--projection-danger, #f08f8f)", borderColor: "rgba(239,68,68,0.3)" }} onClick={() => handleApplication(a.id, "reject")}>Reject</button>
                     </div>
                   </div>
                 </div>
@@ -174,7 +174,7 @@ function AdminOverview() {
         <div className="dashboard-grid dashboard-cards-4">
           {[
             { label: "Total Exercises",    value: t.exercises ?? exercises.length, color: "var(--accent)" },
-            { label: "Published Content",  value: t.published_content, color: "#67d58c" },
+            { label: "Published Content",  value: t.published_content, color: "var(--projection-success, #67d58c)" },
             { label: "Total Assessments",  value: t.assessments },
             { label: "Mood Entries",       value: t.mood_entries, color: "var(--accent)" },
           ].map((m) => (

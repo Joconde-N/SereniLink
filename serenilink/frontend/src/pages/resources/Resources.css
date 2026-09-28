@@ -93,7 +93,7 @@
   left: 16px;
   display: flex;
   align-items: center;
-  color: #a86955;
+  color: var(--projection-primary, #a86955);
 }
 
 .resources-search-input {
@@ -123,7 +123,7 @@
 }
 
 .filter-svg {
-  color: #a86955;
+  color: var(--projection-primary, #a86955);
 }
 
 .resources-filter-box select option {
@@ -186,7 +186,7 @@
 }
 
 .resource-tab.active {
-  background: #a86955;
+  background: var(--projection-primary, #a86955);
   color: #ffffff;
 }
 
@@ -286,7 +286,7 @@
 }
 
 .resource-action-btn {
-  background: #a86955;
+  background: var(--projection-primary, #a86955);
   color: #ffffff;
   padding: 14px 28px;
   border-radius: 999px;
@@ -426,7 +426,7 @@ body.light .resources-hero-content h1 {
 }
 
 body.light .resources-hero-content p {
-  color: #57504a;
+  color: var(--text-soft);
 }
 
 body.light .resources-shape {
@@ -442,7 +442,7 @@ body.light .section-heading-row h2 {
 }
 
 body.light .section-heading-row h2 span {
-  color: #a86955;
+  color: var(--accent);
 }
 
 body.light .section-line {
@@ -451,7 +451,7 @@ body.light .section-line {
 
 body.light .resources-search-box,
 body.light .resources-filter-box {
-  background: #f4eee5;
+  background: var(--bg-panel);
   border: 1px solid rgba(70, 52, 42, 0.14);
 }
 
@@ -460,7 +460,7 @@ body.light .resources-search-input {
 }
 
 body.light .resources-search-input::placeholder {
-  color: #7a7168;
+  color: var(--text-muted);
 }
 
 body.light .resources-filter-box {
@@ -468,7 +468,7 @@ body.light .resources-filter-box {
 }
 
 body.light .resources-filter-box select option {
-  background: #f4eee5;
+  background: var(--bg-panel);
   color: #2b2521;
 }
 
@@ -478,12 +478,12 @@ body.light .resource-tab {
 }
 
 body.light .resource-tab.active {
-  background: #a86955;
+  background: var(--accent);
   color: #ffffff;
 }
 
 body.light .resource-item-card {
-  background: linear-gradient(180deg, #f4eee5, #ece5d9);
+  background: linear-gradient(180deg, var(--bg-panel), #ece5d9);
   border: 1px solid rgba(70, 52, 42, 0.1);
 }
 
@@ -492,7 +492,7 @@ body.light .resource-item-body h3 {
 }
 
 body.light .resource-meta {
-  color: #6b6259;
+  color: var(--text-muted);
 }
 
 body.light .resource-badge {

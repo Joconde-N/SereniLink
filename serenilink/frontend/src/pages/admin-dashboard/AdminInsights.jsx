@@ -9,14 +9,14 @@ import ExportMenu from "../../components/shared/ExportMenu";
 import { buildReportPdf } from "../../utils/reportPdf";
 
 const STATUS_COLOR = {
-  PENDING:   "#f5c95f",
-  APPROVED:  "#67d58c",
-  COMPLETED: "#60a5fa",
-  CANCELLED: "#9ca3af",
-  DECLINED:  "#f08f8f",
+  PENDING:   "var(--projection-warning, #f5c95f)",
+  APPROVED:  "var(--projection-success, #67d58c)",
+  COMPLETED: "var(--projection-info, #60a5fa)",
+  CANCELLED: "var(--projection-neutral, #9ca3af)",
+  DECLINED:  "var(--projection-danger, #f08f8f)",
 };
 
-const SUPPORT_COLOR = { Low: "#67d58c", Moderate: "#f5c95f", High: "#f08f8f" };
+const SUPPORT_COLOR = { Low: "var(--projection-success, #67d58c)", Moderate: "var(--projection-warning, #f5c95f)", High: "var(--projection-danger, #f08f8f)" };
 
 function toTitleCase(str) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -32,9 +32,9 @@ const CHART_STYLE = {
 };
 
 const tooltipStyle = {
-  contentStyle: { background: "#1a1a1d", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, fontSize: 12 },
-  labelStyle: { color: "#b8bfcc" },
-  itemStyle: { color: "#ffffff" },
+  contentStyle: { background: "var(--chart-surface, #1a1a1d)", border: "1px solid var(--chart-grid, rgba(255,255,255,0.08))", borderRadius: 10, fontSize: 12 },
+  labelStyle: { color: "var(--chart-text, #b8bfcc)" },
+  itemStyle: { color: "var(--chart-text, #ffffff)" },
   cursor: { fill: "rgba(255,255,255,0.04)" },
 };
 
@@ -259,10 +259,10 @@ function AdminInsights() {
   };
 
   const TREND_TABS = [
-    { key: "new_users",      label: "New Users",      color: "#60a5fa" },
-    { key: "new_bookings",   label: "Bookings",       color: "#67d58c" },
-    { key: "mood_checkins",  label: "Mood Check-ins", color: "#E19A86" },
-    { key: "new_screenings", label: "Screenings",     color: "#a78bfa" },
+    { key: "new_users",      label: "New Users",      color: "var(--projection-info, #60a5fa)" },
+    { key: "new_bookings",   label: "Bookings",       color: "var(--projection-success, #67d58c)" },
+    { key: "mood_checkins",  label: "Mood Check-ins", color: "var(--accent, #E19A86)" },
+    { key: "new_screenings", label: "Screenings",     color: "var(--projection-purple, #a78bfa)" },
   ];
   const activeTrend = TREND_TABS.find((tab) => tab.key === trendKey);
 
@@ -278,7 +278,7 @@ function AdminInsights() {
 
       <div className="dashboard-grid dashboard-cards-4" style={{ marginBottom: 20 }}>
         <SummaryCard title="Total Users" value={t.users} />
-        <SummaryCard title="Total Counselors" value={t.counselors} color="#60a5fa" />
+        <SummaryCard title="Total Counselors" value={t.counselors} color="var(--projection-info, #60a5fa)" />
         <SummaryCard title="Total Bookings" value={t.bookings} />
         <SummaryCard title="Total Assessments" value={t.assessments} color="var(--accent)" />
       </div>
@@ -287,12 +287,12 @@ function AdminInsights() {
         <SummaryCard
           title="Content Publish Rate"
           value={`${publishRate}%`}
-          color={publishRate >= 70 ? "#67d58c" : "#f5c95f"}
+          color={publishRate >= 70 ? "var(--projection-success, #67d58c)" : "var(--projection-warning, #f5c95f)"}
         />
         <SummaryCard
           title="Users With Screening Data"
           value={riskStats?.total_users_with_data ?? 0}
-          color="#60a5fa"
+          color="var(--projection-info, #60a5fa)"
         />
       </div>
 
@@ -300,13 +300,13 @@ function AdminInsights() {
         <ChartCard title="Bookings by Status">
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={bookingStatusData} barSize={32} style={CHART_STYLE}>
-              <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.04)" />
-              <XAxis dataKey="name" tick={{ fill: "#b8bfcc", fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: "#b8bfcc", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <CartesianGrid vertical={false} stroke="var(--chart-grid, rgba(255,255,255,0.04))" />
+              <XAxis dataKey="name" tick={{ fill: "var(--chart-text, #b8bfcc)", fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "var(--chart-text, #b8bfcc)", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip {...tooltipStyle} />
               <Bar dataKey="value" radius={[6, 6, 0, 0]} isAnimationActive>
                 {bookingStatusData.map((entry) => (
-                  <Cell key={entry.raw} fill={STATUS_COLOR[entry.raw] ?? "#b8bfcc"} />
+                  <Cell key={entry.raw} fill={STATUS_COLOR[entry.raw] ?? "var(--chart-text, #b8bfcc)"} />
                 ))}
               </Bar>
             </BarChart>
@@ -314,7 +314,7 @@ function AdminInsights() {
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 12 }}>
             {bookingStatusData.map((e) => (
               <span key={e.raw} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-soft)" }}>
-                <span style={{ width: 10, height: 10, borderRadius: 2, background: STATUS_COLOR[e.raw] ?? "#b8bfcc", display: "inline-block" }} />
+                <span style={{ width: 10, height: 10, borderRadius: 2, background: STATUS_COLOR[e.raw] ?? "var(--chart-text, #b8bfcc)", display: "inline-block" }} />
                 {e.name}
               </span>
             ))}
@@ -324,13 +324,13 @@ function AdminInsights() {
         <ChartCard title="Support Level Distribution">
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={supportChartData} barSize={48} style={CHART_STYLE}>
-              <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.04)" />
-              <XAxis dataKey="name" tick={{ fill: "#b8bfcc", fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: "#b8bfcc", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <CartesianGrid vertical={false} stroke="var(--chart-grid, rgba(255,255,255,0.04))" />
+              <XAxis dataKey="name" tick={{ fill: "var(--chart-text, #b8bfcc)", fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "var(--chart-text, #b8bfcc)", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip {...tooltipStyle} />
               <Bar dataKey="value" radius={[6, 6, 0, 0]} isAnimationActive>
                 {supportChartData.map((entry) => (
-                  <Cell key={entry.name} fill={SUPPORT_COLOR[entry.name] ?? "#b8bfcc"} />
+                  <Cell key={entry.name} fill={SUPPORT_COLOR[entry.name] ?? "var(--chart-text, #b8bfcc)"} />
                 ))}
               </Bar>
             </BarChart>
@@ -359,9 +359,9 @@ function AdminInsights() {
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={trendData} style={CHART_STYLE}>
-              <CartesianGrid stroke="rgba(255,255,255,0.04)" />
-              <XAxis dataKey="date" tickFormatter={tickFormatter} tick={{ fill: "#b8bfcc", fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: "#b8bfcc", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <CartesianGrid stroke="var(--chart-grid, rgba(255,255,255,0.04))" />
+              <XAxis dataKey="date" tickFormatter={tickFormatter} tick={{ fill: "var(--chart-text, #b8bfcc)", fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "var(--chart-text, #b8bfcc)", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip {...tooltipStyle} labelFormatter={fmtDate} />
               <Line
                 type="monotone" dataKey="count"
@@ -375,9 +375,9 @@ function AdminInsights() {
         <ChartCard title="Published Content by Type">
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={cc} barSize={48} layout="vertical" style={CHART_STYLE}>
-              <CartesianGrid horizontal={false} stroke="rgba(255,255,255,0.04)" />
-              <XAxis type="number" tick={{ fill: "#b8bfcc", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
-              <YAxis type="category" dataKey="category" tick={{ fill: "#b8bfcc", fontSize: 12 }} axisLine={false} tickLine={false} width={60} />
+              <CartesianGrid horizontal={false} stroke="var(--chart-grid, rgba(255,255,255,0.04))" />
+              <XAxis type="number" tick={{ fill: "var(--chart-text, #b8bfcc)", fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <YAxis type="category" dataKey="category" tick={{ fill: "var(--chart-text, #b8bfcc)", fontSize: 12 }} axisLine={false} tickLine={false} width={60} />
               <Tooltip {...tooltipStyle} />
               <Bar dataKey="count" fill="var(--accent)" radius={[0, 6, 6, 0]} isAnimationActive />
             </BarChart>

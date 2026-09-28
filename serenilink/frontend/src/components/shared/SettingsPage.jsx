@@ -100,7 +100,7 @@ function SettingsPage({ role = "user" }) {
 
   const msgStyle = (msg) => ({
     fontSize: "13px", marginBottom: "14px",
-    color: msg.startsWith("success:") ? "#67d58c" : "#f08f8f",
+    color: msg.startsWith("success:") ? "var(--projection-success, #67d58c)" : "var(--projection-danger, #f08f8f)",
   });
   const msgText = (msg) => msg.replace(/^(success:|error:)/, "");
 
@@ -119,7 +119,7 @@ function SettingsPage({ role = "user" }) {
               <input
                 className="form-input" type="text"
                 value={user?.nickname || ""} readOnly
-                style={{ opacity: 0.5, cursor: "not-allowed" }}
+                style={{ opacity: "var(--read-content-opacity, 0.5)", cursor: "not-allowed" }}
               />
               <p style={{ margin: "6px 0 0", fontSize: "11px", color: "var(--text-muted)" }}>
                 Username cannot be changed. Contact support if needed.

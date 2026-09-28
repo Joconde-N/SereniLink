@@ -48,14 +48,14 @@ function ResetPassword() {
           <p className="login-subtext">{PASSWORD_HELP}</p>
 
           {!token ? (
-            <p style={{ color: "#eb5757", fontSize: 14 }}>Invalid reset link. Please request a new one.</p>
+            <p style={{ color: "var(--projection-danger, #eb5757)", fontSize: 14 }}>Invalid reset link. Please request a new one.</p>
           ) : success ? (
-            <p style={{ color: "#6fcf97", fontSize: 15 }}>
+            <p style={{ color: "var(--projection-success, #6fcf97)", fontSize: 15 }}>
               Password reset successfully! Redirecting to login...
             </p>
           ) : (
             <form onSubmit={handleSubmit}>
-              {error && <p style={{ color: "#eb5757", marginBottom: 14, fontSize: 14 }}>{error}</p>}
+              {error && <p style={{ color: "var(--projection-danger, #eb5757)", marginBottom: 14, fontSize: 14 }}>{error}</p>}
 
               <div className="login-field">
                 <label>New Password</label>

@@ -46,7 +46,7 @@ function BookingModal({ counselor, onClose, onBooked }) {
         </div>
 
         {error && (
-          <p style={{ color: "#f08f8f", fontSize: "13px", marginBottom: "14px", padding: "10px 14px", background: "rgba(239,68,68,0.08)", borderRadius: "10px" }}>
+          <p style={{ color: "var(--projection-danger, #f08f8f)", fontSize: "13px", marginBottom: "14px", padding: "10px 14px", background: "rgba(239,68,68,0.08)", borderRadius: "10px" }}>
             {error}
           </p>
         )}
@@ -163,7 +163,7 @@ function FindCounselors() {
       <p className="dashboard-page-subtitle">Browse available counselors and request a session.</p>
 
       {successMsg && (
-        <div style={{ marginBottom: "20px", padding: "12px 16px", borderRadius: "12px", background: "rgba(103,213,140,0.1)", color: "#67d58c", border: "1px solid rgba(103,213,140,0.2)" }}>
+        <div style={{ marginBottom: "20px", padding: "12px 16px", borderRadius: "12px", background: "rgba(103,213,140,0.1)", color: "var(--projection-success, #67d58c)", border: "1px solid rgba(103,213,140,0.2)" }}>
           {successMsg}
         </div>
       )}
@@ -190,7 +190,7 @@ function FindCounselors() {
         </select>
       </div>
 
-      {error && <p style={{ color: "#f08f8f", marginBottom: "16px" }}>{error}</p>}
+      {error && <p style={{ color: "var(--projection-danger, #f08f8f)", marginBottom: "16px" }}>{error}</p>}
 
       {loading && counselors.length === 0 ? (
         <div style={{ color: "var(--text-muted)", padding: "40px", textAlign: "center" }}>Loading counselors...</div>
@@ -249,11 +249,11 @@ function FindCounselors() {
                   onClick={() => setBooking(c)}
                   style={{
                     width: "100%", height: "38px", borderRadius: "10px", border: "none",
-                    background: "#a86955", color: "#fff", fontSize: "13px",
+                    background: "var(--projection-primary, #a86955)", color: "#fff", fontSize: "13px",
                     fontWeight: 600, cursor: "pointer", transition: "background 0.2s ease",
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "#c07a62"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "#a86955"; }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "var(--projection-primary-hover, #c07a62)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "var(--projection-primary, #a86955)"; }}
                 >
                   Book Session
                 </button>

@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
 
 const LEVEL_CONFIG = {
-  Low:      { color: "#67d58c", bg: "rgba(103,213,140,0.06)", border: "rgba(103,213,140,0.2)", icon: "🌿" },
-  Moderate: { color: "#f5c95f", bg: "rgba(245,201,95,0.06)",  border: "rgba(245,201,95,0.2)",  icon: "🌤️" },
-  High:     { color: "#f08f8f", bg: "rgba(240,143,143,0.06)", border: "rgba(240,143,143,0.2)", icon: "🆘" },
+  Low:      { color: "var(--projection-success, #67d58c)", bg: "rgba(103,213,140,0.06)", border: "rgba(103,213,140,0.2)", icon: "🌿" },
+  Moderate: { color: "var(--projection-warning, #f5c95f)", bg: "rgba(245,201,95,0.06)",  border: "rgba(245,201,95,0.2)",  icon: "🌤️" },
+  High:     { color: "var(--projection-danger, #f08f8f)", bg: "rgba(240,143,143,0.06)", border: "rgba(240,143,143,0.2)", icon: "🆘" },
 };
 
 function PatientRiskCard({ userId }) {
@@ -32,7 +32,7 @@ function PatientRiskCard({ userId }) {
         <h3 style={{ margin: 0, fontSize: 15 }}>Client Support Level</h3>
         <span style={{
           padding: "3px 12px", borderRadius: 999, fontSize: 12, fontWeight: 700,
-          background: `${cfg.color}22`, color: cfg.color,
+          background: `color-mix(in srgb, ${cfg.color} 13.333%, transparent)`, color: cfg.color,
         }}>
           {cfg.icon} {data.support_level}
         </span>
@@ -78,7 +78,7 @@ function PatientRiskCard({ userId }) {
 
       {data.support_level === "High" && (
         <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 10, background: "rgba(240,143,143,0.1)", border: "1px solid rgba(240,143,143,0.25)" }}>
-          <p style={{ margin: 0, fontSize: 13, color: "#f08f8f", fontWeight: 600 }}>
+          <p style={{ margin: 0, fontSize: 13, color: "var(--projection-danger, #f08f8f)", fontWeight: 600 }}>
             🆘 This client may need urgent support. Consider prioritizing their session.
           </p>
         </div>

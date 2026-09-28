@@ -223,7 +223,7 @@
   margin-bottom: 30px;
   border: none;
   border-radius: 10px;
-  background: #a86955;
+  background: var(--projection-primary, #a86955);
   color: #ffffff;
   font-size: 17px;
   font-weight: 700;
@@ -281,11 +281,11 @@ body.light .register-topbar {
 }
 
 body.light .register-brand {
-  color: #6b6259;
+  color: var(--text-muted);
 }
 
 body.light .register-back {
-  color: #57504a;
+  color: var(--text-soft);
 }
 
 body.light .register-right {
@@ -297,26 +297,26 @@ body.light .register-form-box h2 {
 }
 
 body.light .register-subtext {
-  color: #6b6259;
+  color: var(--text-muted);
 }
 
 body.light .register-field label,
 body.light .register-terms {
-  color: #57504a;
+  color: var(--text-soft);
 }
 
 body.light .register-field input {
-  background: #f4eee5;
+  background: var(--bg-panel);
   color: #2b2521;
-  border: 1px solid rgba(70, 52, 42, 0.14);
+  border: 1px solid var(--control-border);
 }
 
 body.light .register-field input::placeholder {
-  color: #7a7168;
+  color: var(--text-muted);
 }
 
 body.light .register-subtext a {
-  color: #a86955;
+  color: var(--accent);
 }
 
 body.light .register-image-overlay {

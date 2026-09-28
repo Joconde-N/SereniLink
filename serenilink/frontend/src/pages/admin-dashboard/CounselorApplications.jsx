@@ -12,9 +12,9 @@ function toProtectedUrl(uploadPath) {
 }
 
 const STATUS_STYLE = {
-  PENDING:  { color: "#f5c95f", bg: "rgba(245,201,95,0.1)"  },
-  APPROVED: { color: "#67d58c", bg: "rgba(103,213,140,0.1)" },
-  REJECTED: { color: "#f08f8f", bg: "rgba(240,143,143,0.1)" },
+  PENDING:  { color: "var(--projection-warning, #f5c95f)", bg: "rgba(245,201,95,0.1)"  },
+  APPROVED: { color: "var(--projection-success, #67d58c)", bg: "rgba(103,213,140,0.1)" },
+  REJECTED: { color: "var(--projection-danger, #f08f8f)", bg: "rgba(240,143,143,0.1)" },
 };
 
 const TABS = ["ALL", "PENDING", "APPROVED", "REJECTED"];
@@ -206,14 +206,14 @@ function DetailsModal({ app, onClose, onAction, acting }) {
             <button
               disabled={!!acting}
               onClick={() => onAction(app.id, "approve")}
-              style={{ flex: 1, height: 44, borderRadius: 999, border: "1px solid rgba(103,213,140,0.4)", background: "rgba(103,213,140,0.08)", color: "#67d58c", fontWeight: 700, fontSize: 14, cursor: acting ? "not-allowed" : "pointer", opacity: acting ? 0.6 : 1 }}
+              style={{ flex: 1, height: 44, borderRadius: 999, border: "1px solid rgba(103,213,140,0.4)", background: "rgba(103,213,140,0.08)", color: "var(--projection-success, #67d58c)", fontWeight: 700, fontSize: 14, cursor: acting ? "not-allowed" : "pointer", opacity: acting ? 0.6 : 1 }}
             >
               {acting === "approve" ? "Approving…" : "✓  Approve"}
             </button>
             <button
               disabled={!!acting}
               onClick={() => onAction(app.id, "reject")}
-              style={{ flex: 1, height: 44, borderRadius: 999, border: "1px solid rgba(240,143,143,0.4)", background: "rgba(240,143,143,0.08)", color: "#f08f8f", fontWeight: 700, fontSize: 14, cursor: acting ? "not-allowed" : "pointer", opacity: acting ? 0.6 : 1 }}
+              style={{ flex: 1, height: 44, borderRadius: 999, border: "1px solid rgba(240,143,143,0.4)", background: "rgba(240,143,143,0.08)", color: "var(--projection-danger, #f08f8f)", fontWeight: 700, fontSize: 14, cursor: acting ? "not-allowed" : "pointer", opacity: acting ? 0.6 : 1 }}
             >
               {acting === "reject" ? "Rejecting…" : "✕  Reject"}
             </button>
@@ -263,7 +263,7 @@ function CounselorApplications() {
       <p className="dashboard-page-subtitle">Review and approve or reject counselor applications.</p>
 
       {msg && (
-        <div style={{ marginBottom: 16, padding: "12px 16px", borderRadius: 12, background: "rgba(103,213,140,0.1)", color: "#67d58c", border: "1px solid rgba(103,213,140,0.2)" }}>
+        <div style={{ marginBottom: 16, padding: "12px 16px", borderRadius: 12, background: "rgba(103,213,140,0.1)", color: "var(--projection-success, #67d58c)", border: "1px solid rgba(103,213,140,0.2)" }}>
           {msg}
         </div>
       )}
@@ -334,14 +334,14 @@ function CounselorApplications() {
                             <button
                               title="Approve"
                               onClick={() => handleAction(app.id, "approve")}
-                              style={{ width: 32, height: 32, borderRadius: "50%", border: "2px solid #67d58c", background: "transparent", color: "#67d58c", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                              style={{ width: 32, height: 32, borderRadius: "50%", border: "2px solid #67d58c", background: "transparent", color: "var(--projection-success, #67d58c)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
                             >
                               <LuCheck size={15} />
                             </button>
                             <button
                               title="Reject"
                               onClick={() => handleAction(app.id, "reject")}
-                              style={{ width: 32, height: 32, borderRadius: "50%", border: "2px solid #f08f8f", background: "transparent", color: "#f08f8f", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                              style={{ width: 32, height: 32, borderRadius: "50%", border: "2px solid #f08f8f", background: "transparent", color: "var(--projection-danger, #f08f8f)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
                             >
                               <LuX size={15} />
                             </button>

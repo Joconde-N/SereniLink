@@ -8,11 +8,11 @@ import { IoMdClose } from "react-icons/io";
 import api from "../../api/axios";
 
 const TYPE_META = {
-  BREATHING:     { bg: "rgba(103,213,140,0.08)", border: "rgba(103,213,140,0.22)", text: "#67d58c",  label: "Breathing",     Icon: MdAir },
-  GROUNDING:     { bg: "rgba(202,163,143,0.08)", border: "rgba(202,163,143,0.22)", text: "#E19A86",  label: "Grounding",     Icon: GiMeditation },
-  JOURNAL:       { bg: "rgba(147,112,219,0.08)", border: "rgba(147,112,219,0.22)", text: "#b39ddb",  label: "Journal",       Icon: RiQuillPenLine },
-  REFLECTION:    { bg: "rgba(126,184,247,0.08)", border: "rgba(126,184,247,0.22)", text: "#7eb8f7",  label: "Reflection",    Icon: RiMentalHealthLine },
-  VISUALIZATION: { bg: "rgba(245,201,95,0.08)",  border: "rgba(245,201,95,0.22)",  text: "#f5c95f",  label: "Visualization", Icon: MdOutlineSelfImprovement },
+  BREATHING:     { bg: "rgba(103,213,140,0.08)", border: "rgba(103,213,140,0.22)", text: "var(--projection-success, #67d58c)",  label: "Breathing",     Icon: MdAir },
+  GROUNDING:     { bg: "rgba(202,163,143,0.08)", border: "rgba(202,163,143,0.22)", text: "var(--accent, #E19A86)",  label: "Grounding",     Icon: GiMeditation },
+  JOURNAL:       { bg: "rgba(147,112,219,0.08)", border: "rgba(147,112,219,0.22)", text: "var(--projection-purple, #b39ddb)",  label: "Journal",       Icon: RiQuillPenLine },
+  REFLECTION:    { bg: "rgba(126,184,247,0.08)", border: "rgba(126,184,247,0.22)", text: "var(--projection-info, #7eb8f7)",  label: "Reflection",    Icon: RiMentalHealthLine },
+  VISUALIZATION: { bg: "rgba(245,201,95,0.08)",  border: "rgba(245,201,95,0.22)",  text: "var(--projection-warning, #f5c95f)",  label: "Visualization", Icon: MdOutlineSelfImprovement },
 };
 
 function fmtTime(sec) {
@@ -61,7 +61,7 @@ function ExerciseModal({ ex, onClose, onMarkDone, isDone }) {
       style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.72)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}
     >
       <div style={{ background: "linear-gradient(160deg, var(--bg-panel) 0%, var(--bg-panel-2) 100%)", border: `1px solid ${meta.border}`, borderRadius: "24px", padding: "32px", width: "100%", maxWidth: "520px", boxShadow: "0 24px 80px rgba(0,0,0,0.5)", position: "relative", maxHeight: "90vh", overflowY: "auto" }}>
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: `linear-gradient(90deg, ${meta.text}88, transparent)`, borderRadius: "24px 24px 0 0" }} />
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: `linear-gradient(90deg, color-mix(in srgb, ${meta.text} 53.333%, transparent), transparent)`, borderRadius: "24px 24px 0 0" }} />
 
         <button type="button" onClick={onClose} style={{ position: "absolute", top: "16px", right: "16px", background: "var(--notif-bell-bg)", border: "1px solid var(--border-soft)", borderRadius: "8px", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--text-soft)" }}>
           <IoMdClose size={16} />
@@ -81,16 +81,16 @@ function ExerciseModal({ ex, onClose, onMarkDone, isDone }) {
           <div style={{ position: "relative", width: "110px", height: "110px" }}>
             <svg width="110" height="110" style={{ transform: "rotate(-90deg)" }}>
               <circle cx="55" cy="55" r="44" fill="none" stroke="var(--border-soft)" strokeWidth="6" />
-              <circle cx="55" cy="55" r="44" fill="none" stroke={finished ? "#67d58c" : meta.text} strokeWidth="6" strokeDasharray={circumference} strokeDashoffset={circumference - (circumference * progress) / 100} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.9s linear, stroke 0.4s ease" }} />
+              <circle cx="55" cy="55" r="44" fill="none" stroke={finished ? "var(--projection-success, #67d58c)" : meta.text} strokeWidth="6" strokeDasharray={circumference} strokeDashoffset={circumference - (circumference * progress) / 100} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.9s linear, stroke 0.4s ease" }} />
             </svg>
             <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-              <div style={{ fontSize: "26px", fontWeight: 700, color: finished ? "#67d58c" : "var(--text-main)", fontVariantNumeric: "tabular-nums" }}>{finished ? "✓" : fmtTime(timeLeft)}</div>
+              <div style={{ fontSize: "26px", fontWeight: 700, color: finished ? "var(--projection-success, #67d58c)" : "var(--text-main)", fontVariantNumeric: "tabular-nums" }}>{finished ? "✓" : fmtTime(timeLeft)}</div>
               <div style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "2px" }}>{finished ? "Complete" : `of ${fmtDuration(ex.durationSec)}`}</div>
             </div>
           </div>
           <div style={{ display: "flex", gap: "10px", marginTop: "18px" }}>
             {!finished && (
-              <button type="button" onClick={() => setRunning(r => !r)} style={{ height: "34px", padding: "0 20px", borderRadius: "9px", border: "none", background: running ? "rgba(202,163,143,0.18)" : "#a86955", color: running ? "#E19A86" : "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
+              <button type="button" onClick={() => setRunning(r => !r)} style={{ height: "34px", padding: "0 20px", borderRadius: "9px", border: "none", background: running ? "rgba(202,163,143,0.18)" : "var(--projection-primary, #a86955)", color: running ? "#E19A86" : "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
                 {running ? "Pause" : timeLeft < ex.durationSec ? "Resume" : "Start Timer"}
               </button>
             )}
@@ -104,7 +104,7 @@ function ExerciseModal({ ex, onClose, onMarkDone, isDone }) {
           {ex.instructions}
         </div>
 
-        <button type="button" onClick={() => { onMarkDone(ex.id); onClose(); }} style={{ width: "100%", height: "40px", borderRadius: "10px", border: `1px solid ${isDone ? "rgba(103,213,140,0.4)" : "var(--border-soft)"}`, background: isDone ? "rgba(103,213,140,0.1)" : "transparent", color: isDone ? "#67d58c" : "var(--text-soft)", fontSize: "13px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px" }}>
+        <button type="button" onClick={() => { onMarkDone(ex.id); onClose(); }} style={{ width: "100%", height: "40px", borderRadius: "10px", border: `1px solid ${isDone ? "rgba(103,213,140,0.4)" : "var(--border-soft)"}`, background: isDone ? "rgba(103,213,140,0.1)" : "transparent", color: isDone ? "var(--projection-success, #67d58c)" : "var(--text-soft)", fontSize: "13px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px" }}>
           <IoCheckmarkCircleOutline size={16} />
           {isDone ? "Marked as Done — Undo" : "Mark as Done"}
         </button>
@@ -119,11 +119,11 @@ function ExerciseCard({ ex, isDone, onToggleDone, onOpen }) {
 
   return (
     <div
-      style={{ background: "linear-gradient(160deg, var(--bg-panel) 0%, var(--bg-panel-2) 100%)", border: "1px solid var(--border-soft)", borderRadius: "20px", padding: "20px", boxShadow: "0 6px 28px rgba(0,0,0,0.22)", display: "flex", flexDirection: "column", transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease", opacity: isDone ? 0.65 : 1, position: "relative", overflow: "hidden" }}
+      style={{ background: "linear-gradient(160deg, var(--bg-panel) 0%, var(--bg-panel-2) 100%)", border: "1px solid var(--border-soft)", borderRadius: "20px", padding: "20px", boxShadow: "0 6px 28px rgba(0,0,0,0.22)", display: "flex", flexDirection: "column", transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease", opacity: isDone ? "var(--read-content-opacity, 0.65)" : 1, position: "relative", overflow: "hidden" }}
       onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 14px 40px rgba(0,0,0,0.32)"; e.currentTarget.style.borderColor = meta.border; }}
       onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 6px 28px rgba(0,0,0,0.22)"; e.currentTarget.style.borderColor = "var(--border-soft)"; }}
     >
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: `linear-gradient(90deg, ${meta.text}55, transparent)`, borderRadius: "20px 20px 0 0" }} />
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: `linear-gradient(90deg, color-mix(in srgb, ${meta.text} 33.333%, transparent), transparent)`, borderRadius: "20px 20px 0 0" }} />
 
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "8px", marginBottom: "8px" }}>
         <h3 style={{ margin: 0, fontSize: "15px", fontWeight: 700, color: "var(--text-main)", lineHeight: 1.3 }}>{ex.title}</h3>
@@ -138,13 +138,13 @@ function ExerciseCard({ ex, isDone, onToggleDone, onOpen }) {
       </div>
 
       <div style={{ display: "flex", gap: "8px", marginTop: "auto" }}>
-        <button type="button" onClick={() => onOpen(ex)} style={{ flex: 1, height: "34px", borderRadius: "9px", border: "none", background: "#a86955", color: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}
-          onMouseEnter={e => { e.currentTarget.style.background = "#c07a62"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "#a86955"; }}
+        <button type="button" onClick={() => onOpen(ex)} style={{ flex: 1, height: "34px", borderRadius: "9px", border: "none", background: "var(--projection-primary, #a86955)", color: "#fff", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}
+          onMouseEnter={e => { e.currentTarget.style.background = "var(--projection-primary-hover, #c07a62)"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "var(--projection-primary, #a86955)"; }}
         >
           Start Exercise
         </button>
-        <button type="button" onClick={() => onToggleDone(ex.id)} style={{ flex: 1, height: "34px", borderRadius: "9px", border: `1px solid ${isDone ? "rgba(103,213,140,0.35)" : "var(--border-soft)"}`, background: isDone ? "rgba(103,213,140,0.08)" : "transparent", color: isDone ? "#67d58c" : "var(--text-soft)", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
+        <button type="button" onClick={() => onToggleDone(ex.id)} style={{ flex: 1, height: "34px", borderRadius: "9px", border: `1px solid ${isDone ? "rgba(103,213,140,0.35)" : "var(--border-soft)"}`, background: isDone ? "rgba(103,213,140,0.08)" : "transparent", color: isDone ? "var(--projection-success, #67d58c)" : "var(--text-soft)", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
           {isDone ? "Undo" : "Mark Done"}
         </button>
       </div>
@@ -195,7 +195,7 @@ function Exercises() {
       <p className="dashboard-page-subtitle">
         Practice simple coping exercises anytime you need support.
         {doneCount > 0 && (
-          <span style={{ marginLeft: "12px", color: "#67d58c", fontSize: "14px" }}>
+          <span style={{ marginLeft: "12px", color: "var(--projection-success, #67d58c)", fontSize: "14px" }}>
             <IoCheckmarkCircleOutline size={13} style={{ verticalAlign: "middle", marginRight: "3px" }} />
             {doneCount} completed
           </span>

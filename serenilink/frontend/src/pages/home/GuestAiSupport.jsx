@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { LuBot, LuSendHorizontal, LuMinimize2 } from "react-icons/lu";
 import api from "../../api/axios";
 
-const RISK_COLOR = { MODERATE: "#f5c95f", HIGH: "#f08f8f" };
+const RISK_COLOR = { MODERATE: "var(--projection-warning, #f5c95f)", HIGH: "var(--projection-danger, #f08f8f)" };
 const MAX = 5;
 
 function getGuestId() {
@@ -88,7 +88,7 @@ function GuestAiSupport() {
           SereniLink
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <Link to="/register" style={{ height: "34px", padding: "0 16px", borderRadius: "9px", background: "#a86955", color: "#fff", fontSize: "13px", fontWeight: 600, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>
+          <Link to="/register" style={{ height: "34px", padding: "0 16px", borderRadius: "9px", background: "var(--projection-primary, #a86955)", color: "#fff", fontSize: "13px", fontWeight: 600, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>
             Sign Up Free
           </Link>
           <Link to="/login" style={{ height: "34px", padding: "0 16px", borderRadius: "9px", border: "1px solid var(--border-soft, rgba(176,176,176,0.15))", background: "transparent", color: "var(--text-soft, #b8bfcc)", fontSize: "13px", fontWeight: 600, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>
@@ -100,7 +100,7 @@ function GuestAiSupport() {
       {/* Crisis banner */}
       <div style={{
         background: "rgba(220,80,80,0.08)", borderBottom: "1px solid rgba(220,80,80,0.12)",
-        padding: "9px 32px", color: "#f08f8f", fontSize: "13px",
+        padding: "9px 32px", color: "var(--projection-danger, #f08f8f)", fontSize: "13px",
         textAlign: "center", flexShrink: 0,
       }}>
         <strong>Crisis or emergency?</strong> Call <strong>112</strong> or <strong>114</strong> immediately.
@@ -115,7 +115,7 @@ function GuestAiSupport() {
             background: "rgba(240,143,143,0.12)", border: "1px solid rgba(240,143,143,0.35)",
             display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap",
           }}>
-            <p style={{ margin: 0, color: "#f08f8f", fontSize: 14, lineHeight: 1.5 }}>
+            <p style={{ margin: 0, color: "var(--projection-danger, #f08f8f)", fontSize: 14, lineHeight: 1.5 }}>
               Extra support may help. Log in to book a counselor session. This is not a medical diagnosis.
             </p>
             <Link
@@ -154,7 +154,7 @@ function GuestAiSupport() {
               </div>
               <div>
                 <p style={{ margin: 0, fontWeight: 700, fontSize: "14px", color: "var(--text-main, #f4f4f4)" }}>SereniLink AI</p>
-                <p style={{ margin: 0, fontSize: "11px", color: messagesLeft > 1 ? "#67d58c" : "#f5c95f" }}>
+                <p style={{ margin: 0, fontSize: "11px", color: messagesLeft > 1 ? "var(--projection-success, #67d58c)" : "var(--projection-warning, #f5c95f)" }}>
                   {messagesLeft} free message{messagesLeft !== 1 ? "s" : ""} left ·{" "}
                   <Link to="/register" style={{ color: "var(--accent, #E19A86)", textDecoration: "none" }}>Sign up for unlimited</Link>
                 </p>
@@ -259,13 +259,13 @@ function GuestAiSupport() {
               <div style={{ background: "var(--accent-bg, rgba(202,163,143,0.08))", border: "1px solid var(--border-soft, rgba(202,163,143,0.18))", borderRadius: "14px", padding: "16px", textAlign: "center" }}>
                 <p style={{ margin: "0 0 12px", color: "var(--text-main, #f4f4f4)", fontSize: "14px" }}>You've used all {MAX} free messages.</p>
                 <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
-                  <Link to="/register" style={{ height: "38px", padding: "0 20px", borderRadius: "10px", background: "#a86955", color: "#fff", fontSize: "13px", fontWeight: 600, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>Create Free Account</Link>
+                  <Link to="/register" style={{ height: "38px", padding: "0 20px", borderRadius: "10px", background: "var(--projection-primary, #a86955)", color: "#fff", fontSize: "13px", fontWeight: 600, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>Create Free Account</Link>
                   <Link to="/login" style={{ height: "38px", padding: "0 20px", borderRadius: "10px", border: "1px solid var(--border-soft, rgba(176,176,176,0.15))", background: "transparent", color: "var(--text-soft, #b8bfcc)", fontSize: "13px", fontWeight: 600, display: "inline-flex", alignItems: "center", textDecoration: "none" }}>Log In</Link>
                 </div>
               </div>
             ) : (
               <>
-                {error && <p style={{ color: "#f08f8f", fontSize: "12px", marginBottom: "8px" }}>{error}</p>}
+                {error && <p style={{ color: "var(--projection-danger, #f08f8f)", fontSize: "12px", marginBottom: "8px" }}>{error}</p>}
                 <div style={{
                   display: "flex", gap: "10px", alignItems: "center",
                   background: "var(--notif-bell-bg, rgba(255,255,255,0.04))", border: "1px solid var(--border-soft, rgba(255,255,255,0.09))",

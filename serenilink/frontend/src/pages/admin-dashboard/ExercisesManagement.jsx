@@ -3,11 +3,11 @@ import api from "../../api/axios";
 
 const EMPTY_FORM = { title: "", type: "", description: "", instructions: "", duration_sec: "", is_active: true };
 const CATEGORY_STYLE = {
-  BREATHING:     { color: "#67d58c", bg: "rgba(103,213,140,0.1)" },
-  GROUNDING:     { color: "#E19A86", bg: "rgba(202,163,143,0.1)" },
-  REFLECTION:    { color: "#7eb8f7", bg: "rgba(126,184,247,0.1)" },
-  JOURNAL:       { color: "#b39ddb", bg: "rgba(147,112,219,0.1)" },
-  VISUALIZATION: { color: "#f5c95f", bg: "rgba(245,201,95,0.1)"  },
+  BREATHING:     { color: "var(--projection-success, #67d58c)", bg: "rgba(103,213,140,0.1)" },
+  GROUNDING:     { color: "var(--accent, #E19A86)", bg: "rgba(202,163,143,0.1)" },
+  REFLECTION:    { color: "var(--projection-info, #7eb8f7)", bg: "rgba(126,184,247,0.1)" },
+  JOURNAL:       { color: "var(--projection-purple, #b39ddb)", bg: "rgba(147,112,219,0.1)" },
+  VISUALIZATION: { color: "var(--projection-warning, #f5c95f)", bg: "rgba(245,201,95,0.1)"  },
 };
 const TYPES = ["BREATHING", "GROUNDING", "REFLECTION", "JOURNAL", "VISUALIZATION"];
 
@@ -95,7 +95,7 @@ export default function ExercisesManagement() {
 
       {/* Flash message */}
       {msg && (
-        <div style={{ marginBottom: 16, padding: "12px 16px", borderRadius: 12, background: msg.ok ? "rgba(103,213,140,0.1)" : "rgba(239,68,68,0.1)", color: msg.ok ? "#67d58c" : "#f08f8f", border: `1px solid ${msg.ok ? "rgba(103,213,140,0.2)" : "rgba(239,68,68,0.2)"}` }}>
+        <div style={{ marginBottom: 16, padding: "12px 16px", borderRadius: 12, background: msg.ok ? "rgba(103,213,140,0.1)" : "rgba(239,68,68,0.1)", color: msg.ok ? "var(--projection-success, #67d58c)" : "var(--projection-danger, #f08f8f)", border: `1px solid ${msg.ok ? "rgba(103,213,140,0.2)" : "rgba(239,68,68,0.2)"}` }}>
           {msg.text}
         </div>
       )}
@@ -226,7 +226,7 @@ export default function ExercisesManagement() {
 
                   {/* Status */}
                   <td style={{ padding: "14px" }}>
-                    <span style={{ padding: "3px 10px", borderRadius: 999, fontSize: 12, fontWeight: 600, color: item.is_active ? "#67d58c" : "#f08f8f", background: item.is_active ? "rgba(103,213,140,0.1)" : "rgba(240,143,143,0.1)" }}>
+                    <span style={{ padding: "3px 10px", borderRadius: 999, fontSize: 12, fontWeight: 600, color: item.is_active ? "var(--projection-success, #67d58c)" : "var(--projection-danger, #f08f8f)", background: item.is_active ? "rgba(103,213,140,0.1)" : "rgba(240,143,143,0.1)" }}>
                       {item.is_active ? "Active" : "Inactive"}
                     </span>
                   </td>
@@ -242,7 +242,7 @@ export default function ExercisesManagement() {
                       </button>
                       <button
                         onClick={() => toggleActive(item)}
-                        style={{ padding: "5px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", border: `1px solid ${item.is_active ? "rgba(240,143,143,0.3)" : "rgba(103,213,140,0.3)"}`, background: "transparent", color: item.is_active ? "#f08f8f" : "#67d58c", whiteSpace: "nowrap" }}
+                        style={{ padding: "5px 12px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", border: `1px solid ${item.is_active ? "rgba(240,143,143,0.3)" : "rgba(103,213,140,0.3)"}`, background: "transparent", color: item.is_active ? "var(--projection-danger, #f08f8f)" : "var(--projection-success, #67d58c)", whiteSpace: "nowrap" }}
                       >
                         {item.is_active ? "Deactivate" : "Activate"}
                       </button>

@@ -154,7 +154,7 @@ export default function CounselorProfile() {
       </div>
 
       {msg.text && (
-        <p style={{ color: msg.ok ? "#67d58c" : "#f08f8f", marginBottom: 20, fontSize: 14, padding: "12px 16px", background: "rgba(255,255,255,0.04)", borderRadius: 12 }}>
+        <p style={{ color: msg.ok ? "var(--projection-success, #67d58c)" : "var(--projection-danger, #f08f8f)", marginBottom: 20, fontSize: 14, padding: "12px 16px", background: "rgba(255,255,255,0.04)", borderRadius: 12 }}>
           {msg.text}
         </p>
       )}
@@ -342,8 +342,8 @@ export default function CounselorProfile() {
             <h3 style={{ marginBottom: 16 }}>Account Status</h3>
             <div className="list-stack">
               {[
-                { label: "Status", value: d.application_status, color: "#67d58c" },
-                { label: "Active", value: d.is_active ? "Yes" : "No", color: d.is_active ? "#67d58c" : "#f08f8f" },
+                { label: "Status", value: d.application_status, color: "var(--projection-success, #67d58c)" },
+                { label: "Active", value: d.is_active ? "Yes" : "No", color: d.is_active ? "var(--projection-success, #67d58c)" : "var(--projection-danger, #f08f8f)" },
                 { label: "Username", value: user?.nickname, color: "var(--text-soft)" },
                 { label: "Role", value: user?.role, color: "var(--accent)" },
               ].map(({ label, value, color }) => (
@@ -410,7 +410,7 @@ export default function CounselorProfile() {
               ].map(({ label, active }) => (
                 <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid var(--border-faint)" }}>
                   <span style={{ fontSize: 14, color: "var(--text-soft)" }}>{label}</span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: active ? "#67d58c" : "var(--text-muted)" }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: active ? "var(--projection-success, #67d58c)" : "var(--text-muted)" }}>
                     {active ? "Available" : "Not offered"}
                   </span>
                 </div>

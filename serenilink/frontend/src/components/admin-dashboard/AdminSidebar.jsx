@@ -58,7 +58,7 @@ function AdminSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
         roleLabel="Admin"
-        roleColor="#f5c95f"
+        roleColor="var(--projection-warning, #f5c95f)"
       />
       <aside className={`dashboard-sidebar ${collapsed ? "collapsed" : ""}`}>
       <div className="sidebar-top">
@@ -88,7 +88,7 @@ function AdminSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
             <p style={{ margin: 0, fontWeight: 600, fontSize: "14px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
               {user.nickname}
             </p>
-            <p style={{ margin: 0, fontSize: "11px", color: "#f5c95f" }}>Admin</p>
+            <p style={{ margin: 0, fontSize: "11px", color: "var(--projection-warning, #f5c95f)" }}>Admin</p>
           </div>
         </div>
       )}

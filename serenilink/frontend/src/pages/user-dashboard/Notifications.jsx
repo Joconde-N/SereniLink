@@ -60,7 +60,7 @@ function Notifications() {
       {loading ? (
         <div style={{ color: "var(--text-muted)", padding: "40px" }}>Loading notifications...</div>
       ) : error ? (
-        <div style={{ color: "#f08f8f", padding: "20px" }}>{error}</div>
+        <div style={{ color: "var(--projection-danger, #f08f8f)", padding: "20px" }}>{error}</div>
       ) : (
         <div className="dashboard-card">
           {notifications.length === 0 ? (
@@ -73,7 +73,7 @@ function Notifications() {
                 <div
                   key={item.id}
                   className={`simple-item notification-item ${!item.is_read ? "unread" : ""}`}
-                  style={{ opacity: item.is_read ? 0.65 : 1 }}
+                  style={{ opacity: item.is_read ? "var(--read-content-opacity, 0.65)" : 1 }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                     <div style={{ flex: 1 }}>

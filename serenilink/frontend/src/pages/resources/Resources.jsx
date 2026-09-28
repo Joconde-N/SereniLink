@@ -232,7 +232,7 @@ function Resources() {
             <button
               onClick={() => fetchContent(skip, true, search, activeTab)}
               disabled={loading}
-              style={{ background: "transparent", border: "none", color: "#E19A86", padding: "8px 0", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
+              style={{ background: "transparent", border: "none", color: "var(--accent, #E19A86)", padding: "8px 0", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
             >
               {loading ? "Loading..." : <>{"View More"} <LuArrowRight size={14} /></>}
             </button>
