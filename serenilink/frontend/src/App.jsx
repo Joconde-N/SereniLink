@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 
 import ProtectedRoute from "./components/shared/ProtectedRoute";
+import PublicOnlyRoute from "./components/shared/PublicOnlyRoute";
 import ErrorBoundary from "./components/shared/ErrorBoundary";
 
 // Public layout
@@ -68,9 +69,15 @@ function App() {
   return (
     <ErrorBoundary>
       <Routes>
-        {/* Public */}
         <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
+          <Route
+              index
+              element={
+                <PublicOnlyRoute>
+                  <Home />
+                </PublicOnlyRoute>
+              }
+          />
           <Route path="about" element={<About />} />
           <Route path="counselors" element={<Counselors />} />
           <Route path="resources" element={<Resources />} />
@@ -82,7 +89,7 @@ function App() {
         <Route path="/counselor-application" element={<CounselorApplication />} />
         <Route path="/guest-ai" element={<GuestAiSupport />} />
 
-        {/* User Dashboard — login required, role user (or any authenticated user for now) */}
+        {/* User Dashboard — login required, role user */}
         <Route
           path="/dashboard"
           element={
